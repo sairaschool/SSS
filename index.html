@@ -1,1 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saira School Management System - Multi-Branch Admin ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .login-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+        }
+        /* Professional ID Card Styling */
+        .id-card {
+            width: 330px;
+            border: 2px solid #1e3a8a;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+        .id-card-watermark {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 170px;
+            height: 170px;
+            object-fit: contain;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .id-card-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+            color: white;
+            padding: 12px 14px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .id-card-body {
+            padding: 14px 16px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .id-card-photo {
+            width: 86px;
+            height: 86px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #e0e7ff;
+            margin: 0 auto 8px;
+            background: #f8fafc;
+        }
+        .id-card-details {
+            text-align: left;
+            font-size: 11.5px;
+            line-height: 1.55;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: rgba(248, 250, 252, 0.75);
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .id-card-details p {
+            margin: 2px 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .id-card-details p span.label {
+            color: #64748b;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .id-card-details p span.val {
+            color: #1e293b;
+            font-weight: 700;
+            text-align: right;
+            word-break: break-word;
+        }
+        #qrcode img, #qrcode canvas {
+            margin: 0 auto !important;
+            width: 96px !important;
+            height: 96px !important;
+            padding: 4px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        /* STRICT SINGLE-PAGE PRINT RULES */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+            html, body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            /* Hide everything by default during print */
+            body > * {
+                display: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Only display the active print modal */
+            body.printing-idcard #idcard-modal,
+            body.printing-voucher #voucher-modal,
+            body.printing-reportcard #reportcard-modal {
+                display: flex !important;
+                position: static !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+                align-items: flex-start !important;
+                justify-content: center !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            .print-container {
+                box-shadow: none !important;
+                margin: 15px auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen">
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="login-screen" class="fixed inset-0 login-bg flex items-center justify-center z-[100] p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-6">
+            <div class="text-center">
+                <div id="login-logo-box" class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden border-2 border-indigo-200">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-indigo-700"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-indigo-900" id="login-school-name">Saira Public School</h1>
+                <p class="text-sm text-slate-500 mt-1">Multi-Branch Admin ERP Login</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Admin Password</label>
+                    <input type="password" id="admin-password" placeholder="Enter admin password" required class="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <p class="text-xs text-slate-400 mt-1">Default Password: <strong>admin123</strong></p>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition shadow">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i>Login as Admin
+                </button>
+            </form>
+
+            <p id="login-error" class="text-sm text-rose-600 text-center font-medium hidden"></p>
+            <p class="text-xs text-center text-slate-400 pt-2 border-t">Teachers → use <strong>teacher.html</strong> &nbsp;|&nbsp; Students → use <strong>student.html</strong></p>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN APP ==================== -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col no-print">
+
+        <!-- Top Navigation Bar -->
+        <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center space-x-3">
+                    <div id="nav-logo-container" class="w-11 h-11 bg-white rounded-full flex items-center overflow-hidden justify-center text-indigo-900 font-bold border-2 border-indigo-300">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 id="nav-school-name" class="text-lg font-bold tracking-wide leading-tight">Saira Public School</h1>
+                        <p id="nav-branch-subtitle" class="text-xs text-indigo-200">Head Office (All Branches)</p>
+                    </div>
+                </div>
+
+                <!-- Multi-Branch Selector + Action Buttons -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div class="flex items-center bg-indigo-800 rounded-lg px-2.5 py-1 border border-indigo-600">
+                        <i class="fa-solid fa-code-branch text-indigo-300 text-xs mr-2"></i>
+                        <select id="branch-selector" onchange="handleBranchChange(this.value)" class="bg-transparent text-white text-xs sm:text-sm font-medium outline-none cursor-pointer">
+                            <!-- Rendered dynamically -->
+                        </select>
+                        <button onclick="openBranchModal()" title="Add / Manage Branches" class="ml-2 text-indigo-200 hover:text-white text-xs px-1.5 py-0.5 bg-indigo-700 rounded">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <span id="db-status-badge" class="text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-semibold">
+                        <i class="fa-solid fa-database mr-1"></i>Local + Cloud Ready
+                    </span>
+
+                    <button onclick="openSettingsModal()" class="bg-indigo-800 hover:bg-indigo-700 px-3 py-1.5 rounded text-sm font-medium transition flex items-center space-x-1">
+                        <i class="fa-solid fa-gear"></i><span class="hidden sm:inline">Settings</span>
+                    </button>
+                    <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 px-3 py-1.5 rounded text-sm font-medium transition flex items-center space-x-1">
+                        <i class="fa-solid fa-right-from-bracket"></i><span class="hidden sm:inline">Logout</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full grid grid-cols-1 md:grid-cols-5 gap-6">
+
+            <!-- Sidebar Navigation -->
+            <aside class="md:col-span-1 bg-white rounded-xl shadow-sm p-3 h-fit space-y-1.5 border border-slate-200" id="sidebar">
+                <!-- Rendered dynamically -->
+            </aside>
+
+            <!-- Content Area -->
+            <main class="md:col-span-4 space-y-6">
+
+                <!-- DASHBOARD TAB -->
+                <section id="tab-dashboard" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboard-stats"></div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">Welcome, Administrator</h2>
+                            <p class="text-sm text-slate-600 mt-0.5" id="welcome-message">Viewing records for active branch selection.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="switchTab('admissions')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-user-plus mr-1"></i>New Admission
+                            </button>
+                            <button onclick="switchTab('attendance')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-qrcode mr-1"></i>Scan QR Attendance
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ADMISSIONS TAB -->
+                <section id="tab-admissions" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-user-plus text-indigo-600"></i><span>New Student Admission</span>
+                        </h2>
+                        <form id="admission-form" onsubmit="handleAdmission(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Campus / Branch *</label>
+                                <select id="adm-branch" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none branch-dropdown"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Student Full Name *</label>
+                                <input type="text" id="adm-name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Father's Name *</label>
+                                <input type="text" id="adm-father" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Class / Grade *</label>
+                                <select id="adm-class" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Prep">Prep</option>
+                                    <option value="Class 1">Class 1</option>
+                                    <option value="Class 2">Class 2</option>
+                                    <option value="Class 3">Class 3</option>
+                                    <option value="Class 4">Class 4</option>
+                                    <option value="Class 5">Class 5</option>
+                                    <option value="Class 6">Class 6</option>
+                                    <option value="Class 7">Class 7</option>
+                                    <option value="Class 8">Class 8</option>
+                                    <option value="Matric">Matric</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Date of Birth *</label>
+                                <input type="date" id="adm-dob" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number *</label>
+                                <input type="tel" id="adm-phone" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Emergency Contact *</label>
+                                <input type="tel" id="adm-emergency" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Blood Group</label>
+                                <select id="adm-blood" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="">Not Available</option>
+                                    <option value="A+">A+</option><option value="A-">A-</option>
+                                    <option value="B+">B+</option><option value="B-">B-</option>
+                                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                                    <option value="O+">O+</option><option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Monthly Fee (PKR) *</label>
+                                <input type="number" id="adm-fee" value="2500" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Any Disease / Medical Condition</label>
+                                <input type="text" id="adm-disease" placeholder="None or specify" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Residential Address *</label>
+                                <textarea id="adm-address" rows="2" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Student Photo (Auto Square Fit, Max 500KB) *</label>
+                                <input type="file" id="adm-photo" accept="image/*" required onchange="processImageUpload(this, 'student')" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <p id="image-error-msg" class="text-xs text-rose-500 mt-1 hidden"></p>
+                            </div>
+                            <div class="sm:col-span-2 flex justify-end">
+                                <button type="submit" id="adm-submit-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm shadow transition">
+                                    <i class="fa-solid fa-check mr-2"></i>Complete Admission & Generate QR ID Card
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- STUDENTS DIRECTORY TAB -->
+                <section id="tab-students" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                                <i class="fa-solid fa-users text-indigo-600"></i><span>Students Directory</span>
+                            </h2>
+                            <input type="text" id="search-student" onkeyup="filterStudents()" placeholder="Search by name, Roll ID or class..." class="px-3 py-1.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Photo</th>
+                                        <th class="p-3">Roll ID</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Father</th>
+                                        <th class="p-3">Class</th>
+                                        <th class="p-3">Branch</th>
+                                        <th class="p-3">Phone</th>
+                                        <th class="p-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TEACHERS TAB -->
+                <section id="tab-teachers" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-chalkboard-user text-indigo-600"></i><span>Teachers Management</span>
+                        </h2>
+                        <form onsubmit="addTeacher(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 pb-6 border-b">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Branch *</label>
+                                <select id="t-branch" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none branch-dropdown"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Teacher Name *</label>
+                                <input type="text" id="t-name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Father / Husband Name</label>
+                                <input type="text" id="t-father" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Subject *</label>
+                                <input type="text" id="t-subject" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Class *</label>
+                                <select id="t-class" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Prep">Prep</option>
+                                    <option value="Class 1">Class 1</option><option value="Class 2">Class 2</option>
+                                    <option value="Class 3">Class 3</option><option value="Class 4">Class 4</option>
+                                    <option value="Class 5">Class 5</option><option value="Class 6">Class 6</option>
+                                    <option value="Class 7">Class 7</option><option value="Class 8">Class 8</option>
+                                    <option value="Matric">Matric</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Phone *</label>
+                                <input type="tel" id="t-phone" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Monthly Salary (PKR) *</label>
+                                <input type="number" id="t-salary" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Teacher Photo (Optional)</label>
+                                <input type="file" id="t-photo" accept="image/*" onchange="processImageUpload(this, 'teacher')" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-slate-50">
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-3 flex justify-end">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-lg text-sm shadow transition">
+                                    <i class="fa-solid fa-plus mr-1"></i>Add Teacher & Generate ID Card
+                                </button>
+                            </div>
+                        </form>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Photo</th>
+                                        <th class="p-3">Teacher ID</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Subject</th>
+                                        <th class="p-3">Class</th>
+                                        <th class="p-3">Branch</th>
+                                        <th class="p-3">Salary</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teachers-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- OTHER STAFF TAB -->
+                <section id="tab-staff" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-users-gear text-indigo-600"></i><span>Other Staff Management</span>
+                        </h2>
+                        <form onsubmit="addStaff(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 pb-6 border-b">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Branch *</label>
+                                <select id="st-branch" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none branch-dropdown"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Staff Type *</label>
+                                <select id="st-type" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Guard">Guard</option>
+                                    <option value="Maid / Aaya">Maid / Aaya</option>
+                                    <option value="Peon">Peon</option>
+                                    <option value="Driver">Driver</option>
+                                    <option value="Cleaner">Cleaner</option>
+                                    <option value="Clerk">Clerk</option>
+                                    <option value="Accountant">Accountant</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name *</label>
+                                <input type="text" id="st-name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Father / Husband Name</label>
+                                <input type="text" id="st-father" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Phone *</label>
+                                <input type="tel" id="st-phone" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Monthly Salary (PKR) *</label>
+                                <input type="number" id="st-salary" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Address</label>
+                                <input type="text" id="st-address" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Staff Photo (Optional)</label>
+                                <input type="file" id="st-photo" accept="image/*" onchange="processImageUpload(this, 'staff')" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-slate-50">
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-3 flex justify-end">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-lg text-sm shadow transition">
+                                    <i class="fa-solid fa-plus mr-1"></i>Add Staff & Generate ID Card
+                                </button>
+                            </div>
+                        </form>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Staff ID</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3">Branch</th>
+                                        <th class="p-3">Phone</th>
+                                        <th class="p-3">Salary</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staff-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- QR ATTENDANCE TAB -->
+                <section id="tab-attendance" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                            <h2 class="text-lg font-bold text-slate-800 mb-2 flex items-center space-x-2">
+                                <i class="fa-solid fa-camera text-indigo-600"></i><span>QR Attendance Scanner</span>
+                            </h2>
+                            <p class="text-xs text-slate-500 mb-4">Scan Student, Teacher, or Staff QR ID Card to mark attendance.</p>
+                            <div id="reader" class="w-full rounded-lg overflow-hidden border bg-slate-900 min-h-[240px]"></div>
+                            <div id="scan-result" class="mt-4 p-3 text-sm font-medium rounded-lg hidden"></div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                                <i class="fa-solid fa-calendar-check text-indigo-600"></i><span>Today's Attendance Log</span>
+                            </h2>
+                            <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs sticky top-0">
+                                        <tr>
+                                            <th class="p-3">ID</th>
+                                            <th class="p-3">Name</th>
+                                            <th class="p-3">Branch</th>
+                                            <th class="p-3">Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendance-table-body" class="divide-y divide-slate-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- HOMEWORK / ASSIGNMENTS TAB -->
+                <section id="tab-homework" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-book-open text-indigo-600"></i><span>Homework & Assignments Management</span>
+                        </h2>
+                        <form onsubmit="addHomework(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 pb-6 border-b">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Branch *</label>
+                                <select id="hw-branch" required class="w-full px-3 py-2 border rounded-lg text-sm branch-dropdown"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Class *</label>
+                                <select id="hw-class" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <option value="Prep">Prep</option>
+                                    <option value="Class 1">Class 1</option><option value="Class 2">Class 2</option>
+                                    <option value="Class 3">Class 3</option><option value="Class 4">Class 4</option>
+                                    <option value="Class 5">Class 5</option><option value="Class 6">Class 6</option>
+                                    <option value="Class 7">Class 7</option><option value="Class 8">Class 8</option>
+                                    <option value="Matric">Matric</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Subject *</label>
+                                <input type="text" id="hw-subject" placeholder="e.g. Mathematics" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Due Date *</label>
+                                <input type="date" id="hw-due" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-3">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Assignment Details / Instructions *</label>
+                                <input type="text" id="hw-desc" placeholder="e.g. Solve Exercise 4.2 Questions 1 to 10 on notebook" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm shadow transition">
+                                    <i class="fa-solid fa-plus mr-1"></i>Assign Homework
+                                </button>
+                            </div>
+                        </form>
+                        <div id="homework-list" class="space-y-3"></div>
+                    </div>
+                </section>
+
+                <!-- FEES TAB -->
+                <section id="tab-fees" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-indigo-600"></i><span>Fee & Dues Management</span>
+                        </h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Roll ID</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Class</th>
+                                        <th class="p-3">Branch</th>
+                                        <th class="p-3">Monthly Fee</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fees-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EXAMS TAB -->
+                <section id="tab-exams" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-award text-indigo-600"></i><span>Exams & Results</span>
+                        </h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Roll ID</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Class</th>
+                                        <th class="p-3">Maths (100)</th>
+                                        <th class="p-3">English (100)</th>
+                                        <th class="p-3">Science (100)</th>
+                                        <th class="p-3 text-center">Report Card</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exams-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SALARY TAB -->
+                <section id="tab-salary" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-wallet text-indigo-600"></i><span>Salary Disbursement (Teachers + Staff)</span>
+                        </h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">ID</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Designation</th>
+                                        <th class="p-3">Branch</th>
+                                        <th class="p-3">Salary</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salary-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EXPENSES TAB -->
+                <section id="tab-expenses" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-money-bill-wave text-indigo-600"></i><span>School Expenses</span>
+                        </h2>
+                        <form onsubmit="addExpense(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-6 pb-6 border-b">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Branch *</label>
+                                <select id="exp-branch" required class="w-full px-3 py-2 border rounded-lg text-sm branch-dropdown"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Title *</label>
+                                <input type="text" id="exp-title" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+                                <select id="exp-category" class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Supplies">Supplies</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Events">Events</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Amount (PKR) *</label>
+                                <input type="number" id="exp-amount" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm shadow transition">
+                                    <i class="fa-solid fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                        </form>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3">Title</th>
+                                        <th class="p-3">Category</th>
+                                        <th class="p-3">Branch</th>
+                                        <th class="p-3">Amount</th>
+                                        <th class="p-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MESSAGES TAB -->
+                <section id="tab-messages" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-envelope text-indigo-600"></i><span>Send Official Notice / Message</span>
+                        </h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Target Branch</label>
+                                <select id="msg-branch" class="w-full px-3 py-2 border rounded-lg text-sm branch-dropdown-all"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Send To</label>
+                                <select id="msg-to" class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <option value="ALL">Everyone (All Students + Teachers)</option>
+                                    <option value="STUDENTS">All Students</option>
+                                    <option value="TEACHERS">All Teachers</option>
+                                    <option value="Prep">Class: Prep</option>
+                                    <option value="Class 1">Class: Class 1</option><option value="Class 2">Class: Class 2</option>
+                                    <option value="Class 3">Class: Class 3</option><option value="Class 4">Class: Class 4</option>
+                                    <option value="Class 5">Class: Class 5</option><option value="Class 6">Class: Class 6</option>
+                                    <option value="Class 7">Class: Class 7</option><option value="Class 8">Class: Class 8</option>
+                                    <option value="Matric">Class: Matric</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Message / Circular Text</label>
+                            <textarea id="msg-text" rows="3" placeholder="e.g. School will remain closed tomorrow..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
+                        </div>
+                        <button onclick="sendAdminMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium">
+                            <i class="fa-solid fa-paper-plane mr-2"></i>Publish Notice
+                        </button>
+                        <div class="border-t pt-4 mt-4">
+                            <h3 class="font-semibold mb-2 text-sm">Published Notices</h3>
+                            <div id="admin-msg-list" class="space-y-2 text-sm max-h-64 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- REPORTS & YEAR-END CLEANUP TAB -->
+                <section id="tab-reports" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-print text-indigo-600"></i><span>Official Reports & Printing</span>
+                        </h2>
+                        <p class="text-xs text-slate-500">Reports automatically filter according to the currently selected branch in the top bar.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="printReport('admissions')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                                <i class="fa-solid fa-file-lines mr-2"></i>Admissions Register
+                            </button>
+                            <button onclick="printReport('dues')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                                <i class="fa-solid fa-file-invoice mr-2"></i>Fee Defaulters List
+                            </button>
+                            <button onclick="printReport('salary')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                                <i class="fa-solid fa-wallet mr-2"></i>Salary Sheet
+                            </button>
+                            <button onclick="printReport('expenses')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
+                                <i class="fa-solid fa-money-bill-wave mr-2"></i>Expenses Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Year-End Backup & Reset (5GB Free Tier Storage Manager) -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-rose-200 space-y-4">
+                        <h2 class="text-lg font-bold text-rose-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-broom text-rose-600"></i><span>Year-End Data Backup, Print & Storage Reset</span>
+                        </h2>
+                        <p class="text-xs text-slate-600">Keep your Firebase 5GB Free Tier fast and clean. Export or print full year records, then clear old attendance logs, homework, or reset fee/salary statuses for the new session.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="exportBackupJSON()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-download mr-1.5"></i>Download Full Backup (.JSON)
+                            </button>
+                            <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition cursor-pointer">
+                                <i class="fa-solid fa-upload mr-1.5"></i>Restore Backup (.JSON)
+                                <input type="file" accept=".json" onchange="importBackupJSON(this)" class="hidden">
+                            </label>
+                            <button onclick="resetMonthlyFeeAndSalary()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-rotate mr-1.5"></i>New Month Reset (Set Fees & Salaries Unpaid)
+                            </button>
+                            <button onclick="clearSessionLogs()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-trash-can mr-1.5"></i>Clear Old Attendance, Homework & Notices
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- SINGLE-PAGE ID CARD MODAL WITH WATERMARK -->
+    <div id="idcard-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="relative bg-white p-5 rounded-2xl shadow-2xl max-w-sm w-full flex flex-col items-center">
+            <button onclick="closeModal('idcard-modal')" class="absolute top-3 right-3 bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center text-slate-600 no-print">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Actual ID Card -->
+            <div class="id-card print-container">
+                <!-- Center Watermark Logo -->
+                <img id="card-watermark" src="" alt="" class="id-card-watermark hidden">
+
+                <!-- Header -->
+                <div class="id-card-header">
+                    <div class="flex items-center justify-center gap-2.5">
+                        <img id="card-logo" src="" alt="Logo" class="w-10 h-10 rounded-full object-cover border-2 border-white bg-white hidden shrink-0">
+                        <div class="text-left">
+                            <h3 id="card-school-name" class="font-bold text-sm leading-tight">Saira Public School</h3>
+                            <p id="card-branch-name" class="text-[10px] text-indigo-200 font-semibold leading-tight">Main Campus</p>
+                            <p id="card-school-address" class="text-[9px] opacity-85 leading-tight">City Road, Karachi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="id-card-body">
+                    <img id="card-photo" src="" alt="Photo" class="id-card-photo">
+                    <h4 id="card-name" class="font-bold text-slate-900 text-base leading-snug">Name</h4>
+                    <p id="card-role-badge" class="text-[11px] text-indigo-700 font-bold tracking-wide uppercase">ID: <span id="card-id"></span></p>
+
+                    <div id="card-details" class="id-card-details"></div>
+
+                    <div id="qrcode" class="flex justify-center mt-2.5"></div>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-indigo-950 text-white text-center py-1.5 text-[9px] font-medium tracking-wide relative z-10">
+                    Official Smart ID Card • Scan QR for Verification
+                </div>
+            </div>
+
+            <!-- Print Action Button -->
+            <div class="mt-4 w-full no-print flex gap-2">
+                <button onclick="printSpecificModal('printing-idcard')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-sm font-semibold transition shadow">
+                    <i class="fa-solid fa-print mr-2"></i>Print Single-Page ID Card
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEE VOUCHER MODAL -->
+    <div id="voucher-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 relative print-container border-2 border-indigo-900">
+            <button onclick="closeModal('voucher-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 no-print"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="flex items-center space-x-3 border-b pb-3">
+                <img id="v-logo" src="" alt="Logo" class="w-11 h-11 rounded-full object-cover border hidden">
+                <div>
+                    <h3 id="v-school-name" class="font-bold text-indigo-900 text-base">School Name</h3>
+                    <p id="v-branch-name" class="text-xs text-slate-500">Official Fee Voucher</p>
+                </div>
+            </div>
+            <div class="text-sm space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500">Roll ID:</span> <span id="v-id" class="font-bold"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Student Name:</span> <span id="v-name" class="font-semibold"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Father's Name:</span> <span id="v-father" class="font-semibold"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Class:</span> <span id="v-class" class="font-semibold"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Status:</span> <span id="v-status" class="font-bold"></span></div>
+                <div class="flex justify-between border-t pt-2 mt-2 text-base"><span class="text-slate-700 font-bold">Monthly Fee:</span> <span id="v-fee" class="font-bold text-indigo-700"></span></div>
+            </div>
+            <div class="pt-4 no-print flex space-x-2">
+                <button onclick="markFeePaid(currentVoucherId)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium transition">Mark Paid</button>
+                <button onclick="printSpecificModal('printing-voucher')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-print mr-1"></i>Print Voucher</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPORT CARD MODAL -->
+    <div id="reportcard-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 relative print-container border-2 border-indigo-900">
+            <button onclick="closeModal('reportcard-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 no-print"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="flex flex-col items-center border-b pb-3 text-center">
+                <img id="rc-logo" src="" alt="Logo" class="w-12 h-12 rounded-full object-cover mb-1 border hidden">
+                <h3 id="rc-school-name" class="font-bold text-indigo-900 text-base">School Name</h3>
+                <p class="text-xs text-slate-500">Official Examination Report Card</p>
+            </div>
+            <div class="flex items-center space-x-3 text-sm border-b pb-3">
+                <img id="rc-student-img" src="" alt="Photo" class="w-14 h-14 rounded-lg object-cover border">
+                <div>
+                    <p class="font-bold text-slate-800 text-base" id="rc-name"></p>
+                    <p class="text-xs text-slate-500">Roll ID: <span id="rc-id" class="font-semibold"></span> | Class: <span id="rc-class" class="font-semibold"></span></p>
+                </div>
+            </div>
+            <div class="border-b py-2">
+                <table class="w-full text-left text-sm">
+                    <tr class="text-xs text-slate-500 uppercase border-b"><th class="pb-1">Subject</th><th class="pb-1 text-center">Total</th><th class="pb-1 text-right">Obtained</th></tr>
+                    <tr><td class="py-1.5">Mathematics</td><td class="text-center">100</td><td id="rc-math" class="text-right font-semibold"></td></tr>
+                    <tr><td class="py-1.5">English</td><td class="text-center">100</td><td id="rc-eng" class="text-right font-semibold"></td></tr>
+                    <tr><td class="py-1.5">Science</td><td class="text-center">100</td><td id="rc-sci" class="text-right font-semibold"></td></tr>
+                </table>
+            </div>
+            <div class="text-sm space-y-1 bg-slate-50 p-3 rounded-lg border">
+                <div class="flex justify-between"><span class="text-slate-500">Total Marks:</span> <span id="rc-total" class="font-bold"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Percentage:</span> <span id="rc-perc" class="font-bold text-indigo-600"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Grade:</span> <span id="rc-grade" class="font-bold text-emerald-600"></span></div>
+            </div>
+            <div class="pt-2 no-print">
+                <button onclick="printSpecificModal('printing-reportcard')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-sm font-semibold transition"><i class="fa-solid fa-print mr-2"></i>Print Report Card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BRANCH MANAGEMENT MODAL -->
+    <div id="branch-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 relative">
+            <button onclick="closeModal('branch-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-code-branch text-indigo-600 mr-2"></i>Manage School Branches</h3>
+            <form onsubmit="addBranch(event)" class="flex gap-2">
+                <input type="text" id="new-branch-name" placeholder="e.g. Clifton Campus" required class="flex-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Add</button>
+            </form>
+            <div id="branch-list-container" class="space-y-2 max-h-60 overflow-y-auto text-sm"></div>
+        </div>
+    </div>
+
+    <!-- SETTINGS & LOGO / FIREBASE MODAL -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('settings-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-slate-800">School Branding, Logo & Cloud Settings</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">School Name</label>
+                    <input type="text" id="set-name" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">School Address & Contact</label>
+                    <input type="text" id="set-address" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100 space-y-2">
+                    <label class="block text-xs font-bold text-indigo-900">School Logo (Appears on Header & ID Card Watermark)</label>
+                    <div class="flex items-center gap-3">
+                        <img id="set-logo-preview" src="" alt="Logo" class="w-12 h-12 rounded-full object-cover border bg-white hidden">
+                        <input type="file" accept="image/*" onchange="uploadSchoolLogoFile(this)" class="text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                    </div>
+                    <input type="text" id="set-logo" placeholder="Or paste Logo Image URL..." class="w-full px-3 py-1.5 border rounded-lg text-xs bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Admin Password</label>
+                    <input type="text" id="set-admin-pass" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div class="border-t pt-3">
+                    <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-cloud text-indigo-600 mr-1"></i>Firebase Realtime Database URL (Optional for Cloud Sync)</label>
+                    <input type="url" id="set-firebase-url" placeholder="https://your-school-default-rtdb.firebaseio.com" class="w-full px-3 py-2 border rounded-lg text-xs font-mono">
+                    <p class="text-[11px] text-slate-500 mt-1">Paste your free Firebase Realtime Database URL here to sync Admin, Teacher, and Student portals across all devices automatically.</p>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2 gap-2">
+                <button onclick="saveSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Save All Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='%2394a3b8'><rect width='24' height='24' fill='%23f1f5f9'/><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+
+        // ========== STATE ==========
+        let appSettings = JSON.parse(localStorage.getItem('saira_settings_v3')) || {
+            name: "Saira Public School",
+            address: "Main Campus, Karachi",
+            logo: "",
+            adminPassword: "admin123",
+            firebaseUrl: ""
+        };
+
+        let branches = JSON.parse(localStorage.getItem('saira_branches_v3')) || [
+            { id: "main", name: "Main Campus" },
+            { id: "branch_2", name: "Branch 2 (Gulshan)" },
+            { id: "branch_3", name: "Branch 3 (Clifton)" }
+        ];
+        let activeBranch = localStorage.getItem('saira_active_branch') || 'ALL';
+
+        let students = JSON.parse(localStorage.getItem('saira_students_v3')) || [];
+        let teachers = JSON.parse(localStorage.getItem('saira_teachers_v3')) || [];
+        let staffList = JSON.parse(localStorage.getItem('saira_staff_v3')) || [];
+        let attendance = JSON.parse(localStorage.getItem('saira_attendance_v3')) || [];
+        let exams = JSON.parse(localStorage.getItem('saira_exams_v3')) || {};
+        let expenses = JSON.parse(localStorage.getItem('saira_expenses_v3')) || [];
+        let messages = JSON.parse(localStorage.getItem('saira_messages_v3')) || [];
+        let homeworks = JSON.parse(localStorage.getItem('saira_homework_v3')) || [];
+
+        let currentUser = JSON.parse(sessionStorage.getItem('saira_current_user')) || null;
+        let uploadedPhotos = { student: "", teacher: "", staff: "" };
+        let currentVoucherId = null;
+        let html5QrCode = null;
+
+        // ========== INIT ==========
+        window.onload = async function() {
+            applyBrandingToLogin();
+            await syncFromFirebaseCloud();
+            if (currentUser && currentUser.role === 'admin') {
+                showMainApp();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+        };
+
+        // ========== CLOUD SYNC (FIREBASE REST API) ==========
+        async function syncToFirebaseCloud() {
+            localStorage.setItem('saira_settings_v3', JSON.stringify(appSettings));
+            localStorage.setItem('saira_branches_v3', JSON.stringify(branches));
+            localStorage.setItem('saira_students_v3', JSON.stringify(students));
+            localStorage.setItem('saira_teachers_v3', JSON.stringify(teachers));
+            localStorage.setItem('saira_staff_v3', JSON.stringify(staffList));
+            localStorage.setItem('saira_attendance_v3', JSON.stringify(attendance));
+            localStorage.setItem('saira_exams_v3', JSON.stringify(exams));
+            localStorage.setItem('saira_expenses_v3', JSON.stringify(expenses));
+            localStorage.setItem('saira_messages_v3', JSON.stringify(messages));
+            localStorage.setItem('saira_homework_v3', JSON.stringify(homeworks));
+
+            if (!appSettings.firebaseUrl) return;
+            try {
+                const baseUrl = appSettings.firebaseUrl.replace(/\/$/, '');
+                await fetch(`${baseUrl}/saira_erp.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks
+                    })
+                });
+            } catch (e) {
+                console.warn("Cloud sync warning:", e);
+            }
+        }
+
+        async function syncFromFirebaseCloud() {
+            if (!appSettings.firebaseUrl) return;
+            try {
+                const baseUrl = appSettings.firebaseUrl.replace(/\/$/, '');
+                const res = await fetch(`${baseUrl}/saira_erp.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        if (data.settings) appSettings = data.settings;
+                        if (data.branches) branches = data.branches;
+                        if (data.students) students = data.students;
+                        if (data.teachers) teachers = data.teachers;
+                        if (data.staffList) staffList = data.staffList;
+                        if (data.attendance) attendance = data.attendance;
+                        if (data.exams) exams = data.exams;
+                        if (data.expenses) expenses = data.expenses;
+                        if (data.messages) messages = data.messages;
+                        if (data.homeworks) homeworks = data.homeworks;
+                        syncToFirebaseCloud();
+                    }
+                }
+            } catch (e) {
+                console.warn("Cloud fetch warning:", e);
+            }
+        }
+
+        // ========== LOGIN & AUTH ==========
+        function applyBrandingToLogin() {
+            document.getElementById('login-school-name').innerText = appSettings.name;
+            if (appSettings.logo) {
+                document.getElementById('login-logo-box').innerHTML = `<img src="${appSettings.logo}" class="w-full h-full object-cover">`;
+            }
+        }
+
+        function handleLogin(e) {
+            if (e) e.preventDefault();
+            const errorEl = document.getElementById('login-error');
+            errorEl.classList.add('hidden');
+            const pass = document.getElementById('admin-password').value.trim();
+            const validPass = appSettings.adminPassword || 'admin123';
+
+            if (pass === validPass) {
+                currentUser = { role: 'admin', name: 'Administrator', id: 'ADMIN' };
+                sessionStorage.setItem('saira_current_user', JSON.stringify(currentUser));
+                showMainApp();
+            } else {
+                errorEl.innerText = 'Incorrect admin password! Default is admin123';
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('saira_current_user');
+            currentUser = null;
+            stopQrScanner();
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-password').value = '';
+        }
+
+        function showMainApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            applySettings();
+            populateBranchDropdowns();
+            renderSidebar();
+            updateDashboard();
+            switchTab('dashboard');
+        }
+
+        // ========== MULTI-BRANCH LOGIC ==========
+        function getBranchName(branchId) {
+            if (!branchId || branchId === 'ALL') return 'All Branches';
+            const found = branches.find(b => b.id === branchId);
+            return found ? found.name : 'Main Campus';
+        }
+
+        function matchesBranch(itemBranch) {
+            if (activeBranch === 'ALL') return true;
+            const b = itemBranch || 'main';
+            return b === activeBranch;
+        }
+
+        function populateBranchDropdowns() {
+            const topSelect = document.getElementById('branch-selector');
+            topSelect.innerHTML = `<option value="ALL" class="text-slate-900 font-bold">Head Office (All Branches)</option>`;
+            branches.forEach(b => {
+                topSelect.innerHTML += `<option value="${b.id}" class="text-slate-900">${b.name}</option>`;
+            });
+            topSelect.value = activeBranch;
+            document.getElementById('nav-branch-subtitle').innerText = activeBranch === 'ALL' ? 'Head Office (All Branches View)' : `Active Campus: ${getBranchName(activeBranch)}`;
+
+            document.querySelectorAll('.branch-dropdown').forEach(sel => {
+                sel.innerHTML = '';
+                branches.forEach(b => {
+                    sel.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+                });
+                if (activeBranch !== 'ALL') sel.value = activeBranch;
+            });
+
+            document.querySelectorAll('.branch-dropdown-all').forEach(sel => {
+                sel.innerHTML = `<option value="ALL">All Branches</option>`;
+                branches.forEach(b => {
+                    sel.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+                });
+                sel.value = activeBranch;
+            });
+        }
+
+        function handleBranchChange(branchId) {
+            activeBranch = branchId;
+            localStorage.setItem('saira_active_branch', activeBranch);
+            populateBranchDropdowns();
+            updateDashboard();
+            const currentTab = document.querySelector('.tab-btn.bg-indigo-50')?.getAttribute('data-target') || 'dashboard';
+            switchTab(currentTab);
+        }
+
+        function openBranchModal() {
+            renderBranchList();
+            document.getElementById('branch-modal').classList.remove('hidden');
+            document.getElementById('branch-modal').classList.add('flex');
+        }
+
+        function renderBranchList() {
+            const el = document.getElementById('branch-list-container');
+            el.innerHTML = '';
+            branches.forEach(b => {
+                el.innerHTML += `
+                    <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border">
+                        <span class="font-medium">${b.name}</span>
+                        ${b.id !== 'main' ? `<button onclick="deleteBranch('${b.id}')" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i></button>` : `<span class="text-xs text-slate-400">Default</span>`}
+                    </div>`;
+            });
+        }
+
+        function addBranch(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-branch-name').value.trim();
+            if (!name) return;
+            const id = 'branch_' + Date.now();
+            branches.push({ id, name });
+            document.getElementById('new-branch-name').value = '';
+            syncToFirebaseCloud();
+            populateBranchDropdowns();
+            renderBranchList();
+        }
+
+        function deleteBranch(id) {
+            if (confirm('Delete this branch? Records will remain safe.')) {
+                branches = branches.filter(b => b.id !== id);
+                if (activeBranch === id) activeBranch = 'ALL';
+                syncToFirebaseCloud();
+                populateBranchDropdowns();
+                renderBranchList();
+            }
+        }
+
+        // ========== SIDEBAR ==========
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const btn = (id, icon, label) => `
+                <button onclick="switchTab('${id}')" class="tab-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition flex items-center space-x-3 text-slate-600 hover:bg-slate-50 hover:text-indigo-600" data-target="${id}">
+                    <i class="fa-solid ${icon} w-5 text-center"></i><span>${label}</span>
+                </button>`;
+
+            sidebar.innerHTML = [
+                btn('dashboard', 'fa-chart-pie', 'Dashboard'),
+                btn('admissions', 'fa-user-plus', 'Admissions'),
+                btn('students', 'fa-users', 'Students'),
+                btn('teachers', 'fa-chalkboard-user', 'Teachers'),
+                btn('staff', 'fa-users-gear', 'Other Staff'),
+                btn('attendance', 'fa-qrcode', 'QR Attendance'),
+                btn('homework', 'fa-book-open', 'Homework'),
+                btn('fees', 'fa-file-invoice-dollar', 'Fees & Dues'),
+                btn('exams', 'fa-award', 'Exams & Results'),
+                btn('salary', 'fa-wallet', 'Salary Sheet'),
+                btn('expenses', 'fa-money-bill-wave', 'Expenses'),
+                btn('messages', 'fa-envelope', 'Send Notice'),
+                btn('reports', 'fa-print', 'Reports & Reset')
+            ].join('');
+        }
+
+        function switchTab(targetId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const tab = document.getElementById('tab-' + targetId);
+            if (tab) tab.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-semibold');
+                btn.classList.add('text-slate-600');
+            });
+            const activeBtn = document.querySelector(`[data-target="${targetId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600');
+                activeBtn.classList.add('bg-indigo-50', 'text-indigo-700', 'font-semibold');
+            }
+
+            if (targetId === 'attendance') initQrScanner();
+            else stopQrScanner();
+
+            if (targetId === 'dashboard') updateDashboard();
+            if (targetId === 'students') renderStudents();
+            if (targetId === 'teachers') renderTeachers();
+            if (targetId === 'staff') renderStaff();
+            if (targetId === 'attendance') renderAttendance();
+            if (targetId === 'homework') renderHomework();
+            if (targetId === 'fees') renderFees();
+            if (targetId === 'exams') renderExams();
+            if (targetId === 'salary') renderSalary();
+            if (targetId === 'expenses') renderExpenses();
+            if (targetId === 'messages') renderAdminMessages();
+        }
+
+        // ========== DASHBOARD ==========
+        function updateDashboard() {
+            const statsEl = document.getElementById('dashboard-stats');
+            const filteredStudents = students.filter(s => matchesBranch(s.branchId));
+            const filteredTeachers = teachers.filter(t => matchesBranch(t.branchId));
+            const filteredStaff = staffList.filter(s => matchesBranch(s.branchId));
+            const today = new Date().toISOString().split('T')[0];
+            const presentToday = attendance.filter(a => a.date === today && matchesBranch(a.branchId)).length;
+            const unpaid = filteredStudents.filter(s => s.feeStatus === 'Unpaid').length;
+
+            document.getElementById('welcome-message').innerText = `Showing live statistics for: ${getBranchName(activeBranch)}`;
+
+            statsEl.innerHTML = `
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Students</p><h3 class="text-2xl font-bold">${filteredStudents.length}</h3></div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-check-to-slot"></i></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Present Today</p><h3 class="text-2xl font-bold">${presentToday}</h3></div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Unpaid Fees</p><h3 class="text-2xl font-bold">${unpaid}</h3></div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Teachers & Staff</p><h3 class="text-2xl font-bold">${filteredTeachers.length + filteredStaff.length}</h3></div>
+                </div>`;
+        }
+
+        // ========== IMAGE PROCESSING (AUTO SQUARE CROP) ==========
+        function processImageUpload(input, targetKey) {
+            const errorMsg = document.getElementById('image-error-msg');
+            if (errorMsg) errorMsg.classList.add('hidden');
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 2 * 1024 * 1024) {
+                    if (errorMsg) {
+                        errorMsg.innerText = "File too large. Please select an image under 2MB.";
+                        errorMsg.classList.remove('hidden');
+                    }
+                    input.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const size = 300;
+                        canvas.width = size;
+                        canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        const minDim = Math.min(img.width, img.height);
+                        const sx = (img.width - minDim) / 2;
+                        const sy = (img.height - minDim) / 2;
+                        ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+                        uploadedPhotos[targetKey] = canvas.toDataURL('image/jpeg', 0.82);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadSchoolLogoFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 240;
+                        canvas.height = 240;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, 240, 240);
+                        const dataUrl = canvas.toDataURL('image/png');
+                        document.getElementById('set-logo').value = dataUrl;
+                        const prev = document.getElementById('set-logo-preview');
+                        prev.src = dataUrl;
+                        prev.classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ========== SETTINGS ==========
+        function applySettings() {
+            document.getElementById('nav-school-name').innerText = appSettings.name;
+            document.getElementById('login-school-name').innerText = appSettings.name;
+            if (appSettings.logo) {
+                document.getElementById('nav-logo-container').innerHTML = `<img src="${appSettings.logo}" class="w-full h-full object-cover">`;
+            } else {
+                document.getElementById('nav-logo-container').innerHTML = `<i class="fa-solid fa-graduation-cap text-xl"></i>`;
+            }
+            const dbBadge = document.getElementById('db-status-badge');
+            if (appSettings.firebaseUrl) {
+                dbBadge.innerHTML = `<i class="fa-solid fa-cloud mr-1"></i>Firebase Connected`;
+                dbBadge.className = "text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-semibold";
+            } else {
+                dbBadge.innerHTML = `<i class="fa-solid fa-database mr-1"></i>Local Mode`;
+                dbBadge.className = "text-[11px] bg-indigo-700 text-indigo-100 px-2.5 py-1 rounded-full font-semibold";
+            }
+        }
+
+        function openSettingsModal() {
+            document.getElementById('set-name').value = appSettings.name;
+            document.getElementById('set-address').value = appSettings.address;
+            document.getElementById('set-logo').value = appSettings.logo || '';
+            document.getElementById('set-admin-pass').value = appSettings.adminPassword || 'admin123';
+            document.getElementById('set-firebase-url').value = appSettings.firebaseUrl || '';
+            const prev = document.getElementById('set-logo-preview');
+            if (appSettings.logo) {
+                prev.src = appSettings.logo;
+                prev.classList.remove('hidden');
+            } else {
+                prev.classList.add('hidden');
+            }
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+        }
+
+        async function saveSettings() {
+            appSettings.name = document.getElementById('set-name').value.trim() || "Saira Public School";
+            appSettings.address = document.getElementById('set-address').value.trim() || "Main Campus, Karachi";
+            appSettings.logo = document.getElementById('set-logo').value.trim();
+            appSettings.adminPassword = document.getElementById('set-admin-pass').value.trim() || 'admin123';
+            appSettings.firebaseUrl = document.getElementById('set-firebase-url').value.trim();
+            await syncToFirebaseCloud();
+            applySettings();
+            closeModal('settings-modal');
+            alert('Settings and Logo saved!');
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+
+        // ========== SINGLE-PAGE MODAL PRINTING ==========
+        function printSpecificModal(modeClass) {
+            document.body.classList.add(modeClass);
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove(modeClass);
+            }, 500);
+        }
+
+        // ========== ADMISSIONS & STUDENTS ==========
+        function handleAdmission(e) {
+            e.preventDefault();
+            const id = 'SR-' + Math.floor(1000 + Math.random() * 9000);
+            const branchId = document.getElementById('adm-branch').value || 'main';
+            const newStudent = {
+                id: id,
+                branchId: branchId,
+                name: document.getElementById('adm-name').value.trim(),
+                father: document.getElementById('adm-father').value.trim(),
+                className: document.getElementById('adm-class').value,
+                dob: document.getElementById('adm-dob').value,
+                phone: document.getElementById('adm-phone').value.trim(),
+                emergency: document.getElementById('adm-emergency').value.trim(),
+                bloodGroup: document.getElementById('adm-blood').value,
+                disease: document.getElementById('adm-disease').value.trim() || 'None',
+                fee: document.getElementById('adm-fee').value,
+                address: document.getElementById('adm-address').value.trim(),
+                photo: uploadedPhotos.student || DEFAULT_AVATAR,
+                feeStatus: 'Unpaid'
+            };
+
+            students.push(newStudent);
+            exams[id] = { math: 0, eng: 0, sci: 0 };
+            syncToFirebaseCloud();
+
+            document.getElementById('admission-form').reset();
+            uploadedPhotos.student = '';
+            updateDashboard();
+            showIdCard(id, 'student');
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('students-table-body');
+            const list = students.filter(s => matchesBranch(s.branchId));
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="8" class="p-4 text-center text-slate-400">No students found in this branch.</td></tr>` : '';
+            list.forEach(s => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3"><img src="${s.photo || DEFAULT_AVATAR}" class="w-9 h-9 rounded-full object-cover border"></td>
+                        <td class="p-3 font-bold text-indigo-600">${s.id}</td>
+                        <td class="p-3 font-medium">${s.name}</td>
+                        <td class="p-3 text-slate-600">${s.father}</td>
+                        <td class="p-3 text-slate-600">${s.className}</td>
+                        <td class="p-3 text-xs text-slate-500">${getBranchName(s.branchId)}</td>
+                        <td class="p-3 text-slate-600">${s.phone}</td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick="showIdCard('${s.id}','student')" class="text-indigo-600 hover:text-indigo-800 px-1.5" title="View/Print ID Card"><i class="fa-solid fa-id-card"></i></button>
+                            <button onclick="deleteStudent('${s.id}')" class="text-rose-500 hover:text-rose-700 px-1.5" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function filterStudents() {
+            const q = document.getElementById('search-student').value.toLowerCase();
+            document.querySelectorAll('#students-table-body tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function deleteStudent(id) {
+            if (confirm('Delete this student permanently?')) {
+                students = students.filter(s => s.id !== id);
+                delete exams[id];
+                syncToFirebaseCloud();
+                renderStudents();
+                updateDashboard();
+            }
+        }
+
+        // ========== ID CARD GENERATOR (WITH WATERMARK) ==========
+        function showIdCard(id, type) {
+            let person = null;
+            let detailsHtml = '';
+
+            if (type === 'student') {
+                person = students.find(s => s.id === id);
+                if (!person) return;
+                detailsHtml = `
+                    <p><span class="label">Class:</span> <span class="val">${person.className}</span></p>
+                    <p><span class="label">Father:</span> <span class="val">${person.father}</span></p>
+                    <p><span class="label">DOB:</span> <span class="val">${person.dob || 'N/A'}</span></p>
+                    <p><span class="label">Emergency:</span> <span class="val">${person.emergency || person.phone}</span></p>
+                    ${person.bloodGroup ? `<p><span class="label">Blood Group:</span> <span class="val">${person.bloodGroup}</span></p>` : ''}
+                    ${person.disease && person.disease !== 'None' ? `<p><span class="label">Medical:</span> <span class="val">${person.disease}</span></p>` : ''}
+                    <p><span class="label">Address:</span> <span class="val">${person.address}</span></p>`;
+            } else if (type === 'teacher') {
+                person = teachers.find(t => t.id === id);
+                if (!person) return;
+                detailsHtml = `
+                    <p><span class="label">Designation:</span> <span class="val">Class Teacher</span></p>
+                    <p><span class="label">Subject:</span> <span class="val">${person.subject}</span></p>
+                    <p><span class="label">Assigned Class:</span> <span class="val">${person.assignedClass}</span></p>
+                    <p><span class="label">Phone:</span> <span class="val">${person.phone}</span></p>`;
+            } else if (type === 'staff') {
+                person = staffList.find(s => s.id === id);
+                if (!person) return;
+                detailsHtml = `
+                    <p><span class="label">Role:</span> <span class="val">${person.type}</span></p>
+                    <p><span class="label">Father/Spouse:</span> <span class="val">${person.father || '-'}</span></p>
+                    <p><span class="label">Phone:</span> <span class="val">${person.phone}</span></p>`;
+            }
+
+            document.getElementById('card-school-name').innerText = appSettings.name;
+            document.getElementById('card-branch-name').innerText = getBranchName(person.branchId);
+            document.getElementById('card-school-address').innerText = appSettings.address;
+
+            const logoEl = document.getElementById('card-logo');
+            const watermarkEl = document.getElementById('card-watermark');
+            if (appSettings.logo) {
+                logoEl.src = appSettings.logo;
+                logoEl.classList.remove('hidden');
+                watermarkEl.src = appSettings.logo;
+                watermarkEl.classList.remove('hidden');
+            } else {
+                logoEl.classList.add('hidden');
+                watermarkEl.classList.add('hidden');
+            }
+
+            document.getElementById('card-photo').src = person.photo || DEFAULT_AVATAR;
+            document.getElementById('card-name').innerText = person.name;
+            document.getElementById('card-id').innerText = person.id;
+            document.getElementById('card-details').innerHTML = detailsHtml;
+
+            const qrText = `${appSettings.name} (${getBranchName(person.branchId)})\nName: ${person.name}\nID: ${person.id}`;
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, {
+                text: qrText,
+                width: 96,
+                height: 96,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            const modal = document.getElementById('idcard-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // ========== TEACHERS ==========
+        function addTeacher(e) {
+            e.preventDefault();
+            const id = 'T-' + Math.floor(1000 + Math.random() * 9000);
+            const teacher = {
+                id: id,
+                branchId: document.getElementById('t-branch').value || 'main',
+                name: document.getElementById('t-name').value.trim(),
+                father: document.getElementById('t-father').value.trim(),
+                subject: document.getElementById('t-subject').value.trim(),
+                assignedClass: document.getElementById('t-class').value,
+                phone: document.getElementById('t-phone').value.trim(),
+                salary: document.getElementById('t-salary').value,
+                status: 'Unpaid',
+                photo: uploadedPhotos.teacher || DEFAULT_AVATAR
+            };
+            teachers.push(teacher);
+            uploadedPhotos.teacher = '';
+            syncToFirebaseCloud();
+            e.target.reset();
+            renderTeachers();
+            updateDashboard();
+            showIdCard(id, 'teacher');
+        }
+
+        function renderTeachers() {
+            const tbody = document.getElementById('teachers-table-body');
+            const list = teachers.filter(t => matchesBranch(t.branchId));
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="9" class="p-4 text-center text-slate-400">No teachers added in this branch.</td></tr>` : '';
+            list.forEach(t => {
+                const statusBadge = t.status === 'Paid'
+                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-semibold">Paid</span>`
+                    : `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs font-semibold">Unpaid</span>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3"><img src="${t.photo || DEFAULT_AVATAR}" class="w-9 h-9 rounded-full object-cover border"></td>
+                        <td class="p-3 font-bold text-indigo-600">${t.id}</td>
+                        <td class="p-3 font-medium">${t.name}</td>
+                        <td class="p-3">${t.subject}</td>
+                        <td class="p-3">${t.assignedClass}</td>
+                        <td class="p-3 text-xs text-slate-500">${getBranchName(t.branchId)}</td>
+                        <td class="p-3 font-semibold">Rs. ${t.salary}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="showIdCard('${t.id}','teacher')" class="text-indigo-600 px-1.5" title="ID Card"><i class="fa-solid fa-id-card"></i></button>
+                            <button onclick="paySalary('teacher','${t.id}')" class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Pay</button>
+                            <button onclick="deleteTeacher('${t.id}')" class="text-rose-500 px-1.5"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function deleteTeacher(id) {
+            if (confirm('Remove this teacher?')) {
+                teachers = teachers.filter(t => t.id !== id);
+                syncToFirebaseCloud();
+                renderTeachers();
+                updateDashboard();
+            }
+        }
+
+        // ========== OTHER STAFF ==========
+        function addStaff(e) {
+            e.preventDefault();
+            const id = 'ST-' + Math.floor(1000 + Math.random() * 9000);
+            const staff = {
+                id: id,
+                branchId: document.getElementById('st-branch').value || 'main',
+                type: document.getElementById('st-type').value,
+                name: document.getElementById('st-name').value.trim(),
+                father: document.getElementById('st-father').value.trim(),
+                phone: document.getElementById('st-phone').value.trim(),
+                address: document.getElementById('st-address').value.trim(),
+                salary: document.getElementById('st-salary').value,
+                status: 'Unpaid',
+                photo: uploadedPhotos.staff || DEFAULT_AVATAR
+            };
+            staffList.push(staff);
+            uploadedPhotos.staff = '';
+            syncToFirebaseCloud();
+            e.target.reset();
+            renderStaff();
+            updateDashboard();
+            showIdCard(id, 'staff');
+        }
+
+        function renderStaff() {
+            const tbody = document.getElementById('staff-table-body');
+            const list = staffList.filter(s => matchesBranch(s.branchId));
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="8" class="p-4 text-center text-slate-400">No staff added in this branch.</td></tr>` : '';
+            list.forEach(s => {
+                const statusBadge = s.status === 'Paid'
+                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-semibold">Paid</span>`
+                    : `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs font-semibold">Unpaid</span>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-indigo-600">${s.id}</td>
+                        <td class="p-3 font-medium">${s.name}</td>
+                        <td class="p-3">${s.type}</td>
+                        <td class="p-3 text-xs text-slate-500">${getBranchName(s.branchId)}</td>
+                        <td class="p-3">${s.phone}</td>
+                        <td class="p-3 font-semibold">Rs. ${s.salary}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="showIdCard('${s.id}','staff')" class="text-indigo-600 px-1.5"><i class="fa-solid fa-id-card"></i></button>
+                            <button onclick="paySalary('staff','${s.id}')" class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Pay</button>
+                            <button onclick="deleteStaff('${s.id}')" class="text-rose-500 px-1.5"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function deleteStaff(id) {
+            if (confirm('Remove this staff member?')) {
+                staffList = staffList.filter(s => s.id !== id);
+                syncToFirebaseCloud();
+                renderStaff();
+                updateDashboard();
+            }
+        }
+
+        // ========== HOMEWORK / ASSIGNMENTS ==========
+        function addHomework(e) {
+            e.preventDefault();
+            homeworks.unshift({
+                id: 'HW-' + Date.now(),
+                branchId: document.getElementById('hw-branch').value || 'main',
+                className: document.getElementById('hw-class').value,
+                subject: document.getElementById('hw-subject').value.trim(),
+                dueDate: document.getElementById('hw-due').value,
+                description: document.getElementById('hw-desc').value.trim(),
+                assignedBy: 'Admin',
+                date: new Date().toLocaleDateString()
+            });
+            syncToFirebaseCloud();
+            e.target.reset();
+            renderHomework();
+        }
+
+        function renderHomework() {
+            const el = document.getElementById('homework-list');
+            const list = homeworks.filter(h => matchesBranch(h.branchId));
+            if (list.length === 0) {
+                el.innerHTML = `<p class="text-sm text-slate-400 text-center py-4">No homework assignments found for this branch.</p>`;
+                return;
+            }
+            el.innerHTML = '';
+            list.forEach(h => {
+                el.innerHTML += `
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-start gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded">${h.className}</span>
+                                <span class="font-bold text-slate-800 text-sm">${h.subject}</span>
+                                <span class="text-xs text-slate-500">• ${getBranchName(h.branchId)}</span>
+                            </div>
+                            <p class="text-sm text-slate-700 mt-1.5">${h.description}</p>
+                            <p class="text-xs text-rose-600 font-medium mt-1">Due Date: ${h.dueDate} | Assigned by: ${h.assignedBy}</p>
+                        </div>
+                        <button onclick="deleteHomework('${h.id}')" class="text-rose-500 hover:text-rose-700 text-sm"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+        }
+
+        function deleteHomework(id) {
+            homeworks = homeworks.filter(h => h.id !== id);
+            syncToFirebaseCloud();
+            renderHomework();
+        }
+
+        // ========== QR ATTENDANCE ==========
+        function initQrScanner() {
+            if (html5QrCode) return;
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 240, height: 240 } },
+                onScanSuccess,
+                () => {}
+            ).catch(err => console.log("Camera info:", err));
+        }
+
+        function stopQrScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => { html5QrCode.clear(); html5QrCode = null; }).catch(() => {});
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            let uid = decodedText.trim().toUpperCase();
+            const idMatch = decodedText.match(/ID:\s*(SR-\d+|T-\d+|ST-\d+)/i);
+            if (idMatch) uid = idMatch[1].toUpperCase();
+            else {
+                const fallback = decodedText.match(/(SR-\d+|T-\d+|ST-\d+)/i);
+                if (fallback) uid = fallback[1].toUpperCase();
+            }
+
+            const person = students.find(s => s.id === uid) || teachers.find(t => t.id === uid) || staffList.find(s => s.id === uid);
+            const resultDiv = document.getElementById('scan-result');
+            const today = new Date().toISOString().split('T')[0];
+            const time = new Date().toLocaleTimeString();
+
+            if (person) {
+                const already = attendance.some(a => a.id === person.id && a.date === today);
+                if (!already) {
+                    attendance.unshift({ id: person.id, name: person.name, branchId: person.branchId || 'main', time, date: today, status: 'Present' });
+                    syncToFirebaseCloud();
+                    renderAttendance();
+                    updateDashboard();
+                    resultDiv.className = "mt-4 p-3 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-lg border border-emerald-200";
+                    resultDiv.innerText = `Marked Present: ${person.name} (${person.id})`;
+                } else {
+                    resultDiv.className = "mt-4 p-3 bg-amber-50 text-amber-700 text-sm font-medium rounded-lg border border-amber-200";
+                    resultDiv.innerText = `Already marked today: ${person.name}`;
+                }
+            } else {
+                resultDiv.className = "mt-4 p-3 bg-rose-50 text-rose-700 text-sm font-medium rounded-lg border border-rose-200";
+                resultDiv.innerText = `Invalid QR Code! Record not found.`;
+            }
+            resultDiv.classList.remove('hidden');
+        }
+
+        function renderAttendance() {
+            const tbody = document.getElementById('attendance-table-body');
+            const today = new Date().toISOString().split('T')[0];
+            const todayAtt = attendance.filter(a => a.date === today && matchesBranch(a.branchId));
+            tbody.innerHTML = todayAtt.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-400">No attendance recorded today.</td></tr>` : '';
+            todayAtt.forEach(a => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-indigo-600">${a.id}</td>
+                        <td class="p-3 font-medium">${a.name}</td>
+                        <td class="p-3 text-xs text-slate-500">${getBranchName(a.branchId)}</td>
+                        <td class="p-3 text-slate-600">${a.time}</td>
+                    </tr>`;
+            });
+        }
+
+        // ========== FEES ==========
+        function renderFees() {
+            const tbody = document.getElementById('fees-table-body');
+            const list = students.filter(s => matchesBranch(s.branchId));
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">No student fee records.</td></tr>` : '';
+            list.forEach(s => {
+                const badge = s.feeStatus === 'Paid'
+                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-semibold">Paid</span>`
+                    : `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs font-semibold">Unpaid</span>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-indigo-600">${s.id}</td>
+                        <td class="p-3 font-medium">${s.name}</td>
+                        <td class="p-3">${s.className}</td>
+                        <td class="p-3 text-xs text-slate-500">${getBranchName(s.branchId)}</td>
+                        <td class="p-3 font-semibold">Rs. ${s.fee}</td>
+                        <td class="p-3">${badge}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="showVoucher('${s.id}')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-3 py-1 rounded">Voucher / Pay</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function showVoucher(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+            currentVoucherId = id;
+            document.getElementById('v-school-name').innerText = appSettings.name;
+            document.getElementById('v-branch-name').innerText = `${getBranchName(student.branchId)} • Official Fee Voucher`;
+            const logoEl = document.getElementById('v-logo');
+            if (appSettings.logo) { logoEl.src = appSettings.logo; logoEl.classList.remove('hidden'); }
+            else logoEl.classList.add('hidden');
+            document.getElementById('v-id').innerText = student.id;
+            document.getElementById('v-name').innerText = student.name;
+            document.getElementById('v-father').innerText = student.father;
+            document.getElementById('v-class').innerText = student.className;
+            document.getElementById('v-status').innerText = student.feeStatus;
+            document.getElementById('v-fee').innerText = 'PKR ' + student.fee;
+            const modal = document.getElementById('voucher-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function markFeePaid(id) {
+            const student = students.find(s => s.id === id);
+            if (student) {
+                student.feeStatus = 'Paid';
+                syncToFirebaseCloud();
+                renderFees();
+                updateDashboard();
+                closeModal('voucher-modal');
+            }
+        }
+
+        // ========== EXAMS ==========
+        function renderExams() {
+            const tbody = document.getElementById('exams-table-body');
+            const list = students.filter(s => matchesBranch(s.branchId));
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">No records.</td></tr>` : '';
+            list.forEach(s => {
+                if (!exams[s.id]) exams[s.id] = { math: 0, eng: 0, sci: 0 };
+                const ex = exams[s.id];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-indigo-600">${s.id}</td>
+                        <td class="p-3 font-medium">${s.name}</td>
+                        <td class="p-3">${s.className}</td>
+                        <td class="p-3"><input type="number" max="100" id="math-${s.id}" value="${ex.math}" onchange="updateMarks('${s.id}')" class="w-16 px-2 py-1 border rounded text-sm"></td>
+                        <td class="p-3"><input type="number" max="100" id="eng-${s.id}" value="${ex.eng}" onchange="updateMarks('${s.id}')" class="w-16 px-2 py-1 border rounded text-sm"></td>
+                        <td class="p-3"><input type="number" max="100" id="sci-${s.id}" value="${ex.sci}" onchange="updateMarks('${s.id}')" class="w-16 px-2 py-1 border rounded text-sm"></td>
+                        <td class="p-3 text-center">
+                            <button onclick="showReportCard('${s.id}')" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700"><i class="fa-solid fa-award mr-1"></i>Result Card</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function updateMarks(id) {
+            exams[id] = {
+                math: Number(document.getElementById(`math-${id}`).value) || 0,
+                eng: Number(document.getElementById(`eng-${id}`).value) || 0,
+                sci: Number(document.getElementById(`sci-${id}`).value) || 0
+            };
+            syncToFirebaseCloud();
+        }
+
+        function showReportCard(id) {
+            const student = students.find(s => s.id === id);
+            const ex = exams[id] || { math: 0, eng: 0, sci: 0 };
+            if (!student) return;
+
+            document.getElementById('rc-school-name').innerText = `${appSettings.name} (${getBranchName(student.branchId)})`;
+            const logoEl = document.getElementById('rc-logo');
+            if (appSettings.logo) { logoEl.src = appSettings.logo; logoEl.classList.remove('hidden'); }
+            else logoEl.classList.add('hidden');
+
+            document.getElementById('rc-student-img').src = student.photo || DEFAULT_AVATAR;
+            document.getElementById('rc-id').innerText = student.id;
+            document.getElementById('rc-name').innerText = student.name;
+            document.getElementById('rc-class').innerText = student.className;
+            document.getElementById('rc-math').innerText = ex.math;
+            document.getElementById('rc-eng').innerText = ex.eng;
+            document.getElementById('rc-sci').innerText = ex.sci;
+
+            const total = ex.math + ex.eng + ex.sci;
+            const perc = (total / 300) * 100;
+            let grade = 'F';
+            if (perc >= 80) grade = 'A+';
+            else if (perc >= 70) grade = 'A';
+            else if (perc >= 60) grade = 'B';
+            else if (perc >= 50) grade = 'C';
+            else if (perc >= 40) grade = 'D';
+
+            document.getElementById('rc-total').innerText = total + ' / 300';
+            document.getElementById('rc-perc').innerText = perc.toFixed(1) + '%';
+            document.getElementById('rc-grade').innerText = grade;
+            const modal = document.getElementById('reportcard-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // ========== SALARY & EXPENSES ==========
+        function renderSalary() {
+            const tbody = document.getElementById('salary-table-body');
+            let rows = '';
+            teachers.filter(t => matchesBranch(t.branchId)).forEach(t => {
+                const badge = t.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
+                rows += `<tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-indigo-600">${t.id}</td>
+                    <td class="p-3 font-medium">${t.name}</td>
+                    <td class="p-3">Teacher (${t.subject})</td>
+                    <td class="p-3 text-xs text-slate-500">${getBranchName(t.branchId)}</td>
+                    <td class="p-3 font-semibold">Rs. ${t.salary}</td>
+                    <td class="p-3"><span class="${badge} px-2 py-0.5 rounded text-xs font-semibold">${t.status}</span></td>
+                    <td class="p-3 text-center"><button onclick="paySalary('teacher','${t.id}')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Mark Paid</button></td>
+                </tr>`;
+            });
+            staffList.filter(s => matchesBranch(s.branchId)).forEach(s => {
+                const badge = s.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
+                rows += `<tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-indigo-600">${s.id}</td>
+                    <td class="p-3 font-medium">${s.name}</td>
+                    <td class="p-3">${s.type}</td>
+                    <td class="p-3 text-xs text-slate-500">${getBranchName(s.branchId)}</td>
+                    <td class="p-3 font-semibold">Rs. ${s.salary}</td>
+                    <td class="p-3"><span class="${badge} px-2 py-0.5 rounded text-xs font-semibold">${s.status}</span></td>
+                    <td class="p-3 text-center"><button onclick="paySalary('staff','${s.id}')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Mark Paid</button></td>
+                </tr>`;
+            });
+            tbody.innerHTML = rows || `<tr><td colspan="7" class="p-4 text-center text-slate-400">No salary records.</td></tr>`;
+        }
+
+        function paySalary(type, id) {
+            if (type === 'teacher') {
+                const t = teachers.find(x => x.id === id);
+                if (t) t.status = 'Paid';
+            } else {
+                const s = staffList.find(x => x.id === id);
+                if (s) s.status = 'Paid';
+            }
+            syncToFirebaseCloud();
+            renderSalary();
+            renderTeachers();
+            renderStaff();
+        }
+
+        function addExpense(e) {
+            e.preventDefault();
+            expenses.unshift({
+                id: 'EXP-' + Date.now(),
+                branchId: document.getElementById('exp-branch').value || 'main',
+                title: document.getElementById('exp-title').value.trim(),
+                category: document.getElementById('exp-category').value,
+                amount: document.getElementById('exp-amount').value,
+                date: new Date().toLocaleDateString()
+            });
+            syncToFirebaseCloud();
+            e.target.reset();
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const tbody = document.getElementById('expenses-table-body');
+            const list = expenses.filter(e => matchesBranch(e.branchId));
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="6" class="p-4 text-center text-slate-400">No expenses recorded.</td></tr>` : '';
+            list.forEach(exp => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3">${exp.date}</td>
+                        <td class="p-3 font-medium">${exp.title}</td>
+                        <td class="p-3">${exp.category}</td>
+                        <td class="p-3 text-xs text-slate-500">${getBranchName(exp.branchId)}</td>
+                        <td class="p-3 font-semibold text-rose-600">Rs. ${exp.amount}</td>
+                        <td class="p-3 text-center"><button onclick="deleteExpense('${exp.id}')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>`;
+            });
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(e => e.id !== id);
+            syncToFirebaseCloud();
+            renderExpenses();
+        }
+
+        // ========== MESSAGES ==========
+        function sendAdminMessage() {
+            const text = document.getElementById('msg-text').value.trim();
+            const to = document.getElementById('msg-to').value;
+            const branchId = document.getElementById('msg-branch').value;
+            if (!text) return alert('Please write a message');
+
+            messages.unshift({
+                id: 'MSG-' + Date.now(),
+                branchId: branchId,
+                from: 'Administrator',
+                fromId: 'ADMIN',
+                toClass: to,
+                text: text,
+                date: new Date().toLocaleString(),
+                type: 'admin'
+            });
+            syncToFirebaseCloud();
+            document.getElementById('msg-text').value = '';
+            renderAdminMessages();
+        }
+
+        function renderAdminMessages() {
+            const el = document.getElementById('admin-msg-list');
+            const list = messages.filter(m => activeBranch === 'ALL' || m.branchId === 'ALL' || m.branchId === activeBranch);
+            if (list.length === 0) {
+                el.innerHTML = '<p class="text-slate-400">No notices published yet.</p>';
+                return;
+            }
+            el.innerHTML = '';
+            list.forEach(m => {
+                el.innerHTML += `<div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-slate-500">${m.date} • <strong>${getBranchName(m.branchId)}</strong> → Target: <strong>${m.toClass}</strong></p>
+                        <p class="mt-1 text-slate-800">${m.text}</p>
+                    </div>
+                    <button onclick="deleteMessage('${m.id}')" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+        }
+
+        function deleteMessage(id) {
+            messages = messages.filter(m => m.id !== id);
+            syncToFirebaseCloud();
+            renderAdminMessages();
+        }
+
+        // ========== REPORTS & YEAR-END CLEANUP ==========
+        function printReport(type) {
+            let title = '', content = '';
+            const branchTitle = getBranchName(activeBranch);
+
+            if (type === 'admissions') {
+                title = `Admissions Register - ${branchTitle}`;
+                content = `<table class="w-full text-sm border-collapse border"><tr class="bg-slate-100"><th class="border p-2">Roll ID</th><th class="border p-2">Name</th><th class="border p-2">Father</th><th class="border p-2">Class</th><th class="border p-2">Branch</th><th class="border p-2">Phone</th></tr>`;
+                students.filter(s => matchesBranch(s.branchId)).forEach(s => {
+                    content += `<tr><td class="border p-2">${s.id}</td><td class="border p-2">${s.name}</td><td class="border p-2">${s.father}</td><td class="border p-2">${s.className}</td><td class="border p-2">${getBranchName(s.branchId)}</td><td class="border p-2">${s.phone}</td></tr>`;
+                });
+                content += `</table>`;
+            } else if (type === 'dues') {
+                title = `Fee Defaulters Report - ${branchTitle}`;
+                content = `<table class="w-full text-sm border-collapse border"><tr class="bg-slate-100"><th class="border p-2">Roll ID</th><th class="border p-2">Name</th><th class="border p-2">Class</th><th class="border p-2">Branch</th><th class="border p-2">Unpaid Fee</th></tr>`;
+                students.filter(s => matchesBranch(s.branchId) && s.feeStatus === 'Unpaid').forEach(s => {
+                    content += `<tr><td class="border p-2">${s.id}</td><td class="border p-2">${s.name}</td><td class="border p-2">${s.className}</td><td class="border p-2">${getBranchName(s.branchId)}</td><td class="border p-2">Rs. ${s.fee}</td></tr>`;
+                });
+                content += `</table>`;
+            } else if (type === 'salary') {
+                title = `Staff & Teachers Salary Sheet - ${branchTitle}`;
+                content = `<table class="w-full text-sm border-collapse border"><tr class="bg-slate-100"><th class="border p-2">ID</th><th class="border p-2">Name</th><th class="border p-2">Role</th><th class="border p-2">Branch</th><th class="border p-2">Salary</th><th class="border p-2">Status</th></tr>`;
+                teachers.filter(t => matchesBranch(t.branchId)).forEach(t => {
+                    content += `<tr><td class="border p-2">${t.id}</td><td class="border p-2">${t.name}</td><td class="border p-2">Teacher</td><td class="border p-2">${getBranchName(t.branchId)}</td><td class="border p-2">Rs. ${t.salary}</td><td class="border p-2">${t.status}</td></tr>`;
+                });
+                staffList.filter(s => matchesBranch(s.branchId)).forEach(s => {
+                    content += `<tr><td class="border p-2">${s.id}</td><td class="border p-2">${s.name}</td><td class="border p-2">${s.type}</td><td class="border p-2">${getBranchName(s.branchId)}</td><td class="border p-2">Rs. ${s.salary}</td><td class="border p-2">${s.status}</td></tr>`;
+                });
+                content += `</table>`;
+            } else if (type === 'expenses') {
+                title = `Expenses Report - ${branchTitle}`;
+                content = `<table class="w-full text-sm border-collapse border"><tr class="bg-slate-100"><th class="border p-2">Date</th><th class="border p-2">Title</th><th class="border p-2">Category</th><th class="border p-2">Branch</th><th class="border p-2">Amount</th></tr>`;
+                expenses.filter(e => matchesBranch(e.branchId)).forEach(e => {
+                    content += `<tr><td class="border p-2">${e.date}</td><td class="border p-2">${e.title}</td><td class="border p-2">${e.category}</td><td class="border p-2">${getBranchName(e.branchId)}</td><td class="border p-2">Rs. ${e.amount}</td></tr>`;
+                });
+                content += `</table>`;
+            }
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html><head><title>${title}</title><script src="https://cdn.tailwindcss.com"><\/script></head>
+                <body class="p-8 bg-white">
+                    <div class="text-center pb-4 mb-6 border-b">
+                        <h1 class="text-xl font-bold text-indigo-900">${appSettings.name}</h1>
+                        <p class="text-xs text-slate-500">${appSettings.address}</p>
+                        <h2 class="text-base font-bold mt-2">${title}</h2>
+                    </div>
+                    ${content}
+                    <script>window.onload=function(){window.print()}<\/script>
+                </body></html>`);
+            win.document.close();
+        }
+
+        function exportBackupJSON() {
+            const backup = {
+                exportedAt: new Date().toISOString(),
+                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Saira_School_ERP_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importBackupJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.students) students = data.students;
+                    if (data.teachers) teachers = data.teachers;
+                    if (data.staffList) staffList = data.staffList;
+                    if (data.branches) branches = data.branches;
+                    if (data.attendance) attendance = data.attendance;
+                    if (data.exams) exams = data.exams;
+                    if (data.expenses) expenses = data.expenses;
+                    if (data.messages) messages = data.messages;
+                    if (data.homeworks) homeworks = data.homeworks;
+                    syncToFirebaseCloud();
+                    populateBranchDropdowns();
+                    updateDashboard();
+                    alert('Backup restored successfully!');
+                } catch (err) {
+                    alert('Invalid backup JSON file.');
+                }
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        function resetMonthlyFeeAndSalary() {
+            if (confirm('Start New Month? This will mark all Student Fees and Staff/Teacher Salaries as Unpaid for the new month.')) {
+                students.forEach(s => s.feeStatus = 'Unpaid');
+                teachers.forEach(t => t.status = 'Unpaid');
+                staffList.forEach(s => s.status = 'Unpaid');
+                syncToFirebaseCloud();
+                updateDashboard();
+                alert('All fees and salaries reset to Unpaid for the new billing cycle.');
+            }
+        }
+
+        function clearSessionLogs() {
+            if (confirm(' Make sure you have printed or downloaded your backup first!\n\nClear all old Attendance logs, Homework assignments, Expenses and Notices to free up storage? (Students & Teachers will NOT be deleted).')) {
+                attendance = [];
+                homeworks = [];
+                expenses = [];
+                messages = [];
+                syncToFirebaseCloud();
+                updateDashboard();
+                alert('Session logs cleaned! Storage is now fresh.');
+            }
+        }
+    </script>
+</body>
+</html>
 
