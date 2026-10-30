@@ -381,25 +381,7 @@
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Father / Husband Name</label>
                                 <input type="text" id="t-father" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Subject *</label>
-                                <div class="flex gap-2">
-                                    <select id="t-subject" required class="flex-1 min-w-0 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></select>
-                                    <button type="button" onclick="quickAddSubject()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold whitespace-nowrap">+ New</button>
-                                </div>
-                                <p class="text-[11px] text-slate-500 mt-1">More classes &amp; subjects can be added later with "Assign Classes &amp; Subjects" in the list below.</p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Class *</label>
-                                <select id="t-class" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <option value="Prep">Prep</option>
-                                    <option value="Class 1">Class 1</option><option value="Class 2">Class 2</option>
-                                    <option value="Class 3">Class 3</option><option value="Class 4">Class 4</option>
-                                    <option value="Class 5">Class 5</option><option value="Class 6">Class 6</option>
-                                    <option value="Class 7">Class 7</option><option value="Class 8">Class 8</option>
-                                    <option value="Matric">Matric</option>
-                                </select>
-                            </div>
+                            <p class="sm:col-span-2 lg:col-span-3 text-[11px] text-slate-500 bg-slate-50 border rounded-lg px-3 py-2"><i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i>Classes &amp; subjects are NOT given here. After adding the teacher, open the <strong>Class Assignment</strong> tab to give classes and subjects.</p>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Phone *</label>
                                 <input type="tel" id="t-phone" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -427,7 +409,6 @@
                                         <th class="p-3">Photo</th>
                                         <th class="p-3">Teacher ID</th>
                                         <th class="p-3">Name</th>
-                                        <th class="p-3">Classes &amp; Subjects</th>
                                         <th class="p-3">Branch</th>
                                         <th class="p-3">Salary</th>
                                         <th class="p-3">Status</th>
@@ -618,24 +599,83 @@
                 </section>
 
                 <!-- EXAMS TAB -->
-                <section id="tab-exams" class="tab-content hidden space-y-6">
-                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
-                            <i class="fa-solid fa-award text-indigo-600"></i><span>Exams & Results</span>
+                <section id="tab-assignments" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center space-x-2">
+                            <i class="fa-solid fa-list-check text-indigo-600"></i><span>Class &amp; Subject Assignment</span>
                         </h2>
+                        <p class="text-xs text-slate-500 mb-3">First add the teacher in the "Teachers" tab. Here you give each teacher the classes and subjects he or she teaches. One teacher can have many classes and many subjects, and you can change them at any time.</p>
+                        <p id="assign-summary" class="text-xs font-semibold mb-3"></p>
+                        <div id="assign-list" class="space-y-3"></div>
+                    </div>
+                </section>
+
+                <section id="tab-timetable" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-table-cells text-indigo-600"></i><span>Class Timetable</span>
+                        </h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Branch</label>
+                                <select id="tt-branch" onchange="renderTimetable()" class="branch-dropdown w-full px-3 py-2 border rounded-lg text-sm"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Class</label>
+                                <select id="tt-class" onchange="renderTimetable()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Periods per day</label>
+                                <select id="tt-periods" onchange="setTTPeriods(this.value)" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="clearTimetable()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-2 rounded-lg text-xs font-semibold">Clear this timetable</button>
+                            </div>
+                        </div>
+                        <details class="mb-3 border rounded-lg p-3 bg-slate-50">
+                            <summary class="text-xs font-bold text-slate-700 cursor-pointer"><i class="fa-regular fa-clock mr-1 text-indigo-600"></i>Period times (same for the whole school)</summary>
+                            <div id="period-times" class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-3"></div>
+                            <p class="text-[11px] text-slate-500 mt-2">Type like 8:00-8:40. Leave unused periods empty. These times appear in every class timetable.</p>
+                        </details>
+                        <p id="tt-empty" class="text-xs text-amber-600 font-semibold mb-2 hidden"></p>
+                        <p class="text-[11px] text-slate-500 mb-2">In each box choose the <strong>teacher</strong> first, then the subject. Only teachers given this class in "Class Assignment" are listed. Changes are saved automatically. <span id="tt-status" class="font-semibold text-emerald-600"></span></p>
+                        <div class="overflow-x-auto"><table id="tt-table" class="border-collapse text-sm"></table></div>
+                    </div>
+                </section>
+
+                <section id="tab-exams" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-award text-indigo-600"></i><span>Exams &amp; Results</span>
+                        </h2>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Tests</label>
+                            <div id="tests-list" class="flex flex-wrap gap-1.5 mb-2"></div>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-test-name" maxlength="40" placeholder="New test (e.g. First Term)" class="flex-1 min-w-0 px-3 py-2 border rounded-lg text-xs">
+                                <input type="number" id="new-test-max" min="1" max="1000" value="100" title="Marks per subject" class="w-20 px-2 py-2 border rounded-lg text-xs">
+                                <button type="button" onclick="addTest()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold">Add</button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1">The number in brackets is the total marks of each subject in that test.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Test</label>
+                                <select id="ex-test" onchange="renderExams()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Class</label>
+                                <select id="ex-class" onchange="renderExams()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Subject</label>
+                                <select id="ex-subject" onchange="renderExams()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
+                            </div>
+                        </div>
+                        <p class="text-xs mb-2"><span id="ex-status" class="font-semibold text-emerald-600"></span></p>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 border-b text-slate-600 uppercase text-xs">
-                                    <tr>
-                                        <th class="p-3">Roll ID</th>
-                                        <th class="p-3">Name</th>
-                                        <th class="p-3">Class</th>
-                                        <th class="p-3">Maths (100)</th>
-                                        <th class="p-3">English (100)</th>
-                                        <th class="p-3">Science (100)</th>
-                                        <th class="p-3 text-center">Report Card</th>
-                                    </tr>
-                                </thead>
+                                <thead id="exams-head" class="bg-slate-50 border-b text-slate-600 uppercase text-xs"></thead>
                                 <tbody id="exams-table-body" class="divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
@@ -904,6 +944,7 @@
                 <img id="rc-logo" src="" alt="Logo" class="w-12 h-12 rounded-full object-cover mb-1 border hidden">
                 <h3 id="rc-school-name" class="font-bold text-indigo-900 text-base">School Name</h3>
                 <p class="text-xs text-slate-500">Official Examination Report Card</p>
+                <p id="rc-test" class="text-xs font-semibold text-indigo-700"></p>
             </div>
             <div class="flex items-center space-x-3 text-sm border-b pb-3">
                 <img id="rc-student-img" src="" alt="Photo" class="w-14 h-14 rounded-lg object-cover border">
@@ -915,9 +956,7 @@
             <div class="border-b py-2">
                 <table class="w-full text-left text-sm">
                     <tr class="text-xs text-slate-500 uppercase border-b"><th class="pb-1">Subject</th><th class="pb-1 text-center">Total</th><th class="pb-1 text-right">Obtained</th></tr>
-                    <tr><td class="py-1.5">Mathematics</td><td class="text-center">100</td><td id="rc-math" class="text-right font-semibold"></td></tr>
-                    <tr><td class="py-1.5">English</td><td class="text-center">100</td><td id="rc-eng" class="text-right font-semibold"></td></tr>
-                    <tr><td class="py-1.5">Science</td><td class="text-center">100</td><td id="rc-sci" class="text-right font-semibold"></td></tr>
+                    <tbody id="rc-rows"></tbody>
                 </table>
             </div>
             <div class="text-sm space-y-1 bg-slate-50 p-3 rounded-lg border">
@@ -1074,7 +1113,88 @@
                 });
             });
         }
+
+        // ---- Exams (tests + per-subject marks), timetables, PINs ----
+        const PERIOD_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        let examTests = [];
+        let marks = {};        // marks[testId][studentId][subjectKey] = number
+        let timetables = {};   // timetables['branchId|Class 8'] = { periods, times[], days:{Mon:[{t:teacherId,s:subject},...]} }
+        let periodTimes = [];  // same period times for the whole school, e.g. ['8:00-8:40', ...]
+        try {
+            examTests = JSON.parse(localStorage.getItem('saira_tests_v3')) || [];
+            marks = JSON.parse(localStorage.getItem('saira_marks_v3')) || {};
+            timetables = JSON.parse(localStorage.getItem('saira_timetables_v3')) || {};
+            periodTimes = JSON.parse(localStorage.getItem('saira_periodtimes_v3')) || [];
+        } catch (err) { /* start empty */ }
+
+        // Firebase does not allow . $ # [ ] / in keys, so subject names are made safe when used as keys
+        function mkey(sub) { return String(sub).replace(/[.$#\[\]\/\\]/g, '_'); }
+        function randomPin() { return String(Math.floor(100000 + Math.random() * 900000)); }
+
+        function ensurePinsAndTests() {
+            let changed = false;
+            students.forEach(function(st) { if (!st.pin) { st.pin = randomPin(); changed = true; } });
+            teachers.forEach(function(t) { if (!t.pin) { t.pin = randomPin(); changed = true; } });
+            if (!Array.isArray(examTests) || examTests.length === 0) {
+                examTests = [
+                    { id: 'TST-1', name: 'Monthly Test', max: 25 },
+                    { id: 'TST-2', name: 'Mid Term', max: 100 },
+                    { id: 'TST-3', name: 'Final Term', max: 100 }
+                ];
+                changed = true;
+                // old fixed Maths/English/Science results are kept as one extra test (nothing is lost)
+                const legacy = {};
+                Object.keys(exams || {}).forEach(function(sid) {
+                    const e = exams[sid] || {};
+                    if (e.math || e.eng || e.sci) legacy[sid] = { 'Maths': e.math || 0, 'English': e.eng || 0, 'Science': e.sci || 0 };
+                });
+                if (Object.keys(legacy).length) {
+                    examTests.push({ id: 'TST-OLD', name: 'Previous Result', max: 100 });
+                    marks['TST-OLD'] = legacy;
+                }
+            }
+            // period times used to be typed per class: bring them over once (old values stay where they are)
+            if (!Array.isArray(periodTimes)) { periodTimes = []; changed = true; }
+            if (!periodTimes.some(Boolean)) {
+                Object.keys(timetables).forEach(function(k) {
+                    ((timetables[k] && timetables[k].times) || []).forEach(function(x, i) {
+                        if (x && !periodTimes[i]) { periodTimes[i] = x; changed = true; }
+                    });
+                });
+            }
+            return changed;
+        }
+
+        function saveLocalOnly() {
+            try {
+                localStorage.setItem('saira_students_v3', JSON.stringify(students));
+                localStorage.setItem('saira_teachers_v3', JSON.stringify(teachers));
+                localStorage.setItem('saira_tests_v3', JSON.stringify(examTests));
+                localStorage.setItem('saira_marks_v3', JSON.stringify(marks));
+                localStorage.setItem('saira_periodtimes_v3', JSON.stringify(periodTimes));
+            } catch (err) { console.warn('Local save failed', err); }
+        }
+
+        // one shared "save a moment after the last change" helper (marks, timetable)
+        let queueTimer = null;
+        function queueSync(statusId) {
+            const el = statusId ? document.getElementById(statusId) : null;
+            if (el) el.innerText = 'Saving...';
+            clearTimeout(queueTimer);
+            queueTimer = setTimeout(function() {
+                queueTimer = null;
+                syncToFirebaseCloud();
+                if (el) el.innerText = 'All changes saved ✓';
+            }, 800);
+        }
+        if (window.addEventListener) {
+            window.addEventListener('pagehide', function() {
+                if (queueTimer) { clearTimeout(queueTimer); queueTimer = null; syncToFirebaseCloud(); }
+            });
+        }
+
         normalizeTeachersAndSubjects();
+        if (ensurePinsAndTests()) saveLocalOnly();
 
         let currentUser = JSON.parse(sessionStorage.getItem('saira_current_user')) || null;
         let uploadedPhotos = { student: "", teacher: "", staff: "" };
@@ -1113,7 +1233,11 @@
                 ['saira_expenses_v3', expenses],
                 ['saira_messages_v3', messages],
                 ['saira_homework_v3', homeworks],
-                ['saira_subjects_v3', subjects]
+                ['saira_subjects_v3', subjects],
+                ['saira_tests_v3', examTests],
+                ['saira_marks_v3', marks],
+                ['saira_timetables_v3', timetables],
+                ['saira_periodtimes_v3', periodTimes]
             ];
             let localSaveFailed = false;
             localPairs.forEach(function(pair) {
@@ -1133,7 +1257,7 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, resetAt, resetStudents
+                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
                     })
                 });
             } catch (e) {
@@ -1160,6 +1284,9 @@
                         if (data.messages) messages = data.messages;
                         if (data.homeworks) homeworks = data.homeworks;
                         if (data.subjects) subjects = data.subjects;
+                        if (data.examTests) examTests = data.examTests;
+                        if (data.marks) marks = data.marks;
+                        if (data.timetables) timetables = data.timetables; if (data.periodTimes) periodTimes = data.periodTimes;
                         // A "Start New Year" reset was done on another device: follow it
                         const cloudReset = Number(data.resetAt || 0);
                         if (cloudReset > resetAt) {
@@ -1168,6 +1295,7 @@
                             expenses = data.expenses || [];
                             messages = data.messages || [];
                             exams = data.exams || {};
+                            marks = data.marks || {};
                             if (data.resetStudents) students = data.students || [];
                             resetAt = cloudReset;
                             resetStudents = !!data.resetStudents;
@@ -1175,6 +1303,7 @@
                             localStorage.setItem('saira_reset_students', resetStudents ? '1' : '0');
                         }
                         normalizeTeachersAndSubjects();
+                        ensurePinsAndTests();
                         syncToFirebaseCloud();
                     }
                 }
@@ -1329,9 +1458,11 @@
                 btn('admissions', 'fa-user-plus', 'Admissions'),
                 btn('students', 'fa-users', 'Students'),
                 btn('teachers', 'fa-chalkboard-user', 'Teachers'),
+                btn('assignments', 'fa-list-check', 'Class Assignment'),
                 btn('staff', 'fa-users-gear', 'Other Staff'),
                 btn('attendance', 'fa-qrcode', 'QR Attendance'),
                 btn('homework', 'fa-book-open', 'Homework'),
+                btn('timetable', 'fa-table-cells', 'Timetable'),
                 btn('fees', 'fa-file-invoice-dollar', 'Fees & Dues'),
                 btn('exams', 'fa-award', 'Exams & Results'),
                 btn('salary', 'fa-wallet', 'Salary Sheet'),
@@ -1362,11 +1493,13 @@
             if (targetId === 'dashboard') updateDashboard();
             if (targetId === 'students') renderStudents();
             if (targetId === 'teachers') renderTeachers();
+            if (targetId === 'assignments') renderAssignments();
             if (targetId === 'staff') renderStaff();
             if (targetId === 'attendance') renderAttendance();
             if (targetId === 'homework') renderHomework();
             if (targetId === 'fees') renderFees();
             if (targetId === 'exams') renderExams();
+            if (targetId === 'timetable') renderTimetable();
             if (targetId === 'salary') renderSalary();
             if (targetId === 'expenses') renderExpenses();
             if (targetId === 'messages') renderAdminMessages();
@@ -1603,7 +1736,8 @@
                 fee: document.getElementById('adm-fee').value,
                 address: document.getElementById('adm-address').value.trim(),
                 photo: uploadedPhotos.student || DEFAULT_AVATAR,
-                feeStatus: 'Unpaid'
+                feeStatus: 'Unpaid',
+                pin: randomPin()
             };
 
             students.push(newStudent);
@@ -1632,6 +1766,7 @@
                         <td class="p-3 text-slate-600">${s.phone}</td>
                         <td class="p-3 text-center space-x-2">
                             <button onclick="showIdCard('${s.id}','student')" class="text-indigo-600 hover:text-indigo-800 px-1.5" title="View/Print ID Card"><i class="fa-solid fa-id-card"></i></button>
+                            <button onclick="resetPin('student','${s.id}')" class="text-amber-600 hover:text-amber-800 px-1.5" title="New PIN"><i class="fa-solid fa-key"></i></button>
                             <button onclick="deleteStudent('${s.id}')" class="text-rose-500 hover:text-rose-700 px-1.5" title="Delete"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>`;
@@ -1649,6 +1784,7 @@
             if (confirm('Delete this student permanently?')) {
                 students = students.filter(s => s.id !== id);
                 delete exams[id];
+                Object.keys(marks).forEach(function(tid) { if (marks[tid]) delete marks[tid][id]; });
                 syncToFirebaseCloud();
                 renderStudents();
                 updateDashboard();
@@ -1670,14 +1806,16 @@
                     <p><span class="label">Emergency:</span> <span class="val">${person.emergency || person.phone}</span></p>
                     ${person.bloodGroup ? `<p><span class="label">Blood Group:</span> <span class="val">${person.bloodGroup}</span></p>` : ''}
                     ${person.disease && person.disease !== 'None' ? `<p><span class="label">Medical:</span> <span class="val">${person.disease}</span></p>` : ''}
-                    <p><span class="label">Address:</span> <span class="val">${person.address}</span></p>`;
+                    <p><span class="label">Address:</span> <span class="val">${person.address}</span></p>
+                    <p><span class="label">PIN:</span> <span class="val" style="font-weight:800;letter-spacing:2px;">${esc(person.pin || '')}</span></p>`;
             } else if (type === 'teacher') {
                 person = teachers.find(t => t.id === id);
                 if (!person) return;
                 detailsHtml = `
                     <p><span class="label">Designation:</span> <span class="val">Class Teacher</span></p>
-                    <p><span class="label">Teaches:</span> <span class="val">${teacherGroupedHtml(person)}</span></p>
-                    <p><span class="label">Phone:</span> <span class="val">${person.phone}</span></p>`;
+                    ${teacherPairs(person).length ? `<p><span class="label">Teaches:</span> <span class="val">${teacherGroupedHtml(person)}</span></p>` : ''}
+                    <p><span class="label">Phone:</span> <span class="val">${person.phone}</span></p>
+                    <p><span class="label">PIN:</span> <span class="val" style="font-weight:800;letter-spacing:2px;">${esc(person.pin || '')}</span></p>`;
             } else if (type === 'staff') {
                 person = staffList.find(s => s.id === id);
                 if (!person) return;
@@ -1744,7 +1882,7 @@
         }
 
         function addSubjectName(raw) {
-            const name = String(raw || '').trim().replace(/\s+/g, ' ');
+            const name = String(raw || '').replace(/[.$#\[\]\/\\]/g, ' ').trim().replace(/\s+/g, ' ');
             if (!name) return null;
             const found = subjects.find(function(x) { return x.toLowerCase() === name.toLowerCase(); });
             if (found) return found;
@@ -1760,11 +1898,6 @@
             const added = addSubjectName(inp.value);
             if (!added) { alert('Please type a subject name.'); return; }
             inp.value = '';
-        }
-
-        function quickAddSubject() {
-            const added = addSubjectName(prompt('New subject name (e.g. Urdu, Computer, اسلامیات):'));
-            if (added) document.getElementById('t-subject').value = added;
         }
 
         function deleteSubject(i) {
@@ -1814,6 +1947,35 @@
             });
             if (!order.length) return '-';
             return order.map(function(c) { return esc(c) + ': ' + esc(map[c].join(', ')); }).join('<br>');
+        }
+
+        function renderAssignments() {
+            const box = document.getElementById('assign-list');
+            if (!box) return;
+            const list = teachers.filter(function(t) { return matchesBranch(t.branchId); });
+            const missing = list.filter(function(t) { return teacherPairs(t).length === 0; }).length;
+            const sum = document.getElementById('assign-summary');
+            if (sum) {
+                sum.innerText = !list.length ? '' : (missing ? missing + ' teacher(s) not assigned yet' : 'All teachers are assigned ✓');
+                sum.className = 'text-xs font-semibold mb-3 ' + (missing ? 'text-amber-600' : 'text-emerald-600');
+            }
+            if (!list.length) {
+                box.innerHTML = '<p class="text-sm text-slate-400 text-center py-6">No teachers in this branch. Add a teacher in the Teachers tab first.</p>';
+                return;
+            }
+            box.innerHTML = list.map(function(t) {
+                const has = teacherPairs(t).length > 0;
+                return '<div class="border rounded-lg p-3 flex flex-col gap-2">' +
+                    '<div class="flex items-center gap-3">' +
+                        '<img src="' + esc(t.photo || DEFAULT_AVATAR) + '" class="w-10 h-10 rounded-full object-cover border">' +
+                        '<div class="min-w-0"><p class="font-semibold text-slate-800 text-sm truncate">' + esc(t.name) + '</p>' +
+                        '<p class="text-[11px] text-slate-500">' + esc(t.id) + ' · ' + esc(getBranchName(t.branchId)) + '</p></div>' +
+                    '</div>' +
+                    '<div>' + (has ? teacherChipsHtml(t) : '<span class="text-xs font-semibold text-amber-600">Not assigned yet</span>') + '</div>' +
+                    '<button onclick="openAssignModal(\'' + t.id + '\')" class="self-start text-xs font-semibold ' + (has ? 'bg-slate-100 hover:bg-slate-200 text-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white') + ' px-3 py-2 rounded-lg">' +
+                    '<i class="fa-solid fa-pen-to-square mr-1"></i>' + (has ? 'Change Classes &amp; Subjects' : 'Assign Classes &amp; Subjects') + '</button>' +
+                    '</div>';
+            }).join('');
         }
 
         let assignTeacherId = null;
@@ -1897,6 +2059,7 @@
             t.assignedClass = t.assignments[0].cls;
             syncToFirebaseCloud();
             renderTeachers();
+            renderAssignments();
             closeModal('assign-modal');
         }
 
@@ -1909,13 +2072,14 @@
                 branchId: document.getElementById('t-branch').value || 'main',
                 name: document.getElementById('t-name').value.trim(),
                 father: document.getElementById('t-father').value.trim(),
-                subject: document.getElementById('t-subject').value.trim(),
-                assignedClass: document.getElementById('t-class').value,
-                assignments: [{ cls: document.getElementById('t-class').value, subject: document.getElementById('t-subject').value.trim() }],
+                subject: '',
+                assignedClass: '',
+                assignments: [],
                 phone: document.getElementById('t-phone').value.trim(),
                 salary: document.getElementById('t-salary').value,
                 status: 'Unpaid',
-                photo: uploadedPhotos.teacher || DEFAULT_AVATAR
+                photo: uploadedPhotos.teacher || DEFAULT_AVATAR,
+                pin: randomPin()
             };
             teachers.push(teacher);
             uploadedPhotos.teacher = '';
@@ -1929,7 +2093,7 @@
         function renderTeachers() {
             const tbody = document.getElementById('teachers-table-body');
             const list = teachers.filter(t => matchesBranch(t.branchId));
-            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="8" class="p-4 text-center text-slate-400">No teachers added in this branch.</td></tr>` : '';
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">No teachers added in this branch.</td></tr>` : '';
             list.forEach(t => {
                 const statusBadge = t.status === 'Paid'
                     ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-semibold">Paid</span>`
@@ -1939,12 +2103,12 @@
                         <td class="p-3"><img src="${t.photo || DEFAULT_AVATAR}" class="w-9 h-9 rounded-full object-cover border"></td>
                         <td class="p-3 font-bold text-indigo-600">${t.id}</td>
                         <td class="p-3 font-medium">${t.name}</td>
-                        <td class="p-3">${teacherChipsHtml(t)}<button onclick="openAssignModal('${t.id}')" class="block mt-1 text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i>Assign Classes &amp; Subjects</button></td>
                         <td class="p-3 text-xs text-slate-500">${getBranchName(t.branchId)}</td>
                         <td class="p-3 font-semibold">Rs. ${t.salary}</td>
                         <td class="p-3">${statusBadge}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="showIdCard('${t.id}','teacher')" class="text-indigo-600 px-1.5" title="ID Card"><i class="fa-solid fa-id-card"></i></button>
+                            <button onclick="resetPin('teacher','${t.id}')" class="text-amber-600 px-1.5" title="New PIN"><i class="fa-solid fa-key"></i></button>
                             <button onclick="paySalary('teacher','${t.id}')" class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Pay</button>
                             <button onclick="deleteTeacher('${t.id}')" class="text-rose-500 px-1.5"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -2194,41 +2358,182 @@
         }
 
         // ========== EXAMS ==========
-        function renderExams() {
-            const tbody = document.getElementById('exams-table-body');
-            const list = students.filter(s => matchesBranch(s.branchId));
-            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">No records.</td></tr>` : '';
-            list.forEach(s => {
-                if (!exams[s.id]) exams[s.id] = { math: 0, eng: 0, sci: 0 };
-                const ex = exams[s.id];
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-bold text-indigo-600">${s.id}</td>
-                        <td class="p-3 font-medium">${s.name}</td>
-                        <td class="p-3">${s.className}</td>
-                        <td class="p-3"><input type="number" max="100" id="math-${s.id}" value="${ex.math}" onchange="updateMarks('${s.id}')" class="w-16 px-2 py-1 border rounded text-sm"></td>
-                        <td class="p-3"><input type="number" max="100" id="eng-${s.id}" value="${ex.eng}" onchange="updateMarks('${s.id}')" class="w-16 px-2 py-1 border rounded text-sm"></td>
-                        <td class="p-3"><input type="number" max="100" id="sci-${s.id}" value="${ex.sci}" onchange="updateMarks('${s.id}')" class="w-16 px-2 py-1 border rounded text-sm"></td>
-                        <td class="p-3 text-center">
-                            <button onclick="showReportCard('${s.id}')" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700"><i class="fa-solid fa-award mr-1"></i>Result Card</button>
-                        </td>
-                    </tr>`;
+        // ========== EXAMS (tests + subject-wise marks) ==========
+        function fillSelect(id, items) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const cur = el.value;
+            el.innerHTML = items.map(function(i) { return '<option value="' + esc(i.v) + '">' + esc(i.l) + '</option>'; }).join('');
+            if (items.some(function(i) { return i.v === cur; })) el.value = cur;
+        }
+
+        function gradeFor(p) {
+            if (p >= 80) return 'A+';
+            if (p >= 70) return 'A';
+            if (p >= 60) return 'B';
+            if (p >= 50) return 'C';
+            if (p >= 40) return 'D';
+            return 'F';
+        }
+
+        function studentMark(testId, sid, sub) {
+            const m = marks[testId] && marks[testId][sid];
+            const v = m ? m[mkey(sub)] : undefined;
+            return (v === undefined || v === null) ? undefined : v;
+        }
+
+        function testColumns(testId, list) {
+            return subjects.filter(function(sub) {
+                return list.some(function(st) { return studentMark(testId, st.id, sub) !== undefined; });
             });
         }
 
-        function updateMarks(id) {
-            exams[id] = {
-                math: Number(document.getElementById(`math-${id}`).value) || 0,
-                eng: Number(document.getElementById(`eng-${id}`).value) || 0,
-                sci: Number(document.getElementById(`sci-${id}`).value) || 0
-            };
-            syncToFirebaseCloud();
+        function renderTestsManager() {
+            const box = document.getElementById('tests-list');
+            if (!box) return;
+            box.innerHTML = examTests.map(function(t, i) {
+                return '<span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs font-semibold pl-2.5 pr-1 py-1 rounded-full">' + esc(t.name) + ' (' + esc(t.max) + ')' +
+                    '<button type="button" onclick="editTestMax(' + i + ')" class="ml-1 w-5 h-5 rounded-full hover:bg-indigo-100" title="Change total marks"><i class="fa-solid fa-pen text-[9px]"></i></button>' +
+                    '<button type="button" onclick="deleteTest(' + i + ')" class="w-5 h-5 rounded-full hover:bg-rose-100 text-rose-500" title="Delete test">&times;</button></span>';
+            }).join('');
         }
 
-        function showReportCard(id) {
-            const student = students.find(s => s.id === id);
-            const ex = exams[id] || { math: 0, eng: 0, sci: 0 };
+        function addTest() {
+            const name = document.getElementById('new-test-name').value.trim().replace(/\s+/g, ' ');
+            const max = Number(document.getElementById('new-test-max').value);
+            if (!name) { alert('Please type the test name.'); return; }
+            if (!(max > 0 && max <= 1000)) { alert('Total marks must be between 1 and 1000.'); return; }
+            if (examTests.some(function(t) { return t.name.toLowerCase() === name.toLowerCase(); })) { alert('A test with this name already exists.'); return; }
+            examTests.push({ id: 'TST-' + Date.now().toString(36), name: name, max: max });
+            document.getElementById('new-test-name').value = '';
+            syncToFirebaseCloud();
+            renderExams();
+        }
+
+        function editTestMax(i) {
+            const t = examTests[i];
+            if (!t) return;
+            const v = prompt('Total marks of each subject for "' + t.name + '":', t.max);
+            if (v === null) return;
+            const n = Number(v);
+            if (!(n > 0 && n <= 1000)) { alert('Total marks must be between 1 and 1000.'); return; }
+            t.max = n;
+            syncToFirebaseCloud();
+            renderExams();
+        }
+
+        function deleteTest(i) {
+            const t = examTests[i];
+            if (!t) return;
+            if (examTests.length <= 1) { alert('At least one test is required.'); return; }
+            if (!confirm('Delete test "' + t.name + '" and ALL marks entered in it?')) return;
+            delete marks[t.id];
+            examTests.splice(i, 1);
+            syncToFirebaseCloud();
+            renderExams();
+        }
+
+        function renderExams() {
+            const head = document.getElementById('exams-head');
+            const body = document.getElementById('exams-table-body');
+            if (!head || !body) return;
+
+            fillSelect('ex-test', examTests.map(function(t) { return { v: t.id, l: t.name + ' (' + t.max + ')' }; }));
+            const classes = CLASS_LIST.slice();
+            students.forEach(function(st) { if (st.className && classes.indexOf(st.className) === -1) classes.push(st.className); });
+            const classEl = document.getElementById('ex-class');
+            const hadClass = !!classEl.value;
+            fillSelect('ex-class', classes.map(function(c) { return { v: c, l: c }; }));
+            if (!hadClass) {
+                const first = classes.find(function(c) { return students.some(function(st) { return matchesBranch(st.branchId) && st.className === c; }); });
+                if (first) classEl.value = first;
+            }
+            fillSelect('ex-subject', [{ v: '__sheet__', l: 'Result Sheet (all subjects)' }].concat(subjects.map(function(x) { return { v: x, l: x }; })));
+            renderTestsManager();
+
+            const test = examTests.find(function(t) { return t.id === document.getElementById('ex-test').value; });
+            const cls = classEl.value;
+            const subj = document.getElementById('ex-subject').value;
+            const list = students.filter(function(st) { return matchesBranch(st.branchId) && st.className === cls; });
+            if (!test) { head.innerHTML = ''; body.innerHTML = '<tr><td class="p-4 text-slate-400">No test selected.</td></tr>'; return; }
+            if (subj === '__sheet__') renderResultSheet(test, list, cls);
+            else renderMarkEntry(test, list, subj);
+        }
+
+        function renderMarkEntry(test, list, subj) {
+            document.getElementById('exams-head').innerHTML = '<tr><th class="p-3">Roll ID</th><th class="p-3">Name</th><th class="p-3">' + esc(subj) + ' (out of ' + esc(test.max) + ')</th></tr>';
+            const body = document.getElementById('exams-table-body');
+            if (!list.length) { body.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">No students in this class.</td></tr>'; return; }
+            body.innerHTML = list.map(function(st) {
+                const v = studentMark(test.id, st.id, subj);
+                return '<tr class="hover:bg-slate-50"><td class="p-3 font-bold text-indigo-600">' + esc(st.id) + '</td><td class="p-3 font-medium">' + esc(st.name) + '</td>' +
+                    '<td class="p-3"><input type="number" min="0" max="' + esc(test.max) + '" step="any" value="' + (v === undefined ? '' : esc(v)) + '" ' +
+                    'onchange="setMark(\'' + test.id + '\',\'' + st.id + '\',this.dataset.sub,this)" data-sub="' + esc(subj) + '" class="w-24 px-2 py-1 border rounded text-sm"></td></tr>';
+            }).join('');
+        }
+
+        function setMark(testId, sid, subj, el) {
+            const test = examTests.find(function(t) { return t.id === testId; });
+            if (!test) return;
+            const key = mkey(subj);
+            const cur = marks[testId] && marks[testId][sid] ? marks[testId][sid][key] : undefined;
+            const raw = String(el.value).trim();
+            if (raw === '') {
+                if (cur !== undefined) {
+                    delete marks[testId][sid][key];
+                    if (!Object.keys(marks[testId][sid]).length) delete marks[testId][sid];
+                    queueSync('ex-status');
+                }
+                return;
+            }
+            const n = Number(raw);
+            if (isNaN(n) || n < 0 || n > test.max) {
+                alert('Marks must be between 0 and ' + test.max + '.');
+                el.value = cur === undefined ? '' : cur;
+                return;
+            }
+            if (!marks[testId]) marks[testId] = {};
+            if (!marks[testId][sid]) marks[testId][sid] = {};
+            marks[testId][sid][key] = Math.round(n * 100) / 100;
+            queueSync('ex-status');
+        }
+
+        function renderResultSheet(test, list) {
+            const head = document.getElementById('exams-head');
+            const body = document.getElementById('exams-table-body');
+            const cols = testColumns(test.id, list);
+            if (!list.length) { head.innerHTML = ''; body.innerHTML = '<tr><td class="p-4 text-center text-slate-400">No students in this class.</td></tr>'; return; }
+            if (!cols.length) {
+                head.innerHTML = '';
+                body.innerHTML = '<tr><td class="p-4 text-center text-slate-400">No marks entered yet for this class in "' + esc(test.name) + '". Choose a subject above to enter marks.</td></tr>';
+                return;
+            }
+            head.innerHTML = '<tr><th class="p-3">Roll ID</th><th class="p-3">Name</th>' + cols.map(function(c) { return '<th class="p-3">' + esc(c) + '</th>'; }).join('') +
+                '<th class="p-3">Total</th><th class="p-3">%</th><th class="p-3">Grade</th><th class="p-3 text-center">Card</th></tr>';
+            const max = cols.length * test.max;
+            body.innerHTML = list.map(function(st) {
+                let total = 0, any = false;
+                const cells = cols.map(function(c) {
+                    const v = studentMark(test.id, st.id, c);
+                    if (v === undefined) return '<td class="p-3 text-slate-400">-</td>';
+                    any = true; total += v;
+                    return '<td class="p-3">' + v + '</td>';
+                }).join('');
+                const perc = max ? (total / max) * 100 : 0;
+                const summary = any
+                    ? '<td class="p-3 font-semibold whitespace-nowrap">' + (Math.round(total * 100) / 100) + ' / ' + max + '</td><td class="p-3">' + perc.toFixed(1) + '%</td><td class="p-3 font-bold">' + gradeFor(perc) + '</td>'
+                    : '<td class="p-3 text-slate-400" colspan="3">No marks yet</td>';
+                return '<tr class="hover:bg-slate-50"><td class="p-3 font-bold text-indigo-600">' + esc(st.id) + '</td><td class="p-3 font-medium">' + esc(st.name) + '</td>' + cells + summary +
+                    '<td class="p-3 text-center"><button onclick="showReportCard(\'' + st.id + '\',\'' + test.id + '\')" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 whitespace-nowrap"><i class="fa-solid fa-award mr-1"></i>Result Card</button></td></tr>';
+            }).join('');
+        }
+
+        function showReportCard(id, testId) {
+            const student = students.find(function(x) { return x.id === id; });
             if (!student) return;
+            const tid = testId || (document.getElementById('ex-test') ? document.getElementById('ex-test').value : '');
+            const test = examTests.find(function(t) { return t.id === tid; }) || examTests[0];
+            if (!test) return;
 
             document.getElementById('rc-school-name').innerText = `${appSettings.name} (${getBranchName(student.branchId)})`;
             const logoEl = document.getElementById('rc-logo');
@@ -2239,26 +2544,190 @@
             document.getElementById('rc-id').innerText = student.id;
             document.getElementById('rc-name').innerText = student.name;
             document.getElementById('rc-class').innerText = student.className;
-            document.getElementById('rc-math').innerText = ex.math;
-            document.getElementById('rc-eng').innerText = ex.eng;
-            document.getElementById('rc-sci').innerText = ex.sci;
+            document.getElementById('rc-test').innerText = test.name;
 
-            const total = ex.math + ex.eng + ex.sci;
-            const perc = (total / 300) * 100;
-            let grade = 'F';
-            if (perc >= 80) grade = 'A+';
-            else if (perc >= 70) grade = 'A';
-            else if (perc >= 60) grade = 'B';
-            else if (perc >= 50) grade = 'C';
-            else if (perc >= 40) grade = 'D';
+            const mates = students.filter(function(x) { return x.className === student.className && (x.branchId || 'main') === (student.branchId || 'main'); });
+            const cols = testColumns(test.id, mates);
+            let total = 0;
+            document.getElementById('rc-rows').innerHTML = cols.length ? cols.map(function(c) {
+                const v = studentMark(test.id, student.id, c);
+                if (v !== undefined) total += v;
+                return '<tr><td class="py-1.5">' + esc(c) + '</td><td class="text-center">' + esc(test.max) + '</td><td class="text-right font-semibold">' + (v === undefined ? '-' : v) + '</td></tr>';
+            }).join('') : '<tr><td colspan="3" class="py-2 text-slate-400">No marks entered yet.</td></tr>';
 
-            document.getElementById('rc-total').innerText = total + ' / 300';
+            const max = cols.length * test.max;
+            const perc = max ? (total / max) * 100 : 0;
+            document.getElementById('rc-total').innerText = (Math.round(total * 100) / 100) + ' / ' + max;
             document.getElementById('rc-perc').innerText = perc.toFixed(1) + '%';
-            document.getElementById('rc-grade').innerText = grade;
+            document.getElementById('rc-grade').innerText = cols.length ? gradeFor(perc) : '-';
             const modal = document.getElementById('reportcard-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
+
+        // ========== TIMETABLE ==========
+        function ttKey(br, cls) { return br + '|' + cls; }
+        function ttCurrent() {
+            return {
+                br: document.getElementById('tt-branch').value || (branches[0] ? branches[0].id : 'main'),
+                cls: document.getElementById('tt-class').value
+            };
+        }
+        function ttGet(br, cls) { return timetables[ttKey(br, cls)] || { periods: 8, times: [], days: {} }; }
+        function ttEdit(fn) {
+            const c = ttCurrent();
+            const k = ttKey(c.br, c.cls);
+            if (!timetables[k]) timetables[k] = { periods: 8, times: [], days: {} };
+            if (!timetables[k].times) timetables[k].times = [];
+            if (!timetables[k].days) timetables[k].days = {};
+            fn(timetables[k]);
+            queueSync('tt-status');
+        }
+
+        function ttEligibleTeachers(br, cls) {
+            return teachers.filter(function(t) {
+                return (t.branchId || 'main') === br && teacherPairs(t).some(function(a) { return a.cls === cls; });
+            });
+        }
+        function ttTeacherSubjects(tid, cls) {
+            const t = teachers.find(function(x) { return x.id === tid; });
+            const out = [];
+            if (t) teacherPairs(t).forEach(function(a) { if (a.cls === cls && a.subject && out.indexOf(a.subject) === -1) out.push(a.subject); });
+            return out;
+        }
+        function ttAutoTeacher(br, cls, sub) {
+            const m = teachers.filter(function(t) {
+                return (t.branchId || 'main') === br && teacherPairs(t).some(function(a) { return a.cls === cls && a.subject === sub; });
+            });
+            return m.length === 1 ? m[0].id : '';
+        }
+        // a box can be new style {t:teacherId, s:subject} or old style "Maths" (still shown, teacher found automatically)
+        function ttCell(v, br, cls) {
+            if (v && typeof v === 'object') return { t: v.t || '', s: v.s || '' };
+            if (typeof v === 'string' && v) return { t: ttAutoTeacher(br, cls, v), s: v };
+            return { t: '', s: '' };
+        }
+        // other classes of the same branch where this teacher is already busy in this day + period
+        function ttBusyElsewhere(br, cls, day, i, tid) {
+            const out = [];
+            if (!tid) return out;
+            Object.keys(timetables).forEach(function(k) {
+                const sep = k.indexOf('|');
+                const kb = k.slice(0, sep), kc = k.slice(sep + 1);
+                if (kb !== br || kc === cls) return;
+                const tt = timetables[k] || {};
+                if (i >= (tt.periods || 8)) return;
+                const arr = (tt.days || {})[day] || [];
+                if (ttCell(arr[i], br, kc).t === tid) out.push(kc);
+            });
+            return out;
+        }
+
+        function setTTTeacher(day, i, tid) {
+            const c = ttCurrent();
+            ttEdit(function(t) {
+                if (!t.days[day]) t.days[day] = [];
+                const prev = ttCell(t.days[day][i], c.br, c.cls);
+                const subs = tid ? ttTeacherSubjects(tid, c.cls) : [];
+                let sub = prev.s;
+                if (!tid) sub = '';
+                else if (subs.indexOf(sub) === -1) sub = subs.length === 1 ? subs[0] : '';
+                t.days[day][i] = (tid || sub) ? { t: tid, s: sub } : '';
+            });
+            const busy = ttBusyElsewhere(c.br, c.cls, day, i, tid);
+            if (busy.length) {
+                const tObj = teachers.find(function(x) { return x.id === tid; });
+                alert('Warning: ' + (tObj ? tObj.name : tid) + ' is already teaching ' + busy.join(', ') + ' on ' + day + ', period ' + (i + 1) + '.\n\nٹیچر اسی وقت دوسری کلاس میں مصروف ہے۔');
+            }
+            renderTimetable();
+        }
+        function setTTSubject(day, i, sub) {
+            const c = ttCurrent();
+            ttEdit(function(t) {
+                if (!t.days[day]) t.days[day] = [];
+                const prev = ttCell(t.days[day][i], c.br, c.cls);
+                t.days[day][i] = (prev.t || sub) ? { t: prev.t, s: sub } : '';
+            });
+            renderTimetable();
+        }
+        function setPeriodTime(i, val) {
+            if (!Array.isArray(periodTimes)) periodTimes = [];
+            periodTimes[i] = String(val).trim();
+            queueSync('tt-status');
+            renderTimetable();
+        }
+        function setTTPeriods(n) { ttEdit(function(t) { t.periods = Number(n) || 8; }); renderTimetable(); }
+        function clearTimetable() {
+            const c = ttCurrent();
+            if (!confirm('Clear the whole timetable of ' + c.cls + '?')) return;
+            delete timetables[ttKey(c.br, c.cls)];
+            queueSync('tt-status');
+            renderTimetable();
+        }
+
+        function renderTimetable() {
+            const table = document.getElementById('tt-table');
+            if (!table) return;
+            if (!document.getElementById('tt-class').options.length) fillSelect('tt-class', CLASS_LIST.map(function(c) { return { v: c, l: c }; }));
+            if (!document.getElementById('tt-periods').options.length) fillSelect('tt-periods', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function(n) { return { v: String(n), l: String(n) }; }));
+            const c = ttCurrent();
+            const tt = ttGet(c.br, c.cls);
+            document.getElementById('tt-periods').value = String(tt.periods || 8);
+
+            const pt = document.getElementById('period-times');
+            if (pt) {
+                let h = '';
+                for (let i = 0; i < 10; i++) {
+                    h += '<div><label class="block text-[11px] text-slate-500 mb-0.5">Period ' + (i + 1) + '</label>' +
+                        '<input type="text" value="' + esc((periodTimes || [])[i] || '') + '" placeholder="8:00-8:40" onchange="setPeriodTime(' + i + ',this.value)" class="w-full px-2 py-1.5 border rounded text-xs"></div>';
+                }
+                pt.innerHTML = h;
+            }
+
+            const eligible = ttEligibleTeachers(c.br, c.cls);
+            const empty = document.getElementById('tt-empty');
+            if (empty) {
+                if (eligible.length) empty.classList.add('hidden');
+                else { empty.innerText = 'No teacher has been given ' + c.cls + ' yet. Please use the "Class Assignment" tab first.'; empty.classList.remove('hidden'); }
+            }
+
+            let html = '<thead><tr class="bg-slate-50 text-xs text-slate-600 uppercase"><th class="p-2 border">Period</th>' +
+                PERIOD_DAYS.map(function(d) { return '<th class="p-2 border">' + d + '</th>'; }).join('') + '</tr></thead><tbody>';
+            for (let i = 0; i < (tt.periods || 8); i++) {
+                const time = (periodTimes || [])[i] || '';
+                html += '<tr><td class="p-2 border text-center whitespace-nowrap"><div class="font-bold text-slate-600 text-xs">Period ' + (i + 1) + '</div><div class="text-[10px] text-slate-500">' + (time ? esc(time) : '—') + '</div></td>';
+                PERIOD_DAYS.forEach(function(d) {
+                    const cell = ttCell((((tt.days || {})[d]) || [])[i], c.br, c.cls);
+                    const busy = ttBusyElsewhere(c.br, c.cls, d, i, cell.t);
+                    const subs = cell.t ? ttTeacherSubjects(cell.t, c.cls) : [];
+                    let tOpts = '<option value="">— Teacher —</option>' + eligible.map(function(t) {
+                        return '<option value="' + esc(t.id) + '"' + (t.id === cell.t ? ' selected' : '') + '>' + esc(t.name) + '</option>';
+                    }).join('');
+                    if (cell.t && !eligible.some(function(t) { return t.id === cell.t; })) {
+                        const o = teachers.find(function(x) { return x.id === cell.t; });
+                        tOpts += '<option value="' + esc(cell.t) + '" selected>' + esc(o ? o.name : cell.t) + ' (not in this class)</option>';
+                    }
+                    html += '<td class="p-1 border align-top' + (busy.length ? ' bg-rose-50 border-rose-400' : '') + '">' +
+                        '<select onchange="setTTTeacher(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px] mb-1">' + tOpts + '</select>' +
+                        '<select onchange="setTTSubject(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px]"' + ((!cell.t && !cell.s) ? ' disabled' : '') + '>' +
+                        '<option value="">— Subject —</option>' + optionsHtml(subs, cell.s) + '</select>' +
+                        (busy.length ? '<div class="text-[10px] text-rose-600 font-semibold mt-0.5">Busy: ' + esc(busy.join(', ')) + '</div>' : '') + '</td>';
+                });
+                html += '</tr>';
+            }
+            table.innerHTML = html + '</tbody>';
+        }
+
+        function resetPin(type, id) {
+            const list = type === 'teacher' ? teachers : students;
+            const p = list.find(function(x) { return x.id === id; });
+            if (!p) return;
+            if (!confirm('Make a NEW PIN for ' + p.name + '? The old PIN will stop working. Please reprint the ID card afterwards.')) return;
+            p.pin = randomPin();
+            syncToFirebaseCloud();
+            showIdCard(id, type);
+        }
+
 
         // ========== SALARY & EXPENSES ==========
         function renderSalary() {
@@ -2269,7 +2738,7 @@
                 rows += `<tr class="hover:bg-slate-50">
                     <td class="p-3 font-bold text-indigo-600">${t.id}</td>
                     <td class="p-3 font-medium">${t.name}</td>
-                    <td class="p-3">Teacher (${esc(teacherSubjectsText(t))})</td>
+                    <td class="p-3">Teacher${teacherSubjectsText(t) ? ' (' + esc(teacherSubjectsText(t)) + ')' : ''}</td>
                     <td class="p-3 text-xs text-slate-500">${getBranchName(t.branchId)}</td>
                     <td class="p-3 font-semibold">Rs. ${t.salary}</td>
                     <td class="p-3"><span class="${badge} px-2 py-0.5 rounded text-xs font-semibold">${t.status}</span></td>
@@ -2446,7 +2915,7 @@
         function exportBackupJSON() {
             const backup = {
                 exportedAt: new Date().toISOString(),
-                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, resetAt, resetStudents
+                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
@@ -2472,7 +2941,11 @@
                     if (data.messages) messages = data.messages;
                     if (data.homeworks) homeworks = data.homeworks;
                     if (data.subjects) subjects = data.subjects;
+                    if (data.examTests) examTests = data.examTests;
+                    if (data.marks) marks = data.marks;
+                    if (data.timetables) timetables = data.timetables; if (data.periodTimes) periodTimes = data.periodTimes;
                     normalizeTeachersAndSubjects();
+                    ensurePinsAndTests();
                     syncToFirebaseCloud();
                     populateBranchDropdowns();
                     updateDashboard();
@@ -2512,6 +2985,7 @@
             expenses = [];
             messages = [];
             exams = {};
+            marks = {};
             if (removeStudents) students = [];
             resetAt = Date.now();
             resetStudents = removeStudents;
