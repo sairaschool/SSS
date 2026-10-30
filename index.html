@@ -535,40 +535,17 @@
                         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
                             <i class="fa-solid fa-book-open text-indigo-600"></i><span>Homework & Assignments Management</span>
                         </h2>
-                        <form onsubmit="addHomework(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 pb-6 border-b">
+                        <p class="text-xs text-slate-500 mb-3"><i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i>Homework is given by the teachers from the Teacher Portal. Here you can see it and delete it if needed.</p>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Branch *</label>
-                                <select id="hw-branch" required class="w-full px-3 py-2 border rounded-lg text-sm branch-dropdown"></select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Class *</label>
-                                <select id="hw-class" required class="w-full px-3 py-2 border rounded-lg text-sm">
-                                    <option value="Prep">Prep</option>
-                                    <option value="Class 1">Class 1</option><option value="Class 2">Class 2</option>
-                                    <option value="Class 3">Class 3</option><option value="Class 4">Class 4</option>
-                                    <option value="Class 5">Class 5</option><option value="Class 6">Class 6</option>
-                                    <option value="Class 7">Class 7</option><option value="Class 8">Class 8</option>
-                                    <option value="Matric">Matric</option>
-                                </select>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Class</label>
+                                <select id="hw-filter-class" onchange="renderHomework()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Subject *</label>
-                                <select id="hw-subject" required class="w-full px-3 py-2 border rounded-lg text-sm"></select>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Teacher</label>
+                                <select id="hw-filter-teacher" onchange="renderHomework()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Due Date *</label>
-                                <input type="date" id="hw-due" required class="w-full px-3 py-2 border rounded-lg text-sm">
-                            </div>
-                            <div class="sm:col-span-2 lg:col-span-3">
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Assignment Details / Instructions *</label>
-                                <input type="text" id="hw-desc" placeholder="e.g. Solve Exercise 4.2 Questions 1 to 10 on notebook" required class="w-full px-3 py-2 border rounded-lg text-sm">
-                            </div>
-                            <div class="flex items-end">
-                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm shadow transition">
-                                    <i class="fa-solid fa-plus mr-1"></i>Assign Homework
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                         <div id="homework-list" class="space-y-3"></div>
                     </div>
                 </section>
@@ -615,6 +592,7 @@
                         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
                             <i class="fa-solid fa-table-cells text-indigo-600"></i><span>Class Timetable</span>
                         </h2>
+                        <h3 id="tt-title" class="text-base font-bold text-indigo-700 mb-3"></h3>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Branch</label>
@@ -631,6 +609,14 @@
                             <div class="flex items-end">
                                 <button onclick="clearTimetable()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-2 rounded-lg text-xs font-semibold">Clear this timetable</button>
                             </div>
+                        </div>
+                        <div class="flex flex-wrap items-end gap-2 mb-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Week starting (Monday)</label>
+                                <input type="date" id="tt-week" class="px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <button onclick="printTimetable('class')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF - this class</button>
+                            <button onclick="printTimetable('all')" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF - all classes</button>
                         </div>
                         <details class="mb-3 border rounded-lg p-3 bg-slate-50">
                             <summary class="text-xs font-bold text-slate-700 cursor-pointer"><i class="fa-regular fa-clock mr-1 text-indigo-600"></i>Period times (same for the whole school)</summary>
@@ -795,7 +781,7 @@
                             <i class="fa-solid fa-paper-plane mr-2"></i>Publish Notice
                         </button>
                         <div class="border-t pt-4 mt-4">
-                            <h3 class="font-semibold mb-2 text-sm">Published Notices</h3>
+                            <h3 class="font-semibold mb-2 text-sm">Published Notices &amp; Teacher Messages</h3>
                             <div id="admin-msg-list" class="space-y-2 text-sm max-h-64 overflow-y-auto"></div>
                         </div>
                     </div>
@@ -821,6 +807,15 @@
                             <button onclick="printReport('expenses')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition">
                                 <i class="fa-solid fa-money-bill-wave mr-2"></i>Expenses Report
                             </button>
+                            <button onclick="printList('summary')" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-chart-pie mr-2"></i>School Summary (totals)</button>
+                            <button onclick="printList('students')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-user-graduate mr-2"></i>Students List</button>
+                            <button onclick="printList('teachers')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-chalkboard-user mr-2"></i>Teachers List</button>
+                            <button onclick="printList('staff')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-people-group mr-2"></i>Staff List</button>
+                            <button onclick="printList('fees')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-coins mr-2"></i>Fee Report</button>
+                            <button onclick="printList('attendance')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-check-to-slot mr-2"></i>Today's Attendance</button>
+                            <button onclick="printList('homework')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-book-open mr-2"></i>Homework List</button>
+                            <button onclick="printList('assignments')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-list-check mr-2"></i>Teacher Assignments</button>
+                            <button onclick="printTimetable('all')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-table-cells mr-2"></i>All Class Timetables</button>
                         </div>
                     </div>
 
@@ -1075,6 +1070,20 @@
         let messages = JSON.parse(localStorage.getItem('saira_messages_v3')) || [];
         let homeworks = JSON.parse(localStorage.getItem('saira_homework_v3')) || [];
 
+        // ---- Firebase project settings (the app talks to the Realtime Database through its REST address) ----
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyCF7LN_MRBI-e3pLKU53ngy9eeKuMufirY",
+            authDomain: "saira-school-system.firebaseapp.com",
+            projectId: "saira-school-system",
+            storageBucket: "saira-school-system.firebasestorage.app",
+            messagingSenderId: "860674367727",
+            appId: "1:860674367727:web:840e46c10b46ea35a43b1a",
+            // Realtime Database address. If the Firebase console shows a different address
+            // (for example ...asia-southeast1.firebasedatabase.app), paste it here.
+            databaseURL: "https://saira-school-system-default-rtdb.firebaseio.com"
+        };
+        if (!appSettings.firebaseUrl) appSettings.firebaseUrl = FIREBASE_CONFIG.databaseURL;
+
         // ---- Subjects list (admin-managed) and class list ----
         const DEFAULT_SUBJECTS = ['Maths', 'English', 'Science', 'Urdu', 'Islamiyat', 'Computer'];
         const CLASS_LIST = ['Prep', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Matric'];
@@ -1205,6 +1214,10 @@
         window.onload = async function() {
             applyBrandingToLogin();
             await syncFromFirebaseCloud();
+            injectPrintBars();
+            checkCloudConnection();
+            pullInbox();
+            if (typeof setInterval === 'function') setInterval(pullInbox, 60000);
             if (currentUser && currentUser.role === 'admin') {
                 showMainApp();
             } else {
@@ -1250,18 +1263,20 @@
             });
             if (localSaveFailed) warnStorageFull();
 
-            if (!appSettings.firebaseUrl) return;
+            if (!appSettings.firebaseUrl) return false;
             try {
                 const baseUrl = appSettings.firebaseUrl.replace(/\/$/, '');
-                await fetch(`${baseUrl}/saira_erp.json`, {
+                const putRes = await fetch(`${baseUrl}/saira_erp.json`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
                     })
                 });
+                return !!putRes.ok;
             } catch (e) {
                 console.warn("Cloud sync warning:", e);
+                return false;
             }
         }
 
@@ -1305,10 +1320,115 @@
                         normalizeTeachersAndSubjects();
                         ensurePinsAndTests();
                         syncToFirebaseCloud();
+                    } else {
+                        syncToFirebaseCloud();   // the cloud is still empty: upload what this device has
                     }
                 }
             } catch (e) {
                 console.warn("Cloud fetch warning:", e);
+            }
+        }
+
+        // ========== INBOX: records written by the Teacher portal ==========
+        // Teachers write small records into "saira_inbox". The admin page is the only writer of the main
+        // data, so it merges these records in (and then clears them). Nothing can overwrite anything.
+        function setBadgeError() {
+            const badge = document.getElementById('db-status-badge');
+            if (!badge) return;
+            badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>Cloud Error';
+            badge.className = 'text-[11px] bg-amber-500 text-white px-2.5 py-1 rounded-full font-semibold';
+        }
+
+        async function checkCloudConnection() {
+            if (!appSettings.firebaseUrl) return;
+            try {
+                const res = await fetch(appSettings.firebaseUrl.replace(/\/$/, '') + '/saira_erp.json?shallow=true');
+                if (!res.ok) setBadgeError();
+            } catch (e) { setBadgeError(); }
+        }
+
+        function rerenderActiveTab() {
+            const open = document.querySelector('.tab-content:not(.hidden)');
+            if (open && open.id) switchTab(open.id.replace('tab-', ''));
+        }
+
+        let inboxBusy = false;
+        async function pullInbox() {
+            if (!appSettings.firebaseUrl || inboxBusy) return 0;
+            inboxBusy = true;
+            try {
+                const base = appSettings.firebaseUrl.replace(/\/$/, '');
+                let data = null;
+                try {
+                    const res = await fetch(base + '/saira_inbox.json');
+                    if (!res.ok) return 0;
+                    data = await res.json();
+                } catch (e) { return 0; }
+                if (!data) return 0;
+
+                const del = {};
+                const each = function(o, fn) { Object.keys(o || {}).forEach(function(k) { fn(k, o[k]); }); };
+
+                each(data.homeworks, function(id, h) {
+                    if (h && h.id) {
+                        const i = homeworks.findIndex(function(x) { return x.id === id; });
+                        if (i >= 0) homeworks[i] = h; else homeworks.unshift(h);
+                    }
+                    del['homeworks/' + id] = null;
+                });
+                each(data.homeworkDel, function(id) {
+                    homeworks = homeworks.filter(function(x) { return x.id !== id; });
+                    del['homeworkDel/' + id] = null;
+                });
+                each(data.messages, function(id, m) {
+                    if (m && m.id) {
+                        const i = messages.findIndex(function(x) { return x.id === id; });
+                        if (i >= 0) messages[i] = m; else messages.unshift(m);
+                    }
+                    del['messages/' + id] = null;
+                });
+                each(data.messageDel, function(id) {
+                    messages = messages.filter(function(x) { return x.id !== id; });
+                    del['messageDel/' + id] = null;
+                });
+                each(data.attendance, function(k, r) {
+                    if (r && r.id && r.date) {
+                        const i = attendance.findIndex(function(a) { return a.id === r.id && a.date === r.date; });
+                        if (r.status === 'Absent') { if (i >= 0) attendance.splice(i, 1); }
+                        else if (i < 0) attendance.unshift({ id: r.id, name: r.name, branchId: r.branchId || 'main', time: r.time, date: r.date, status: 'Present' });
+                    }
+                    del['attendance/' + k] = null;
+                });
+                each(data.marks, function(k, m) {
+                    if (m && m.testId && m.sid && m.key) {
+                        if (m.v === '' || m.v === null || m.v === undefined) {
+                            if (marks[m.testId] && marks[m.testId][m.sid]) {
+                                delete marks[m.testId][m.sid][m.key];
+                                if (!Object.keys(marks[m.testId][m.sid]).length) delete marks[m.testId][m.sid];
+                                if (!Object.keys(marks[m.testId]).length) delete marks[m.testId];
+                            }
+                        } else {
+                            if (!marks[m.testId]) marks[m.testId] = {};
+                            if (!marks[m.testId][m.sid]) marks[m.testId][m.sid] = {};
+                            marks[m.testId][m.sid][m.key] = Number(m.v);
+                        }
+                    }
+                    del['marks/' + k] = null;
+                });
+
+                const n = Object.keys(del).length;
+                if (!n) return 0;
+                const ok = await syncToFirebaseCloud();
+                if (ok) {
+                    try {
+                        await fetch(base + '/saira_inbox.json', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(del) });
+                    } catch (e) { console.warn('Inbox clear warning:', e); }
+                }
+                updateDashboard();
+                rerenderActiveTab();
+                return n;
+            } finally {
+                inboxBusy = false;
             }
         }
 
@@ -2186,46 +2306,32 @@
         }
 
         // ========== HOMEWORK / ASSIGNMENTS ==========
-        function addHomework(e) {
-            e.preventDefault();
-            homeworks.unshift({
-                id: 'HW-' + Date.now(),
-                branchId: document.getElementById('hw-branch').value || 'main',
-                className: document.getElementById('hw-class').value,
-                subject: document.getElementById('hw-subject').value.trim(),
-                dueDate: document.getElementById('hw-due').value,
-                description: document.getElementById('hw-desc').value.trim(),
-                assignedBy: 'Admin',
-                date: new Date().toLocaleDateString()
-            });
-            syncToFirebaseCloud();
-            e.target.reset();
-            renderHomework();
-        }
-
         function renderHomework() {
             const el = document.getElementById('homework-list');
-            const list = homeworks.filter(h => matchesBranch(h.branchId));
+            if (!el) return;
+            fillSelect('hw-filter-class', [{ v: '', l: 'All classes' }].concat(CLASS_LIST.map(function(c) { return { v: c, l: c }; })));
+            const names = [];
+            homeworks.forEach(function(h) { if (h.assignedBy && names.indexOf(h.assignedBy) === -1) names.push(h.assignedBy); });
+            fillSelect('hw-filter-teacher', [{ v: '', l: 'All teachers' }].concat(names.map(function(n) { return { v: n, l: n }; })));
+            const fc = document.getElementById('hw-filter-class').value;
+            const ft = document.getElementById('hw-filter-teacher').value;
+            const list = homeworks.filter(function(h) {
+                return matchesBranch(h.branchId) && (!fc || h.className === fc) && (!ft || h.assignedBy === ft);
+            });
             if (list.length === 0) {
-                el.innerHTML = `<p class="text-sm text-slate-400 text-center py-4">No homework assignments found for this branch.</p>`;
+                el.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No homework found.</p>';
                 return;
             }
-            el.innerHTML = '';
-            list.forEach(h => {
-                el.innerHTML += `
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-start gap-4">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded">${h.className}</span>
-                                <span class="font-bold text-slate-800 text-sm">${h.subject}</span>
-                                <span class="text-xs text-slate-500">• ${getBranchName(h.branchId)}</span>
-                            </div>
-                            <p class="text-sm text-slate-700 mt-1.5">${h.description}</p>
-                            <p class="text-xs text-rose-600 font-medium mt-1">Due Date: ${h.dueDate} | Assigned by: ${h.assignedBy}</p>
-                        </div>
-                        <button onclick="deleteHomework('${h.id}')" class="text-rose-500 hover:text-rose-700 text-sm"><i class="fa-solid fa-trash"></i></button>
-                    </div>`;
-            });
+            el.innerHTML = list.map(function(h) {
+                return '<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-start gap-4">' +
+                    '<div><div class="flex flex-wrap items-center gap-2">' +
+                    '<span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded">' + esc(h.className) + '</span>' +
+                    '<span class="font-bold text-slate-800 text-sm">' + esc(h.subject) + '</span>' +
+                    '<span class="text-xs text-slate-500">• ' + esc(getBranchName(h.branchId)) + '</span></div>' +
+                    '<p class="text-sm text-slate-700 mt-1.5">' + esc(h.description) + '</p>' +
+                    '<p class="text-xs text-rose-600 font-medium mt-1">Due Date: ' + esc(h.dueDate) + ' | Given by: ' + esc(h.assignedBy) + '</p></div>' +
+                    '<button onclick="deleteHomework(\'' + esc(h.id) + '\')" class="text-rose-500 hover:text-rose-700 text-sm"><i class="fa-solid fa-trash"></i></button></div>';
+            }).join('');
         }
 
         function deleteHomework(id) {
@@ -2601,11 +2707,15 @@
             });
             return m.length === 1 ? m[0].id : '';
         }
-        // a box can be new style {t:teacherId, s:subject} or old style "Maths" (still shown, teacher found automatically)
+        function ttTeacherName(id) {
+            const t = teachers.find(function(x) { return x.id === id; });
+            return t ? t.name : '';
+        }
+        // a box is {t:teacherId, s:subject, n:teacherName}; an old plain "Maths" is still understood
         function ttCell(v, br, cls) {
-            if (v && typeof v === 'object') return { t: v.t || '', s: v.s || '' };
-            if (typeof v === 'string' && v) return { t: ttAutoTeacher(br, cls, v), s: v };
-            return { t: '', s: '' };
+            if (v && typeof v === 'object') return { t: v.t || '', s: v.s || '', n: v.n || ttTeacherName(v.t) };
+            if (typeof v === 'string' && v) { const t = ttAutoTeacher(br, cls, v); return { t: t, s: v, n: ttTeacherName(t) }; }
+            return { t: '', s: '', n: '' };
         }
         // other classes of the same branch where this teacher is already busy in this day + period
         function ttBusyElsewhere(br, cls, day, i, tid) {
@@ -2622,6 +2732,10 @@
             });
             return out;
         }
+        function ttWarnBusy(c, day, i, tid) {
+            const busy = ttBusyElsewhere(c.br, c.cls, day, i, tid);
+            if (busy.length) alert('Warning: ' + (ttTeacherName(tid) || tid) + ' is already teaching ' + busy.join(', ') + ' on ' + day + ', period ' + (i + 1) + '.\n\nٹیچر اسی وقت دوسری کلاس میں مصروف ہے۔');
+        }
 
         function setTTTeacher(day, i, tid) {
             const c = ttCurrent();
@@ -2631,23 +2745,24 @@
                 const subs = tid ? ttTeacherSubjects(tid, c.cls) : [];
                 let sub = prev.s;
                 if (!tid) sub = '';
-                else if (subs.indexOf(sub) === -1) sub = subs.length === 1 ? subs[0] : '';
-                t.days[day][i] = (tid || sub) ? { t: tid, s: sub } : '';
+                else if (subs.length === 1) sub = subs[0];
+                else if (subs.indexOf(sub) === -1) sub = '';
+                t.days[day][i] = (tid || sub) ? { t: tid, s: sub, n: tid ? ttTeacherName(tid) : '' } : '';
             });
-            const busy = ttBusyElsewhere(c.br, c.cls, day, i, tid);
-            if (busy.length) {
-                const tObj = teachers.find(function(x) { return x.id === tid; });
-                alert('Warning: ' + (tObj ? tObj.name : tid) + ' is already teaching ' + busy.join(', ') + ' on ' + day + ', period ' + (i + 1) + '.\n\nٹیچر اسی وقت دوسری کلاس میں مصروف ہے۔');
-            }
+            if (tid) ttWarnBusy(c, day, i, tid);
             renderTimetable();
         }
         function setTTSubject(day, i, sub) {
             const c = ttCurrent();
+            let autoSet = '';
             ttEdit(function(t) {
                 if (!t.days[day]) t.days[day] = [];
                 const prev = ttCell(t.days[day][i], c.br, c.cls);
-                t.days[day][i] = (prev.t || sub) ? { t: prev.t, s: sub } : '';
+                let tid = prev.t;
+                if (!tid && sub) { tid = ttAutoTeacher(c.br, c.cls, sub); autoSet = tid; }
+                t.days[day][i] = (tid || sub) ? { t: tid, s: sub, n: tid ? ttTeacherName(tid) : '' } : '';
             });
+            if (autoSet) ttWarnBusy(c, day, i, autoSet);
             renderTimetable();
         }
         function setPeriodTime(i, val) {
@@ -2665,14 +2780,44 @@
             renderTimetable();
         }
 
+        function ttComingMonday() {
+            const d = new Date();
+            const day = d.getDay();
+            const add = day === 1 ? 0 : (8 - day) % 7;
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate() + add);
+        }
+        function ttIso(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function ttFmt(d) {
+            return String(d.getDate()).padStart(2, '0') + '-' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + '-' + d.getFullYear();
+        }
+        function ttWeekDates() {
+            const el = document.getElementById('tt-week');
+            let start = ttComingMonday();
+            if (el && el.value) { const p = el.value.split('-').map(Number); start = new Date(p[0], p[1] - 1, p[2]); }
+            return PERIOD_DAYS.map(function(_, i) { return new Date(start.getFullYear(), start.getMonth(), start.getDate() + i); });
+        }
+
         function renderTimetable() {
             const table = document.getElementById('tt-table');
             if (!table) return;
-            if (!document.getElementById('tt-class').options.length) fillSelect('tt-class', CLASS_LIST.map(function(c) { return { v: c, l: c }; }));
+            const clsEl = document.getElementById('tt-class');
+            const hadClass = !!clsEl.value;
+            if (!clsEl.options.length) fillSelect('tt-class', CLASS_LIST.map(function(c) { return { v: c, l: c }; }));
+            if (!hadClass) {
+                const brNow = document.getElementById('tt-branch').value || (branches[0] ? branches[0].id : 'main');
+                const first = CLASS_LIST.find(function(cl) { return ttEligibleTeachers(brNow, cl).length > 0; });
+                if (first) clsEl.value = first;
+            }
             if (!document.getElementById('tt-periods').options.length) fillSelect('tt-periods', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function(n) { return { v: String(n), l: String(n) }; }));
+            const wk = document.getElementById('tt-week');
+            if (wk && !wk.value) wk.value = ttIso(ttComingMonday());
             const c = ttCurrent();
             const tt = ttGet(c.br, c.cls);
             document.getElementById('tt-periods').value = String(tt.periods || 8);
+            const title = document.getElementById('tt-title');
+            if (title) title.innerText = c.cls + ' - ' + getBranchName(c.br);
 
             const pt = document.getElementById('period-times');
             if (pt) {
@@ -2688,10 +2833,10 @@
             const empty = document.getElementById('tt-empty');
             if (empty) {
                 if (eligible.length) empty.classList.add('hidden');
-                else { empty.innerText = 'No teacher has been given ' + c.cls + ' yet. Please use the "Class Assignment" tab first.'; empty.classList.remove('hidden'); }
+                else { empty.innerText = 'No teacher has been given ' + c.cls + ' yet. You can still choose subjects; add teachers in the "Class Assignment" tab.'; empty.classList.remove('hidden'); }
             }
 
-            let html = '<thead><tr class="bg-slate-50 text-xs text-slate-600 uppercase"><th class="p-2 border">Period</th>' +
+            let html = '<thead><tr class="bg-slate-50 text-xs text-slate-600 uppercase"><th class="p-2 border">' + esc(c.cls) + '<div class="text-[10px] normal-case text-slate-400">Period</div></th>' +
                 PERIOD_DAYS.map(function(d) { return '<th class="p-2 border">' + d + '</th>'; }).join('') + '</tr></thead><tbody>';
             for (let i = 0; i < (tt.periods || 8); i++) {
                 const time = (periodTimes || [])[i] || '';
@@ -2699,23 +2844,185 @@
                 PERIOD_DAYS.forEach(function(d) {
                     const cell = ttCell((((tt.days || {})[d]) || [])[i], c.br, c.cls);
                     const busy = ttBusyElsewhere(c.br, c.cls, d, i, cell.t);
-                    const subs = cell.t ? ttTeacherSubjects(cell.t, c.cls) : [];
                     let tOpts = '<option value="">— Teacher —</option>' + eligible.map(function(t) {
                         return '<option value="' + esc(t.id) + '"' + (t.id === cell.t ? ' selected' : '') + '>' + esc(t.name) + '</option>';
                     }).join('');
                     if (cell.t && !eligible.some(function(t) { return t.id === cell.t; })) {
-                        const o = teachers.find(function(x) { return x.id === cell.t; });
-                        tOpts += '<option value="' + esc(cell.t) + '" selected>' + esc(o ? o.name : cell.t) + ' (not in this class)</option>';
+                        tOpts += '<option value="' + esc(cell.t) + '" selected>' + esc(cell.n || cell.t) + ' (not in this class)</option>';
                     }
                     html += '<td class="p-1 border align-top' + (busy.length ? ' bg-rose-50 border-rose-400' : '') + '">' +
                         '<select onchange="setTTTeacher(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px] mb-1">' + tOpts + '</select>' +
-                        '<select onchange="setTTSubject(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px]"' + ((!cell.t && !cell.s) ? ' disabled' : '') + '>' +
-                        '<option value="">— Subject —</option>' + optionsHtml(subs, cell.s) + '</select>' +
+                        '<select onchange="setTTSubject(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px]">' +
+                        '<option value="">— Subject —</option>' + optionsHtml(subjects, cell.s) + '</select>' +
                         (busy.length ? '<div class="text-[10px] text-rose-600 font-semibold mt-0.5">Busy: ' + esc(busy.join(', ')) + '</div>' : '') + '</td>';
                 });
                 html += '</tr>';
             }
             table.innerHTML = html + '</tbody>';
+        }
+
+        // ---------- print / PDF ----------
+        function openPrintWindow(title, body, landscape) {
+            const win = window.open('', '_blank');
+            if (!win) { alert('Please allow pop-ups, then press Print again.'); return; }
+            const logo = appSettings.logo ? '<img src="' + appSettings.logo + '" style="height:56px"><br>' : '';
+            win.document.write('<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' + esc(title) + '</title><style>' +
+                'body{font-family:Arial,sans-serif;margin:0;padding:18px;color:#111}h1{font-size:20px;margin:4px 0}h2{font-size:15px;margin:10px 0 4px}p{margin:3px 0;font-size:12px}' +
+                '.hdr{text-align:center;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}' +
+                'th,td{border:1px solid #888;padding:5px 6px;text-align:left;vertical-align:top}th{background:#eee}td.c,th.c{text-align:center}.small{font-size:10px;color:#444}' +
+                '.pg{page-break-after:always}.pg:last-child{page-break-after:auto}@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:10mm}</style></head><body>' +
+                '<div class="hdr">' + logo + '<h1>' + esc(appSettings.name) + '</h1><div style="font-size:12px">' + esc(appSettings.address) + '</div></div>' + body +
+                '<script>window.onload=function(){window.print()}<\/script></body></html>');
+            win.document.close();
+        }
+
+        function tableHtml(headers, rows) {
+            return '<table><tr>' + headers.map(function(h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr>' +
+                rows.map(function(r) { return '<tr>' + r.map(function(v) { return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>';
+        }
+
+        function ttPageHtml(br, cls, dates) {
+            const tt = ttGet(br, cls);
+            let h = '<div class="pg"><h2 style="text-align:center">Weekly Timetable - ' + esc(cls) + ' (' + esc(getBranchName(br)) + ')</h2>' +
+                '<p style="text-align:center">Week: ' + ttFmt(dates[0]) + ' to ' + ttFmt(dates[dates.length - 1]) + '</p>' +
+                '<table><tr><th class="c">Period</th>' + PERIOD_DAYS.map(function(d, i) { return '<th class="c">' + d + '<div class="small">' + ttFmt(dates[i]) + '</div></th>'; }).join('') + '</tr>';
+            for (let i = 0; i < (tt.periods || 8); i++) {
+                const time = (periodTimes || [])[i] || '';
+                h += '<tr><td class="c"><b>Period ' + (i + 1) + '</b><div class="small">' + esc(time) + '</div></td>';
+                PERIOD_DAYS.forEach(function(d) {
+                    const cell = ttCell((((tt.days || {})[d]) || [])[i], br, cls);
+                    h += '<td class="c">' + (cell.s ? '<b>' + esc(cell.s) + '</b>' + (cell.n ? '<div class="small">' + esc(cell.n) + '</div>' : '') : '') + '</td>';
+                });
+                h += '</tr>';
+            }
+            return h + '</table></div>';
+        }
+
+        function printTimetable(mode) {
+            const c = ttCurrent();
+            const dates = ttWeekDates();
+            let body = '';
+            if (mode === 'all') {
+                const list = CLASS_LIST.filter(function(cl) {
+                    const tt = timetables[ttKey(c.br, cl)];
+                    return tt && Object.keys(tt.days || {}).some(function(d) { return (tt.days[d] || []).some(function(v) { return !!v; }); });
+                });
+                if (!list.length) { alert('No timetable has been made for this branch yet.'); return; }
+                body = list.map(function(cl) { return ttPageHtml(c.br, cl, dates); }).join('');
+            } else {
+                body = ttPageHtml(c.br, c.cls, dates);
+            }
+            openPrintWindow('Timetable', body, true);
+        }
+
+        function injectPrintBars() {
+            const map = { dashboard: 'summary', students: 'students', teachers: 'teachers', staff: 'staff', attendance: 'attendance', homework: 'homework',
+                fees: 'fees', assignments: 'assignments', exams: 'result', salary: 'salary', expenses: 'expenses' };
+            Object.keys(map).forEach(function(tab) {
+                const sec = document.getElementById('tab-' + tab);
+                if (!sec || !sec.insertAdjacentHTML || (sec.querySelector && sec.querySelector('[data-printbar]'))) return;
+                sec.insertAdjacentHTML('afterbegin', '<div data-printbar="1" class="flex justify-end"><button onclick="printList(\'' + map[tab] + '\')" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF</button></div>');
+            });
+        }
+
+        function printList(type) {
+            const brName = getBranchName(activeBranch);
+            const S = students.filter(function(x) { return matchesBranch(x.branchId); });
+            const T = teachers.filter(function(x) { return matchesBranch(x.branchId); });
+            const F = staffList.filter(function(x) { return matchesBranch(x.branchId); });
+            const E = expenses.filter(function(x) { return matchesBranch(x.branchId); });
+            const rs = function(n) { return 'Rs. ' + (Number(n) || 0).toLocaleString(); };
+            const sum = function(arr, f) { return arr.reduce(function(a, x) { return a + (Number(f(x)) || 0); }, 0); };
+            const byClass = function(a, b) {
+                const d = CLASS_LIST.indexOf(a.className) - CLASS_LIST.indexOf(b.className);
+                return d !== 0 ? d : String(a.name).localeCompare(String(b.name));
+            };
+            const today = new Date().toISOString().split('T')[0];
+            let title = '', body = '', landscape = false;
+
+            if (type === 'students') {
+                title = 'Students List - ' + brName;
+                body = '<h2>' + esc(title) + '</h2><p>Total students: <b>' + S.length + '</b></p>' +
+                    tableHtml(['Roll ID', 'Name', 'Father', 'Class', 'Phone', 'Fee'], S.slice().sort(byClass).map(function(x) { return [x.id, x.name, x.father, x.className, x.phone, x.feeStatus]; }));
+            } else if (type === 'teachers') {
+                title = 'Teachers List - ' + brName;
+                body = '<h2>' + esc(title) + '</h2><p>Total teachers: <b>' + T.length + '</b></p>' +
+                    tableHtml(['ID', 'Name', 'Phone', 'Classes & Subjects', 'Salary', 'Status'], T.map(function(x) {
+                        return [x.id, x.name, x.phone, teacherPairs(x).map(function(a) { return a.cls + ' - ' + a.subject; }).join(', ') || '-', rs(x.salary), x.status];
+                    }));
+                landscape = true;
+            } else if (type === 'staff') {
+                title = 'Staff List - ' + brName;
+                body = '<h2>' + esc(title) + '</h2><p>Total staff: <b>' + F.length + '</b></p>' +
+                    tableHtml(['ID', 'Name', 'Role', 'Phone', 'Salary', 'Status'], F.map(function(x) { return [x.id, x.name, x.type, x.phone, rs(x.salary), x.status]; }));
+            } else if (type === 'assignments') {
+                title = 'Teacher Class & Subject Assignment - ' + brName;
+                body = '<h2>' + esc(title) + '</h2>' + tableHtml(['ID', 'Teacher', 'Classes & Subjects'], T.map(function(x) {
+                    return [x.id, x.name, teacherPairs(x).map(function(a) { return a.cls + ' - ' + a.subject; }).join(', ') || 'Not assigned yet'];
+                }));
+            } else if (type === 'attendance') {
+                title = 'Attendance of ' + today + ' - ' + brName;
+                const list = attendance.filter(function(a) { return a.date === today && matchesBranch(a.branchId); });
+                body = '<h2>' + esc(title) + '</h2><p>Present: <b>' + list.length + '</b></p>' + tableHtml(['ID', 'Name', 'Time', 'Status'], list.map(function(a) { return [a.id, a.name, a.time, a.status]; }));
+            } else if (type === 'homework') {
+                title = 'Homework List - ' + brName;
+                const list = homeworks.filter(function(h) { return matchesBranch(h.branchId); });
+                body = '<h2>' + esc(title) + '</h2>' + tableHtml(['Class', 'Subject', 'Given by', 'Due', 'Details'], list.map(function(h) { return [h.className, h.subject, h.assignedBy, h.dueDate, h.description]; }));
+            } else if (type === 'fees') {
+                title = 'Fee Report - ' + brName;
+                const unpaid = S.filter(function(x) { return x.feeStatus === 'Unpaid'; });
+                body = '<h2>' + esc(title) + '</h2><p>Total students: <b>' + S.length + '</b> | Paid: <b>' + (S.length - unpaid.length) + '</b> | Unpaid: <b>' + unpaid.length + '</b> | Unpaid amount: <b>' + rs(sum(unpaid, function(x) { return x.fee; })) + '</b></p>' +
+                    tableHtml(['Roll ID', 'Name', 'Class', 'Fee', 'Status'], S.slice().sort(byClass).map(function(x) { return [x.id, x.name, x.className, rs(x.fee), x.feeStatus]; }));
+            } else if (type === 'salary') {
+                title = 'Salary Sheet - ' + brName;
+                const rows = T.map(function(x) { return [x.id, x.name, 'Teacher', rs(x.salary), x.status]; }).concat(F.map(function(x) { return [x.id, x.name, x.type, rs(x.salary), x.status]; }));
+                const all = T.concat(F);
+                const paid = all.filter(function(x) { return x.status === 'Paid'; });
+                body = '<h2>' + esc(title) + '</h2><p>Total monthly salary: <b>' + rs(sum(all, function(x) { return x.salary; })) + '</b> | Paid: <b>' + rs(sum(paid, function(x) { return x.salary; })) + '</b> | Unpaid: <b>' + rs(sum(all, function(x) { return x.salary; }) - sum(paid, function(x) { return x.salary; })) + '</b></p>' +
+                    tableHtml(['ID', 'Name', 'Role', 'Salary', 'Status'], rows);
+            } else if (type === 'expenses') {
+                title = 'Expenses Report - ' + brName;
+                body = '<h2>' + esc(title) + '</h2><p>Total expenses: <b>' + rs(sum(E, function(x) { return x.amount; })) + '</b></p>' +
+                    tableHtml(['Date', 'Title', 'Category', 'Amount'], E.map(function(x) { return [x.date, x.title, x.category, rs(x.amount)]; }));
+            } else if (type === 'result') {
+                const tEl = document.getElementById('ex-test'), cEl = document.getElementById('ex-class');
+                const test = examTests.find(function(t) { return tEl && t.id === tEl.value; }) || examTests[0];
+                const cls = cEl && cEl.value ? cEl.value : CLASS_LIST[0];
+                const list = students.filter(function(x) { return matchesBranch(x.branchId) && x.className === cls; });
+                const cols = testColumns(test.id, list);
+                title = 'Result Sheet - ' + cls + ' - ' + test.name;
+                const max = cols.length * test.max;
+                const rows = list.map(function(x) {
+                    let total = 0;
+                    const cells = cols.map(function(cn) { const v = studentMark(test.id, x.id, cn); if (v !== undefined) total += v; return v === undefined ? '-' : String(v); });
+                    const perc = max ? (total / max) * 100 : 0;
+                    return [x.id, x.name].concat(cells, [String(Math.round(total * 100) / 100) + ' / ' + max, perc.toFixed(1) + '%', cols.length ? gradeFor(perc) : '-']);
+                });
+                body = '<h2>' + esc(title) + '</h2><p>' + esc(brName) + ' | each subject out of ' + esc(test.max) + '</p>' + (cols.length ? tableHtml(['Roll ID', 'Name'].concat(cols, ['Total', '%', 'Grade']), rows) : '<p>No marks entered yet.</p>');
+                landscape = true;
+            } else {
+                title = 'School Summary - ' + brName;
+                const unpaid = S.filter(function(x) { return x.feeStatus === 'Unpaid'; });
+                const all = T.concat(F);
+                const paid = all.filter(function(x) { return x.status === 'Paid'; });
+                const present = attendance.filter(function(a) { return a.date === today && matchesBranch(a.branchId); }).length;
+                const classRows = CLASS_LIST.map(function(cl) { return [cl, String(S.filter(function(x) { return x.className === cl; }).length)]; }).filter(function(r) { return r[1] !== '0'; });
+                const cats = {};
+                E.forEach(function(x) { cats[x.category] = (cats[x.category] || 0) + (Number(x.amount) || 0); });
+                body = '<h2>' + esc(title) + '</h2><p>Date: ' + today + '</p>' +
+                    tableHtml(['Item', 'Value'], [
+                        ['Total students', String(S.length)], ['Total teachers', String(T.length)], ['Total staff', String(F.length)],
+                        ['Present today (all)', String(present)],
+                        ['Students with unpaid fee', String(unpaid.length) + ' (' + rs(sum(unpaid, function(x) { return x.fee; })) + ')'],
+                        ['Total monthly salary (teachers + staff)', rs(sum(all, function(x) { return x.salary; }))],
+                        ['Salary paid', rs(sum(paid, function(x) { return x.salary; }))],
+                        ['Salary unpaid', rs(sum(all, function(x) { return x.salary; }) - sum(paid, function(x) { return x.salary; }))],
+                        ['Other expenses (total)', rs(sum(E, function(x) { return x.amount; }))]
+                    ]) +
+                    '<h2>Students per class</h2>' + tableHtml(['Class', 'Students'], classRows) +
+                    '<h2>Expenses by category</h2>' + tableHtml(['Category', 'Amount'], Object.keys(cats).map(function(k) { return [k, rs(cats[k])]; }));
+            }
+            openPrintWindow(title, body, landscape);
         }
 
         function resetPin(type, id) {
@@ -2845,7 +3152,7 @@
             list.forEach(m => {
                 el.innerHTML += `<div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 flex justify-between items-start">
                     <div>
-                        <p class="text-xs text-slate-500">${m.date} • <strong>${getBranchName(m.branchId)}</strong> → Target: <strong>${m.toClass}</strong></p>
+                        <p class="text-xs text-slate-500">${m.date} • From: <strong>${esc(m.from || 'Administrator')}</strong> • <strong>${getBranchName(m.branchId)}</strong> → Target: <strong>${esc(m.toClass)}</strong></p>
                         <p class="mt-1 text-slate-800">${m.text}</p>
                     </div>
                     <button onclick="deleteMessage('${m.id}')" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
