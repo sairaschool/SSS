@@ -19,6 +19,7 @@
         /* Professional ID Card Styling */
         .id-card {
             width: 330px;
+            max-width: 100%;
             border: 2px solid #1e3a8a;
             border-radius: 14px;
             overflow: hidden;
@@ -37,7 +38,7 @@
             width: 170px;
             height: 170px;
             object-fit: contain;
-            opacity: 0.08;
+            opacity: 0.12;
             pointer-events: none;
             z-index: 1;
         }
@@ -134,6 +135,9 @@
                 justify-content: center !important;
                 width: 100% !important;
                 height: auto !important;
+            }
+            #idcard-inner {
+                padding: 20px !important;
             }
             .print-container {
                 box-shadow: none !important;
@@ -315,9 +319,10 @@
                                 <textarea id="adm-address" rows="2" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Student Photo (Auto Square Fit, Max 500KB) *</label>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Student Photo *</label>
                                 <input type="file" id="adm-photo" accept="image/*" required onchange="processImageUpload(this, 'student')" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <p id="image-error-msg" class="text-xs text-rose-500 mt-1 hidden"></p>
+                                <p class="text-[11px] text-slate-500 mt-1">Square photo (1×1 or 1.5×1.5 inch) • Min 10 KB • Max 2 MB • Auto-compressed to ~10 KB</p>
+                                <p id="image-error-msg" class="photo-msg text-xs text-rose-500 mt-1 hidden"></p>
                             </div>
                             <div class="sm:col-span-2 flex justify-end">
                                 <button type="submit" id="adm-submit-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm shadow transition">
@@ -378,7 +383,11 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Subject *</label>
-                                <input type="text" id="t-subject" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <div class="flex gap-2">
+                                    <select id="t-subject" required class="flex-1 min-w-0 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></select>
+                                    <button type="button" onclick="quickAddSubject()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold whitespace-nowrap">+ New</button>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">More classes &amp; subjects can be added later with "Assign Classes &amp; Subjects" in the list below.</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Class *</label>
@@ -402,6 +411,8 @@
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Teacher Photo (Optional)</label>
                                 <input type="file" id="t-photo" accept="image/*" onchange="processImageUpload(this, 'teacher')" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-slate-50">
+                                <p class="text-[11px] text-slate-500 mt-1">Square photo (1×1 or 1.5×1.5 inch) • Min 10 KB • Max 2 MB • Auto-compressed to ~10 KB</p>
+                                <p class="photo-msg text-xs mt-1 hidden"></p>
                             </div>
                             <div class="sm:col-span-2 lg:col-span-3 flex justify-end">
                                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-lg text-sm shadow transition">
@@ -416,8 +427,7 @@
                                         <th class="p-3">Photo</th>
                                         <th class="p-3">Teacher ID</th>
                                         <th class="p-3">Name</th>
-                                        <th class="p-3">Subject</th>
-                                        <th class="p-3">Class</th>
+                                        <th class="p-3">Classes &amp; Subjects</th>
                                         <th class="p-3">Branch</th>
                                         <th class="p-3">Salary</th>
                                         <th class="p-3">Status</th>
@@ -477,6 +487,8 @@
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Staff Photo (Optional)</label>
                                 <input type="file" id="st-photo" accept="image/*" onchange="processImageUpload(this, 'staff')" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-slate-50">
+                                <p class="text-[11px] text-slate-500 mt-1">Square photo (1×1 or 1.5×1.5 inch) • Min 10 KB • Max 2 MB • Auto-compressed to ~10 KB</p>
+                                <p class="photo-msg text-xs mt-1 hidden"></p>
                             </div>
                             <div class="sm:col-span-2 lg:col-span-3 flex justify-end">
                                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-lg text-sm shadow transition">
@@ -560,7 +572,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Subject *</label>
-                                <input type="text" id="hw-subject" placeholder="e.g. Mathematics" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                                <select id="hw-subject" required class="w-full px-3 py-2 border rounded-lg text-sm"></select>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Due Date *</label>
@@ -777,7 +789,7 @@
                         <h2 class="text-lg font-bold text-rose-800 flex items-center space-x-2">
                             <i class="fa-solid fa-broom text-rose-600"></i><span>Year-End Data Backup, Print & Storage Reset</span>
                         </h2>
-                        <p class="text-xs text-slate-600">Keep your Firebase 5GB Free Tier fast and clean. Export or print full year records, then clear old attendance logs, homework, or reset fee/salary statuses for the new session.</p>
+                        <p class="text-xs text-slate-600">Keep your Firebase Spark free database (1 GB) fast and clean. <strong>Yearly steps:</strong> (1) Download Full Backup and keep the file safe, (2) press Start New Year. You can also print records, clear old logs, or reset fee/salary statuses.</p>
                         <div class="flex flex-wrap gap-3">
                             <button onclick="exportBackupJSON()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
                                 <i class="fa-solid fa-download mr-1.5"></i>Download Full Backup (.JSON)
@@ -788,6 +800,9 @@
                             </label>
                             <button onclick="resetMonthlyFeeAndSalary()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
                                 <i class="fa-solid fa-rotate mr-1.5"></i>New Month Reset (Set Fees & Salaries Unpaid)
+                            </button>
+                            <button onclick="resetCloudForNewYear()" class="bg-rose-800 hover:bg-rose-900 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-cloud-arrow-down mr-1.5"></i>Start New Year (Empty Firebase Records)
                             </button>
                             <button onclick="clearSessionLogs()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
                                 <i class="fa-solid fa-trash-can mr-1.5"></i>Clear Old Attendance, Homework & Notices
@@ -803,9 +818,9 @@
     <!-- ==================== MODALS ==================== -->
 
     <!-- SINGLE-PAGE ID CARD MODAL WITH WATERMARK -->
-    <div id="idcard-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
-        <div class="relative bg-white p-5 rounded-2xl shadow-2xl max-w-sm w-full flex flex-col items-center">
-            <button onclick="closeModal('idcard-modal')" class="absolute top-3 right-3 bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center text-slate-600 no-print">
+    <div id="idcard-modal" onclick="if(event.target===this)closeModal('idcard-modal')" class="fixed inset-0 bg-black/60 hidden items-start justify-center z-50 p-2 sm:p-4 overflow-y-auto">
+        <div id="idcard-inner" class="relative bg-white px-2 pb-3 pt-12 sm:px-5 sm:pb-5 rounded-2xl shadow-2xl max-w-sm w-full flex flex-col items-center my-auto">
+            <button onclick="closeModal('idcard-modal')" aria-label="Close" class="absolute top-2 right-2 z-50 bg-rose-700 hover:bg-rose-800 text-white rounded-full w-9 h-9 flex items-center justify-center shadow no-print">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -845,8 +860,11 @@
 
             <!-- Print Action Button -->
             <div class="mt-4 w-full no-print flex gap-2">
-                <button onclick="printSpecificModal('printing-idcard')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-sm font-semibold transition shadow">
-                    <i class="fa-solid fa-print mr-2"></i>Print Single-Page ID Card
+                <button onclick="printSpecificModal('printing-idcard')" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-2 rounded-lg text-xs sm:text-sm font-semibold transition shadow">
+                    <i class="fa-solid fa-print mr-1"></i>Print Single-Page ID Card
+                </button>
+                <button onclick="closeModal('idcard-modal')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 px-2 rounded-lg text-xs sm:text-sm font-semibold transition shadow">
+                    <i class="fa-solid fa-xmark mr-1"></i>Close / بند کریں
                 </button>
             </div>
         </div>
@@ -926,6 +944,21 @@
         </div>
     </div>
 
+    <!-- ASSIGN CLASSES & SUBJECTS MODAL -->
+    <div id="assign-modal" onclick="if(event.target===this)closeModal('assign-modal')" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-3 no-print">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-slate-800">Assign Classes &amp; Subjects</h3>
+            <p id="assign-teacher-name" class="text-xs text-slate-500"></p>
+            <div id="assign-rows" class="space-y-2"></div>
+            <button type="button" onclick="addAssignRow()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-plus mr-1"></i>Add another class &amp; subject</button>
+            <p id="assign-error" class="text-xs text-rose-600 hidden"></p>
+            <div class="flex justify-end gap-2 pt-1">
+                <button type="button" onclick="closeModal('assign-modal')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">Close / بند کریں</button>
+                <button type="button" onclick="saveAssignments()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Save</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SETTINGS & LOGO / FIREBASE MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 no-print">
         <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto">
@@ -953,12 +986,22 @@
                     <input type="text" id="set-admin-pass" class="w-full px-3 py-2 border rounded-lg text-sm">
                 </div>
                 <div class="border-t pt-3">
+                    <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-book mr-1 text-indigo-600"></i>Manage Subjects</label>
+                    <div id="subjects-list" class="flex flex-wrap gap-1.5 mb-2"></div>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-subject-input" maxlength="40" placeholder="New subject (e.g. Urdu, Computer, اسلامیات)" class="flex-1 min-w-0 px-3 py-2 border rounded-lg text-xs">
+                        <button type="button" onclick="addSubject()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold">Add</button>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1">Subjects are saved immediately. A subject that is assigned to a teacher cannot be deleted.</p>
+                </div>
+                <div class="border-t pt-3">
                     <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-cloud text-indigo-600 mr-1"></i>Firebase Realtime Database URL (Optional for Cloud Sync)</label>
                     <input type="url" id="set-firebase-url" placeholder="https://your-school-default-rtdb.firebaseio.com" class="w-full px-3 py-2 border rounded-lg text-xs font-mono">
                     <p class="text-[11px] text-slate-500 mt-1">Paste your free Firebase Realtime Database URL here to sync Admin, Teacher, and Student portals across all devices automatically.</p>
                 </div>
             </div>
             <div class="flex justify-end pt-2 gap-2">
+                <button onclick="closeModal('settings-modal')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition">Close / بند کریں</button>
                 <button onclick="saveSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Save All Settings</button>
             </div>
         </div>
@@ -993,6 +1036,46 @@
         let messages = JSON.parse(localStorage.getItem('saira_messages_v3')) || [];
         let homeworks = JSON.parse(localStorage.getItem('saira_homework_v3')) || [];
 
+        // ---- Subjects list (admin-managed) and class list ----
+        const DEFAULT_SUBJECTS = ['Maths', 'English', 'Science', 'Urdu', 'Islamiyat', 'Computer'];
+        const CLASS_LIST = ['Prep', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Matric'];
+        let subjects = DEFAULT_SUBJECTS.slice();
+        try {
+            const savedSubjects = JSON.parse(localStorage.getItem('saira_subjects_v3'));
+            if (Array.isArray(savedSubjects) && savedSubjects.length) subjects = savedSubjects;
+        } catch (err) { /* keep defaults */ }
+
+        // ---- Year reset markers (so old devices do not bring back cleared data) ----
+        let resetAt = Number(localStorage.getItem('saira_reset_at') || 0);
+        let resetStudents = localStorage.getItem('saira_reset_students') === '1';
+        let lastBackupAt = 0;
+
+        function esc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        // Old teachers had one subject + one class. Convert them to the new "assignments" list
+        // WITHOUT removing the old fields (so nothing is lost and old portals keep working).
+        function normalizeTeachersAndSubjects() {
+            if (!Array.isArray(subjects) || subjects.length === 0) subjects = DEFAULT_SUBJECTS.slice();
+            teachers.forEach(function(t) {
+                if (!Array.isArray(t.assignments)) {
+                    t.assignments = (t.subject || t.assignedClass)
+                        ? [{ cls: t.assignedClass || '', subject: t.subject || '' }]
+                        : [];
+                }
+                t.assignments.forEach(function(a) {
+                    if (!a.subject) return;
+                    const found = subjects.find(function(x) { return x.toLowerCase() === String(a.subject).toLowerCase(); });
+                    if (found) a.subject = found;
+                    else subjects.push(a.subject);
+                });
+            });
+        }
+        normalizeTeachersAndSubjects();
+
         let currentUser = JSON.parse(sessionStorage.getItem('saira_current_user')) || null;
         let uploadedPhotos = { student: "", teacher: "", staff: "" };
         let currentVoucherId = null;
@@ -1010,17 +1093,38 @@
         };
 
         // ========== CLOUD SYNC (FIREBASE REST API) ==========
+        let lastStorageWarn = 0;
+        function warnStorageFull() {
+            const now = Date.now();
+            if (now - lastStorageWarn < 60000) return;
+            lastStorageWarn = now;
+            alert('Warning: browser storage is full, so some changes could not be saved on this device.\n\nPlease download a backup (Reports tab) and clear old attendance logs.\n\nاسٹوریج بھر گئی ہے۔ براہ کرم بیک اپ ڈاؤن لوڈ کریں اور پرانی حاضری صاف کریں۔');
+        }
+
         async function syncToFirebaseCloud() {
-            localStorage.setItem('saira_settings_v3', JSON.stringify(appSettings));
-            localStorage.setItem('saira_branches_v3', JSON.stringify(branches));
-            localStorage.setItem('saira_students_v3', JSON.stringify(students));
-            localStorage.setItem('saira_teachers_v3', JSON.stringify(teachers));
-            localStorage.setItem('saira_staff_v3', JSON.stringify(staffList));
-            localStorage.setItem('saira_attendance_v3', JSON.stringify(attendance));
-            localStorage.setItem('saira_exams_v3', JSON.stringify(exams));
-            localStorage.setItem('saira_expenses_v3', JSON.stringify(expenses));
-            localStorage.setItem('saira_messages_v3', JSON.stringify(messages));
-            localStorage.setItem('saira_homework_v3', JSON.stringify(homeworks));
+            const localPairs = [
+                ['saira_settings_v3', appSettings],
+                ['saira_branches_v3', branches],
+                ['saira_students_v3', students],
+                ['saira_teachers_v3', teachers],
+                ['saira_staff_v3', staffList],
+                ['saira_attendance_v3', attendance],
+                ['saira_exams_v3', exams],
+                ['saira_expenses_v3', expenses],
+                ['saira_messages_v3', messages],
+                ['saira_homework_v3', homeworks],
+                ['saira_subjects_v3', subjects]
+            ];
+            let localSaveFailed = false;
+            localPairs.forEach(function(pair) {
+                try {
+                    localStorage.setItem(pair[0], JSON.stringify(pair[1]));
+                } catch (err) {
+                    localSaveFailed = true;
+                    console.warn('Local storage save failed for', pair[0], err);
+                }
+            });
+            if (localSaveFailed) warnStorageFull();
 
             if (!appSettings.firebaseUrl) return;
             try {
@@ -1029,7 +1133,7 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks
+                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, resetAt, resetStudents
                     })
                 });
             } catch (e) {
@@ -1055,6 +1159,22 @@
                         if (data.expenses) expenses = data.expenses;
                         if (data.messages) messages = data.messages;
                         if (data.homeworks) homeworks = data.homeworks;
+                        if (data.subjects) subjects = data.subjects;
+                        // A "Start New Year" reset was done on another device: follow it
+                        const cloudReset = Number(data.resetAt || 0);
+                        if (cloudReset > resetAt) {
+                            attendance = data.attendance || [];
+                            homeworks = data.homeworks || [];
+                            expenses = data.expenses || [];
+                            messages = data.messages || [];
+                            exams = data.exams || {};
+                            if (data.resetStudents) students = data.students || [];
+                            resetAt = cloudReset;
+                            resetStudents = !!data.resetStudents;
+                            localStorage.setItem('saira_reset_at', String(resetAt));
+                            localStorage.setItem('saira_reset_students', resetStudents ? '1' : '0');
+                        }
+                        normalizeTeachersAndSubjects();
                         syncToFirebaseCloud();
                     }
                 }
@@ -1144,6 +1264,7 @@
                 });
                 sel.value = activeBranch;
             });
+            refreshSubjectDropdowns();
         }
 
         function handleBranchChange(branchId) {
@@ -1283,61 +1404,120 @@
         }
 
         // ========== IMAGE PROCESSING (AUTO SQUARE CROP) ==========
+        // ---- Photo upload: validate, square-crop, compress to ~10 KB ----
+        const PHOTO_MIN_BYTES = 10 * 1024;        // smallest original file accepted
+        const PHOTO_MAX_BYTES = 2 * 1024 * 1024;  // largest original file accepted
+        const PHOTO_MIN_PIXELS = 150;             // smallest side in pixels
+        const PHOTO_TARGET_CHARS = 10 * 1024;     // target size of stored text (~10 KB)
+
+        function photoMsg(input, text, isError) {
+            const el = input.parentElement.querySelector('.photo-msg');
+            if (!el) { if (isError && text) alert(text); return; }
+            if (!text) { el.classList.add('hidden'); return; }
+            el.innerText = text;
+            el.className = 'photo-msg text-xs mt-1 ' + (isError ? 'text-rose-600' : 'text-emerald-600');
+        }
+
         function processImageUpload(input, targetKey) {
-            const errorMsg = document.getElementById('image-error-msg');
-            if (errorMsg) errorMsg.classList.add('hidden');
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                if (file.size > 2 * 1024 * 1024) {
-                    if (errorMsg) {
-                        errorMsg.innerText = "File too large. Please select an image under 2MB.";
-                        errorMsg.classList.remove('hidden');
-                    }
+            photoMsg(input, '', false);
+            if (!(input.files && input.files[0])) return;
+            const file = input.files[0];
+            uploadedPhotos[targetKey] = '';
+
+            if (file.size > PHOTO_MAX_BYTES) {
+                photoMsg(input, 'File too large (' + Math.round(file.size / 1024) + ' KB). Please select an image under 2 MB.', true);
+                input.value = '';
+                return;
+            }
+            if (file.size < PHOTO_MIN_BYTES) {
+                photoMsg(input, 'Photo is too small (' + Math.max(1, Math.round(file.size / 1024)) + ' KB). Minimum is 10 KB, otherwise it will be blurry.', true);
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onerror = function() {
+                photoMsg(input, 'Could not read this file. Please choose a JPG or PNG photo.', true);
+                input.value = '';
+            };
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onerror = function() {
+                    photoMsg(input, 'This image format is not supported. Please choose a JPG or PNG photo.', true);
                     input.value = '';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
+                };
+                img.onload = function() {
+                    const minDim = Math.min(img.width, img.height);
+                    if (minDim < PHOTO_MIN_PIXELS) {
+                        photoMsg(input, 'Photo is too small (' + img.width + 'x' + img.height + ' px). Minimum is ' + PHOTO_MIN_PIXELS + ' px.', true);
+                        input.value = '';
+                        return;
+                    }
+                    const sx = (img.width - minDim) / 2;
+                    const sy = (img.height - minDim) / 2;
+                    let best = null, bestSize = 0;
+                    outer:
+                    for (const size of [200, 170, 140]) {
                         const canvas = document.createElement('canvas');
-                        const size = 300;
                         canvas.width = size;
                         canvas.height = size;
                         const ctx = canvas.getContext('2d');
-                        const minDim = Math.min(img.width, img.height);
-                        const sx = (img.width - minDim) / 2;
-                        const sy = (img.height - minDim) / 2;
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, size, size);
                         ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
-                        uploadedPhotos[targetKey] = canvas.toDataURL('image/jpeg', 0.82);
-                    };
-                    img.src = e.target.result;
+                        for (const q of [0.8, 0.7, 0.6, 0.5, 0.4]) {
+                            const data = canvas.toDataURL('image/jpeg', q);
+                            if (!best || data.length < best.length) { best = data; bestSize = size; }
+                            if (data.length <= PHOTO_TARGET_CHARS) { best = data; bestSize = size; break outer; }
+                        }
+                    }
+                    uploadedPhotos[targetKey] = best;
+                    photoMsg(input, 'Photo ready: ' + bestSize + 'x' + bestSize + ' px, ' + Math.max(1, Math.round(best.length / 1024)) + ' KB after compression.', false);
                 };
-                reader.readAsDataURL(file);
-            }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function uploadSchoolLogoFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = 240;
-                        canvas.height = 240;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, 240, 240);
-                        const dataUrl = canvas.toDataURL('image/png');
-                        document.getElementById('set-logo').value = dataUrl;
-                        const prev = document.getElementById('set-logo-preview');
-                        prev.src = dataUrl;
-                        prev.classList.remove('hidden');
-                    };
-                    img.src = e.target.result;
+            if (!(input.files && input.files[0])) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onerror = function() {
+                alert('Could not read this file. Please choose a JPG or PNG logo.');
+            };
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onerror = function() {
+                    alert('This logo format is not supported. Please choose a JPG or PNG image.');
                 };
-                reader.readAsDataURL(file);
-            }
+                img.onload = function() {
+                    // Square 240x240 canvas, logo centered with its original proportions (no stretching)
+                    const box = 240;
+                    const scale = Math.min(box / img.width, box / img.height);
+                    const w = Math.max(1, Math.round(img.width * scale));
+                    const h = Math.max(1, Math.round(img.height * scale));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = box;
+                    canvas.height = box;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, Math.round((box - w) / 2), Math.round((box - h) / 2), w, h);
+                    let dataUrl = canvas.toDataURL('image/png');
+                    if (dataUrl.length > 120000) {
+                        // very detailed logo: switch to JPEG on white to keep it small
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, box, box);
+                        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    }
+                    document.getElementById('set-logo').value = dataUrl;
+                    const prev = document.getElementById('set-logo-preview');
+                    prev.src = dataUrl;
+                    prev.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         // ========== SETTINGS ==========
@@ -1365,6 +1545,7 @@
             document.getElementById('set-logo').value = appSettings.logo || '';
             document.getElementById('set-admin-pass').value = appSettings.adminPassword || 'admin123';
             document.getElementById('set-firebase-url').value = appSettings.firebaseUrl || '';
+            renderSubjectsManager();
             const prev = document.getElementById('set-logo-preview');
             if (appSettings.logo) {
                 prev.src = appSettings.logo;
@@ -1495,8 +1676,7 @@
                 if (!person) return;
                 detailsHtml = `
                     <p><span class="label">Designation:</span> <span class="val">Class Teacher</span></p>
-                    <p><span class="label">Subject:</span> <span class="val">${person.subject}</span></p>
-                    <p><span class="label">Assigned Class:</span> <span class="val">${person.assignedClass}</span></p>
+                    <p><span class="label">Teaches:</span> <span class="val">${teacherGroupedHtml(person)}</span></p>
                     <p><span class="label">Phone:</span> <span class="val">${person.phone}</span></p>`;
             } else if (type === 'staff') {
                 person = staffList.find(s => s.id === id);
@@ -1543,6 +1723,183 @@
             modal.classList.add('flex');
         }
 
+        // ========== SUBJECTS ==========
+        function refreshSubjectDropdowns() {
+            ['t-subject', 'hw-subject'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const cur = el.value;
+                el.innerHTML = subjects.map(function(x) { return '<option value="' + esc(x) + '">' + esc(x) + '</option>'; }).join('');
+                if (cur && subjects.indexOf(cur) !== -1) el.value = cur;
+            });
+        }
+
+        function renderSubjectsManager() {
+            const box = document.getElementById('subjects-list');
+            if (!box) return;
+            box.innerHTML = subjects.map(function(x, i) {
+                return '<span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs font-semibold pl-2.5 pr-1 py-1 rounded-full">' + esc(x) +
+                    '<button type="button" onclick="deleteSubject(' + i + ')" class="ml-1 w-5 h-5 rounded-full hover:bg-rose-100 text-rose-500" title="Delete">&times;</button></span>';
+            }).join('');
+        }
+
+        function addSubjectName(raw) {
+            const name = String(raw || '').trim().replace(/\s+/g, ' ');
+            if (!name) return null;
+            const found = subjects.find(function(x) { return x.toLowerCase() === name.toLowerCase(); });
+            if (found) return found;
+            subjects.push(name);
+            syncToFirebaseCloud();
+            refreshSubjectDropdowns();
+            renderSubjectsManager();
+            return name;
+        }
+
+        function addSubject() {
+            const inp = document.getElementById('new-subject-input');
+            const added = addSubjectName(inp.value);
+            if (!added) { alert('Please type a subject name.'); return; }
+            inp.value = '';
+        }
+
+        function quickAddSubject() {
+            const added = addSubjectName(prompt('New subject name (e.g. Urdu, Computer, اسلامیات):'));
+            if (added) document.getElementById('t-subject').value = added;
+        }
+
+        function deleteSubject(i) {
+            const name = subjects[i];
+            if (name === undefined) return;
+            if (subjects.length <= 1) { alert('At least one subject is required.'); return; }
+            const users = teachers.filter(function(t) {
+                return teacherPairs(t).some(function(a) { return a.subject === name; });
+            });
+            if (users.length) {
+                alert('Cannot delete "' + name + '" because it is assigned to: ' + users.map(function(t) { return t.name; }).join(', ') + '.\n\nRemove it from their assignments first.');
+                return;
+            }
+            if (!confirm('Delete subject "' + name + '"? (Old homework records keep their text.)')) return;
+            subjects.splice(i, 1);
+            syncToFirebaseCloud();
+            refreshSubjectDropdowns();
+            renderSubjectsManager();
+        }
+
+        // ========== TEACHER ASSIGNMENTS (many classes + subjects) ==========
+        function teacherPairs(t) {
+            if (Array.isArray(t.assignments) && t.assignments.length) return t.assignments;
+            if (t.subject || t.assignedClass) return [{ cls: t.assignedClass || '', subject: t.subject || '' }];
+            return [];
+        }
+
+        function teacherSubjectsText(t) {
+            const out = [];
+            teacherPairs(t).forEach(function(a) { if (a.subject && out.indexOf(a.subject) === -1) out.push(a.subject); });
+            return out.join(', ');
+        }
+
+        function teacherChipsHtml(t) {
+            const p = teacherPairs(t);
+            if (!p.length) return '<span class="text-xs text-slate-400">Not assigned</span>';
+            return p.map(function(a) {
+                return '<span class="inline-block bg-indigo-50 text-indigo-700 text-[11px] font-semibold px-2 py-0.5 rounded mr-1 mb-1 whitespace-nowrap">' + esc(a.cls) + ' · ' + esc(a.subject) + '</span>';
+            }).join('');
+        }
+
+        function teacherGroupedHtml(t) {
+            const order = [], map = {};
+            teacherPairs(t).forEach(function(a) {
+                if (!(a.cls in map)) { map[a.cls] = []; order.push(a.cls); }
+                if (a.subject && map[a.cls].indexOf(a.subject) === -1) map[a.cls].push(a.subject);
+            });
+            if (!order.length) return '-';
+            return order.map(function(c) { return esc(c) + ': ' + esc(map[c].join(', ')); }).join('<br>');
+        }
+
+        let assignTeacherId = null;
+        let assignDraft = [];
+
+        function optionsHtml(list, selected) {
+            const items = list.slice();
+            if (selected && items.indexOf(selected) === -1) items.push(selected);
+            return items.map(function(x) {
+                return '<option value="' + esc(x) + '"' + (x === selected ? ' selected' : '') + '>' + esc(x) + '</option>';
+            }).join('');
+        }
+
+        function openAssignModal(id) {
+            const t = teachers.find(function(x) { return x.id === id; });
+            if (!t) return;
+            assignTeacherId = id;
+            assignDraft = teacherPairs(t).map(function(a) { return { cls: a.cls, subject: a.subject }; });
+            if (assignDraft.length === 0) assignDraft.push({ cls: CLASS_LIST[0], subject: subjects[0] || '' });
+            document.getElementById('assign-teacher-name').innerText = t.name + ' (' + t.id + ')';
+            document.getElementById('assign-error').classList.add('hidden');
+            renderAssignRows();
+            const m = document.getElementById('assign-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function renderAssignRows() {
+            document.getElementById('assign-rows').innerHTML = assignDraft.map(function(a, i) {
+                return '<div class="flex items-center gap-2">' +
+                    '<select onchange="updateAssignRow(' + i + ',\'cls\',this.value)" class="flex-1 min-w-0 px-2 py-2 border rounded-lg text-sm">' + optionsHtml(CLASS_LIST, a.cls) + '</select>' +
+                    '<select onchange="updateAssignRow(' + i + ',\'subject\',this.value)" class="flex-1 min-w-0 px-2 py-2 border rounded-lg text-sm">' + optionsHtml(subjects, a.subject) + '</select>' +
+                    '<button type="button" onclick="removeAssignRow(' + i + ')" class="text-rose-500 hover:text-rose-700 px-1.5" title="Remove"><i class="fa-solid fa-trash"></i></button>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function updateAssignRow(i, key, val) {
+            if (assignDraft[i]) assignDraft[i][key] = val;
+        }
+
+        function addAssignRow() {
+            const last = assignDraft[assignDraft.length - 1];
+            assignDraft.push({ cls: last ? last.cls : CLASS_LIST[0], subject: subjects[0] || '' });
+            renderAssignRows();
+        }
+
+        function removeAssignRow(i) {
+            assignDraft.splice(i, 1);
+            renderAssignRows();
+        }
+
+        function saveAssignments() {
+            const t = teachers.find(function(x) { return x.id === assignTeacherId; });
+            const err = document.getElementById('assign-error');
+            if (!t) return;
+            if (assignDraft.length === 0) {
+                err.innerText = 'Please keep at least one class and subject.';
+                err.classList.remove('hidden');
+                return;
+            }
+            const seen = {};
+            for (let i = 0; i < assignDraft.length; i++) {
+                const a = assignDraft[i];
+                if (!a.cls || !a.subject) {
+                    err.innerText = 'Every row needs a class and a subject.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                const key = a.cls + '|' + a.subject;
+                if (seen[key]) {
+                    err.innerText = 'Duplicate row: ' + a.cls + ' - ' + a.subject + '.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                seen[key] = true;
+            }
+            t.assignments = assignDraft.map(function(a) { return { cls: a.cls, subject: a.subject }; });
+            // keep the old single fields filled so older pages (teacher.html) still work
+            t.subject = teacherSubjectsText(t);
+            t.assignedClass = t.assignments[0].cls;
+            syncToFirebaseCloud();
+            renderTeachers();
+            closeModal('assign-modal');
+        }
+
         // ========== TEACHERS ==========
         function addTeacher(e) {
             e.preventDefault();
@@ -1554,6 +1911,7 @@
                 father: document.getElementById('t-father').value.trim(),
                 subject: document.getElementById('t-subject').value.trim(),
                 assignedClass: document.getElementById('t-class').value,
+                assignments: [{ cls: document.getElementById('t-class').value, subject: document.getElementById('t-subject').value.trim() }],
                 phone: document.getElementById('t-phone').value.trim(),
                 salary: document.getElementById('t-salary').value,
                 status: 'Unpaid',
@@ -1571,7 +1929,7 @@
         function renderTeachers() {
             const tbody = document.getElementById('teachers-table-body');
             const list = teachers.filter(t => matchesBranch(t.branchId));
-            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="9" class="p-4 text-center text-slate-400">No teachers added in this branch.</td></tr>` : '';
+            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="8" class="p-4 text-center text-slate-400">No teachers added in this branch.</td></tr>` : '';
             list.forEach(t => {
                 const statusBadge = t.status === 'Paid'
                     ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-semibold">Paid</span>`
@@ -1581,8 +1939,7 @@
                         <td class="p-3"><img src="${t.photo || DEFAULT_AVATAR}" class="w-9 h-9 rounded-full object-cover border"></td>
                         <td class="p-3 font-bold text-indigo-600">${t.id}</td>
                         <td class="p-3 font-medium">${t.name}</td>
-                        <td class="p-3">${t.subject}</td>
-                        <td class="p-3">${t.assignedClass}</td>
+                        <td class="p-3">${teacherChipsHtml(t)}<button onclick="openAssignModal('${t.id}')" class="block mt-1 text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i>Assign Classes &amp; Subjects</button></td>
                         <td class="p-3 text-xs text-slate-500">${getBranchName(t.branchId)}</td>
                         <td class="p-3 font-semibold">Rs. ${t.salary}</td>
                         <td class="p-3">${statusBadge}</td>
@@ -1912,7 +2269,7 @@
                 rows += `<tr class="hover:bg-slate-50">
                     <td class="p-3 font-bold text-indigo-600">${t.id}</td>
                     <td class="p-3 font-medium">${t.name}</td>
-                    <td class="p-3">Teacher (${t.subject})</td>
+                    <td class="p-3">Teacher (${esc(teacherSubjectsText(t))})</td>
                     <td class="p-3 text-xs text-slate-500">${getBranchName(t.branchId)}</td>
                     <td class="p-3 font-semibold">Rs. ${t.salary}</td>
                     <td class="p-3"><span class="${badge} px-2 py-0.5 rounded text-xs font-semibold">${t.status}</span></td>
@@ -2089,13 +2446,14 @@
         function exportBackupJSON() {
             const backup = {
                 exportedAt: new Date().toISOString(),
-                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks
+                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, resetAt, resetStudents
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = `Saira_School_ERP_Backup_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
+            lastBackupAt = Date.now();
         }
 
         function importBackupJSON(input) {
@@ -2113,6 +2471,8 @@
                     if (data.expenses) expenses = data.expenses;
                     if (data.messages) messages = data.messages;
                     if (data.homeworks) homeworks = data.homeworks;
+                    if (data.subjects) subjects = data.subjects;
+                    normalizeTeachersAndSubjects();
                     syncToFirebaseCloud();
                     populateBranchDropdowns();
                     updateDashboard();
@@ -2135,6 +2495,33 @@
             }
         }
 
+        function resetCloudForNewYear() {
+            if (!lastBackupAt || Date.now() - lastBackupAt > 60 * 60 * 1000) {
+                alert('Please press "Download Full Backup (.JSON)" first (within the last hour) and keep that file safe.\n\nپہلے بیک اپ ڈاؤن لوڈ کریں، پھر دوبارہ یہ بٹن دبائیں۔');
+                return;
+            }
+            const first = prompt('This EMPTIES this year\'s Attendance, Homework, Expenses, Notices and Exam marks on this device and in Firebase.\n\nStudents, Teachers, Staff, Settings and Subjects stay.\n\nType RESET to continue:');
+            if (first === null) return;
+            if (first.trim() !== 'RESET') { alert('Not confirmed. Nothing was changed.'); return; }
+            const second = prompt('OPTIONAL: To ALSO delete ALL STUDENTS (with photos), type DELETE STUDENTS.\n\nTo keep students, leave this empty and press OK.');
+            if (second === null) { alert('Cancelled. Nothing was changed.'); return; }
+            const removeStudents = second.trim() === 'DELETE STUDENTS';
+
+            attendance = [];
+            homeworks = [];
+            expenses = [];
+            messages = [];
+            exams = {};
+            if (removeStudents) students = [];
+            resetAt = Date.now();
+            resetStudents = removeStudents;
+            localStorage.setItem('saira_reset_at', String(resetAt));
+            localStorage.setItem('saira_reset_students', resetStudents ? '1' : '0');
+            syncToFirebaseCloud();
+            updateDashboard();
+            alert('New year started. Firebase records are emptied' + (removeStudents ? ' (students removed too).' : ' (students kept).'));
+        }
+
         function clearSessionLogs() {
             if (confirm(' Make sure you have printed or downloaded your backup first!\n\nClear all old Attendance logs, Homework assignments, Expenses and Notices to free up storage? (Students & Teachers will NOT be deleted).')) {
                 attendance = [];
@@ -2149,4 +2536,3 @@
     </script>
 </body>
 </html>
-
