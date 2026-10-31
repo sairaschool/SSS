@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { padding-bottom: 76px; }
         .nav-btn { color: #64748b; }
@@ -50,6 +51,7 @@
                     <p id="hdr-school" class="font-bold truncate"></p>
                     <p id="hdr-name" class="text-xs text-emerald-100 truncate"></p>
                 </div>
+                <button onclick="openTeacherAiModal()" class="px-3 h-9 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold shadow flex items-center gap-1.5 border border-amber-300" title="AI Agent"><i class="fa-solid fa-robot"></i><span>AI Agent</span></button>
                 <button onclick="refreshAll()" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
                 <button onclick="logout()" class="w-9 h-9 rounded-full bg-rose-500/90 hover:bg-rose-600" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
@@ -62,21 +64,104 @@
             <section id="tab-students" class="tab hidden space-y-3"></section>
             <section id="tab-attendance" class="tab hidden space-y-3"></section>
             <section id="tab-marks" class="tab hidden space-y-3"></section>
+            <section id="tab-syllabus" class="tab hidden space-y-3"></section>
             <section id="tab-homework" class="tab hidden space-y-3"></section>
             <section id="tab-messages" class="tab hidden space-y-3"></section>
         </main>
 
         <nav class="fixed bottom-0 inset-x-0 bg-white border-t shadow-lg z-50">
-            <div class="max-w-2xl mx-auto grid grid-cols-7 text-[9px]">
+            <div class="max-w-2xl mx-auto grid grid-cols-8 text-[9px]">
                 <button data-tab="home" onclick="showTab('home')" class="nav-btn active py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-house text-base"></i>Home</button>
                 <button data-tab="timetable" onclick="showTab('timetable')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-table-cells text-base"></i>Timetable</button>
                 <button data-tab="students" onclick="showTab('students')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-user-graduate text-base"></i>Students</button>
                 <button data-tab="attendance" onclick="showTab('attendance')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-check-to-slot text-base"></i>Attend.</button>
                 <button data-tab="marks" onclick="showTab('marks')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-award text-base"></i>Marks</button>
+                <button data-tab="syllabus" onclick="showTab('syllabus')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-book-bookmark text-base"></i>Syllabus</button>
                 <button data-tab="homework" onclick="showTab('homework')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-book-open text-base"></i>Homework</button>
                 <button data-tab="messages" onclick="showTab('messages')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-envelope text-base"></i>Messages</button>
             </div>
         </nav>
+    </div>
+
+
+    <!-- TEACHER AI AGENT MODAL (USES CENTRAL ADMIN API KEY + VOICE MIC + 'X' RESET) -->
+    <div id="teacher-ai-modal" onclick="if(event.target===this)closeTeacherAiModalAndReset()" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[90] p-3">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-4 space-y-3 relative max-h-[88vh] flex flex-col border-2 border-emerald-600">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center text-base shadow">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800 leading-tight">Teacher AI Assistant</h3>
+                        <p id="t-ai-key-badge" class="text-[10px] text-emerald-700 font-semibold">Central School AI Key Connected ✓</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeTeacherAiModalAndReset()" title="Close & Clear Chat History" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Quick One-Click Teacher Prompts -->
+            <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="askTeacherAiQuick('Meri classes ki aaj ki hazri aur syllabus progress batao.')" class="text-[10px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">📊 Hazri & Syllabus</button>
+                <button type="button" onclick="askTeacherAiQuick('Mere ذمے admin ki taraf se kaun se tasks pending hain?')" class="text-[10px] bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">✅ My Admin Tasks</button>
+                <button type="button" onclick="askTeacherAiQuick('Bacho ke liye aaj ka homework aur parent WhatsApp message draft kar do.')" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">📝 Draft Homework & Parent Msg</button>
+            </div>
+
+            <!-- Chat Messages Box -->
+            <div id="teacher-ai-chat-box" class="flex-1 overflow-y-auto bg-slate-50 border rounded-xl p-3 space-y-2.5 min-h-[220px] max-h-[340px] text-xs">
+            </div>
+
+            <!-- Input + Voice Microphone -->
+            <form onsubmit="handleTeacherAiSubmit(event)" class="flex gap-1.5 items-center">
+                <button type="button" id="t-ai-mic-btn" onclick="toggleTeacherVoiceInput()" title="Voice Input (Bol kar poochein)" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 border border-slate-300 flex items-center justify-center shrink-0 transition">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <input type="text" id="t-ai-input" placeholder="Bol kar ya likh kar poochein..." class="flex-1 px-3 py-2.5 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                <button type="submit" id="t-ai-send-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow transition">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHAPTER COMPLETION -> PARENT WHATSAPP & STUDENT PORTAL DUAL NOTIFICATION MODAL -->
+    <div id="whatsapp-parent-modal" onclick="if(event.target===this)closeWhatsappModal()" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[95] p-3">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 space-y-3.5 relative max-h-[90vh] flex flex-col border-2 border-emerald-600">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800" id="wa-modal-title">Chapter Completed • Parent & Student Alert</h3>
+                        <p class="text-[11px] text-emerald-700 font-semibold">✓ Sent to Student Portal & Admin Log • Ready for Parents WhatsApp</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeWhatsappModal()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">AI-Drafted Parent WhatsApp Message (Editable):</label>
+                <textarea id="wa-draft-text" rows="4" class="w-full p-2.5 border rounded-xl text-xs bg-emerald-50/40 focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                <div class="flex gap-2 mt-1.5">
+                    <button type="button" onclick="copyWhatsappDraft()" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg font-semibold">
+                        <i class="fa-regular fa-copy mr-1"></i>Copy Message
+                    </button>
+                    <button type="button" onclick="regenerateWhatsappDraftWithAi()" id="btn-wa-regen" class="text-[11px] bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-semibold">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Improve with Gemini AI
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto border rounded-xl p-2.5 bg-slate-50 space-y-2 max-h-60">
+                <p class="text-[11px] font-bold text-slate-600">Send 1-Click WhatsApp to Parents of <span id="wa-class-name">Class</span>:</p>
+                <div id="wa-parents-list" class="space-y-1.5"></div>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -178,7 +263,9 @@ async function loadAll(t) {
         safe(fbQuery('saira_erp/attendance', 'date', today), []),
         safe(fbGet('saira_erp/messages'), []),
         safe(fbGet('saira_inbox'), null),
-        Promise.all(classes.map(function(c) { return safe(fbQuery('saira_erp/students', 'className', c), []); }))
+        Promise.all(classes.map(function(c) { return safe(fbQuery('saira_erp/students', 'className', c), []); })),
+        safe(fbGet('saira_erp/syllabus'), {}),
+        safe(fbGet('saira_erp/teacherTasks'), [])
     ]);
     const settings = r[0] || {}, branches = toList(r[1]), tests = toList(r[2]), subjects = toList(r[3]);
     const inbox = r[9] || {};
@@ -224,8 +311,41 @@ async function loadAll(t) {
         else { if (!marks[m.testId][m.sid]) marks[m.testId][m.sid] = {}; marks[m.testId][m.sid][m.key] = Number(m.v); }
     });
 
+    // syllabus (+ pending chapter completions in saira_inbox not yet merged by Admin)
+    const syllabus = JSON.parse(JSON.stringify(r[11] || {}));
+    Object.keys(inbox.syllabusComplete || {}).forEach(function(k) {
+        const sc = inbox.syllabusComplete[k];
+        if (sc && sc.sylKey && syllabus[sc.sylKey] && Array.isArray(syllabus[sc.sylKey].chapters)) {
+            const ch = syllabus[sc.sylKey].chapters.find(function(c) { return String(c.id) === String(sc.chapterId) || Number(c.no) === Number(sc.chapterNo); });
+            if (ch) {
+                ch.status = sc.status || 'Completed';
+                ch.completedAt = sc.completedAt || '';
+                ch.completedBy = sc.completedBy || '';
+            }
+        }
+    });
+
+    // teacherTasks assigned to me (+ pending status updates in saira_inbox)
+    const myTasks = toList(r[12]).filter(function(tk) { return tk && tk.teacherId === tid; });
+    Object.keys(inbox.taskStatus || {}).forEach(function(k) {
+        const ts = inbox.taskStatus[k];
+        if (ts && ts.taskId) {
+            const tk = myTasks.find(function(x) { return x.id === ts.taskId; });
+            if (tk) { tk.status = ts.status || 'Completed'; tk.completedAt = ts.completedAt || ''; }
+        }
+    });
+
+    // Also check if I marked my own teacher attendance today
+    let myAttToday = false;
+    r[7].forEach(function(a) { if (a && a.id === tid) myAttToday = true; });
+    Object.keys(inbox.attendance || {}).forEach(function(k) {
+        const a = inbox.attendance[k];
+        if (a && a.date === today && a.id === tid) myAttToday = (a.status !== 'Absent');
+    });
+
     S = { t: t, br: br, pairs: pairs, classes: classes, settings: settings, branches: branches, tests: tests, subjects: subjects,
           periodTimes: toList(r[4]), timetables: r[5] || {}, students: students, homework: homework, att: att, messages: messages, marks: marks,
+          syllabus: syllabus, tasks: myTasks, myAttToday: myAttToday, sylPairIdx: 0,
           tab: 'home', day: null, cls: classes[0] || '', cur: [], mk: { test: '', cls: '', sub: '' }, filter: '' };
 }
 
@@ -291,7 +411,7 @@ function showTab(name) {
     document.querySelectorAll('.tab').forEach(function(el) { el.classList.add('hidden'); });
     $('tab-' + name).classList.remove('hidden');
     document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
-    ({ home: renderHome, timetable: renderTimetable, students: renderStudents, attendance: renderAttendance, marks: renderMarks, homework: renderHomework, messages: renderMessages })[name]();
+    ({ home: renderHome, timetable: renderTimetable, students: renderStudents, attendance: renderAttendance, marks: renderMarks, syllabus: renderSyllabus, homework: renderHomework, messages: renderMessages })[name]();
     window.scrollTo(0, 0);
 }
 
@@ -350,6 +470,21 @@ function renderHome() {
     h += card(heading("Today's Periods", 'آج کے پیریڈ') + '<div class="mt-2 space-y-1.5">' + (today.length ? today.map(function(p) {
         return '<div class="flex items-center gap-3 text-sm"><span class="w-16 text-[11px] text-slate-400">P' + (p.i + 1) + (p.time ? '<br>' + esc(p.time) : '') + '</span><span class="font-semibold">' + esc(p.cls) + '</span><span class="text-xs text-slate-500">' + esc(p.subject) + '</span></div>';
     }).join('') : '<p class="text-sm text-slate-400">No periods found for today.</p>') + '</div>');
+    // Admin Assigned Tasks with Deadlines
+    const pendingTasks = (S.tasks || []).filter(function(tk) { return tk.status !== 'Completed'; });
+    h += card('<div class="flex items-center justify-between mb-2">' + heading('My Tasks & Deadlines', 'میرے ٹاسک اور ڈیڈ لائنز') +
+        '<span class="text-[11px] font-bold px-2 py-0.5 rounded-full ' + (pendingTasks.length ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700') + '">' + pendingTasks.length + ' Pending</span></div>' +
+        ((S.tasks && S.tasks.length) ? '<div class="space-y-2 mt-2">' + S.tasks.map(function(tk, idx) {
+            const done = tk.status === 'Completed';
+            return '<div class="p-2.5 rounded-lg border ' + (done ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200') + ' flex items-start justify-between gap-2">' +
+                '<div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-1.5">' +
+                (tk.classSubject ? '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">' + esc(tk.classSubject) + '</span>' : '') +
+                '<span class="text-[10px] font-bold px-2 py-0.5 rounded ' + (tk.priority === 'High' ? 'bg-rose-100 text-rose-700' : 'bg-slate-200 text-slate-600') + '">' + esc(tk.priority || 'Normal') + '</span></div>' +
+                '<p class="text-xs font-medium text-slate-800 mt-1">' + esc(tk.title) + '</p>' +
+                '<p class="text-[10px] text-rose-600 font-semibold mt-0.5">Deadline: ' + esc(tk.dueDate) + '</p></div>' +
+                '<button onclick="toggleTeacherTaskDone(' + idx + ')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold shrink-0 ' + (done ? 'bg-emerald-600 text-white' : 'bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50') + '">' + (done ? '✓ Done' : 'Mark Done') + '</button></div>';
+        }).join('') + '</div>' : '<p class="text-xs text-slate-400">No tasks assigned by Admin right now.</p>'));
+
     const notices = S.messages.filter(function(m) { return (m.toClass === 'ALL' || m.toClass === 'TEACHERS') && (!m.branchId || m.branchId === 'ALL' || m.branchId === S.br); }).slice(0, 3);
     if (notices.length) h += card(heading('School Notices', 'اسکول نوٹس') + notices.map(function(m) { return '<p class="text-sm mt-2 border-t pt-2 whitespace-pre-line">' + esc(m.text) + '<span class="block text-[11px] text-slate-400">' + esc(m.date) + '</span></p>'; }).join(''));
     $('tab-home').innerHTML = h;
@@ -399,16 +534,57 @@ async function setAttendance(st, status) {
     await fbPut('saira_inbox/attendance/' + today + '__' + st.id, rec);
     if (status === 'Present') S.att[st.id] = rec; else delete S.att[st.id];
 }
+async function markMyOwnTeacherAttendance() {
+    const today = isoToday();
+    const rec = { id: S.t.id, name: S.t.name, branchId: S.br, date: today, time: new Date().toLocaleTimeString(), status: 'Present' };
+    try {
+        await fbPut('saira_inbox/attendance/' + today + '__' + S.t.id, rec);
+        S.myAttToday = true;
+        renderAttendance();
+    } catch (e) { saveFail(); }
+}
+
+function toggleMyQrCard() {
+    const box = $('my-teacher-qr-box');
+    if (!box) return;
+    box.classList.toggle('hidden');
+    if (!box.classList.contains('hidden')) {
+        const qEl = $('my-teacher-qr-canvas');
+        if (qEl && typeof QRCode !== 'undefined') {
+            qEl.innerHTML = '';
+            new QRCode(qEl, {
+                text: (S.settings.name || 'Saira School') + '\nName: ' + S.t.name + '\nID: ' + S.t.id,
+                width: 120,
+                height: 120
+            });
+        }
+    }
+}
+
 function renderAttendance() {
     stopScan();
-    if (!S.classes.length) { $('tab-attendance').innerHTML = heading('Attendance', 'حاضری') + noClasses(); return; }
+    if (!S.classes.length) { $('tab-attendance').innerHTML = heading('Attendance & QR Scanner', 'حاضری اور کیو آر اسکینر') + noClasses(); return; }
     S.cur = S.students[S.cls] || [];
-    $('tab-attendance').innerHTML = heading('Attendance', 'حاضری') + '<p class="text-xs text-slate-500">Today: ' + esc(isoToday()) + '</p>' + classSelect('setClass(this.value)', S.cls, 'att-class') +
-        '<div class="flex gap-2"><button onclick="markAll()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 rounded-lg"><i class="fa-solid fa-check-double mr-1"></i>Mark all present</button>' +
-        '<button onclick="startScan()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2.5 rounded-lg"><i class="fa-solid fa-qrcode mr-1"></i>Scan QR</button></div>' +
-        '<div id="reader-wrap" class="hidden"><div id="reader" class="w-full rounded-lg overflow-hidden"></div><button onclick="stopScan()" class="mt-2 text-xs text-rose-600 font-semibold">Close camera</button></div>' +
+    const myDone = !!S.myAttToday;
+    const teacherSelfBar = card('<div class="flex flex-wrap items-center justify-between gap-2">' +
+        '<div><p class="text-xs font-bold text-slate-800"><i class="fa-solid fa-id-badge text-emerald-700 mr-1"></i>Teacher Attendance & Mobile QR</p>' +
+        '<p class="text-[11px] text-slate-500">' + esc(S.t.name) + ' (' + esc(S.t.id) + ') • ' + esc(isoToday()) + '</p></div>' +
+        '<div class="flex gap-1.5">' +
+        '<button onclick="toggleMyQrCard()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700"><i class="fa-solid fa-qrcode mr-1"></i>My QR</button>' +
+        '<button onclick="markMyOwnTeacherAttendance()" class="px-3 py-1.5 rounded-lg text-xs font-bold ' + (myDone ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-600 text-white') + '">' + (myDone ? '✓ Present Today' : 'Mark Me Present') + '</button>' +
+        '</div></div>' +
+        '<div id="my-teacher-qr-box" class="hidden mt-3 pt-3 border-t flex flex-col items-center text-center">' +
+        '<div id="my-teacher-qr-canvas" class="p-2 bg-white border rounded-xl"></div>' +
+        '<p class="text-[11px] text-slate-500 mt-1">Your Official Teacher QR Code (' + esc(S.t.id) + ')</p></div>', 'p-3');
+
+    $('tab-attendance').innerHTML = heading('Class QR Attendance', 'کلاس کیو آر حاضری') +
+        teacherSelfBar +
+        classSelect('setClass(this.value)', S.cls, 'att-class') +
+        '<div class="flex gap-2"><button onclick="startScan()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-2.5 rounded-lg shadow"><i class="fa-solid fa-camera mr-1.5 text-amber-400"></i>Scan Student QR Card</button>' +
+        '<button onclick="markAll()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 rounded-lg"><i class="fa-solid fa-check-double mr-1"></i>Mark All Present</button></div>' +
+        '<div id="reader-wrap" class="hidden bg-slate-900 p-3 rounded-xl text-center"><p class="text-xs text-emerald-300 mb-2 font-semibold"><i class="fa-solid fa-qrcode mr-1"></i>Point mobile camera at Student ID Card QR Code</p><div id="reader" class="w-full rounded-lg overflow-hidden"></div><button onclick="stopScan()" class="mt-2.5 px-4 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold">Close Camera</button></div>' +
         '<p id="scan-result" class="text-sm font-medium hidden"></p>' +
-        '<p class="text-sm font-semibold">Present: <span id="att-count" class="text-emerald-700"></span></p>' +
+        '<p class="text-sm font-semibold">Present in ' + esc(S.cls) + ': <span id="att-count" class="text-emerald-700"></span></p>' +
         '<div id="att-list" class="space-y-2"></div>';
     renderAttList();
 }
@@ -602,6 +778,579 @@ async function deleteMessage(i) {
     renderMessages();
 }
 
+
+// ===================== SYLLABUS, CHAPTER COMPLETION & DUAL NOTIFICATION (PARENTS WHATSAPP + STUDENT PORTAL + ADMIN LOG) =====================
+function sylKeyOf(cls, sub) {
+    return String(cls || 'Prep') + '__' + mkey(sub || 'English');
+}
+
+function renderSyllabus() {
+    if (!S.pairs.length) {
+        $('tab-syllabus').innerHTML = heading('Syllabus & Chapters', 'سلیبس اور ابواب') + noClasses();
+        return;
+    }
+    if (S.sylPairIdx >= S.pairs.length || S.sylPairIdx < 0) S.sylPairIdx = 0;
+    const p = S.pairs[S.sylPairIdx];
+    const key = sylKeyOf(p.cls, p.subject);
+    const entry = (S.syllabus && S.syllabus[key]) ? S.syllabus[key] : { className: p.cls, subject: p.subject, bookName: '', publisher: '', chapters: [] };
+    const chs = toList(entry.chapters);
+    const doneCount = chs.filter(function(c) { return c.status === 'Completed'; }).length;
+
+    const pairSelector = '<select onchange="S.sylPairIdx=Number(this.value);sylSelected={};renderSyllabus()" class="w-full px-3 py-2.5 border rounded-lg text-sm font-semibold bg-white">' +
+        S.pairs.map(function(pair, i) {
+            return '<option value="' + i + '"' + (i === S.sylPairIdx ? ' selected' : '') + '>' + esc(pair.cls) + ' · ' + esc(pair.subject) + '</option>';
+        }).join('') + '</select>';
+
+    const bookCard = card(
+        '<div class="flex items-start justify-between gap-2">' +
+            '<div><p class="text-xs text-slate-400 font-semibold uppercase">Book & Publisher</p>' +
+            '<p class="text-sm font-bold text-slate-800 mt-0.5">' + esc(entry.bookName || (p.subject + ' Textbook')) + '</p>' +
+            '<p class="text-xs text-emerald-700 font-medium">' + esc(entry.publisher || 'Configured by School Admin') + '</p></div>' +
+            '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">' + doneCount + ' / ' + chs.length + ' Done</span>' +
+        '</div>' +
+        '<p class="text-[11px] text-slate-500 mt-2 border-t pt-2"><i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i>When you mark any chapter <b>Completed</b>, Gemini AI automatically sends the update to the <b>Student Portal</b>, logs it on the <b>Admin Portal</b>, and prepares the <b>Parent WhatsApp message</b> for all students of ' + esc(p.cls) + '.</p>'
+    );
+
+    const chaptersHtml = chs.length ? chs.map(function(ch, idx) {
+        const isDone = ch.status === 'Completed';
+        return card(
+            '<div class="flex items-start justify-between gap-3">' +
+                (isDone ? '' : '<input type="checkbox" ' + (sylSelected[idx] ? 'checked ' : '') + 'onchange="toggleSylSel(' + idx + ',this.checked)" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">') +
+                '<div class="min-w-0 flex-1">' +
+                    '<div class="flex flex-wrap items-center gap-1.5">' +
+                        '<span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><i class="fa-regular fa-calendar mr-1"></i>' + esc(ch.month || 'Term Plan') + '</span>' +
+                        (isDone ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white">✓ Completed</span>' : '<span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Pending</span>') +
+                    '</div>' +
+                    '<p class="font-bold text-sm text-slate-800 mt-1.5">' + esc(ch.title) + '</p>' +
+                    (isDone && ch.completedAt ? '<p class="text-[11px] text-slate-400 mt-0.5">Completed on ' + esc(ch.completedAt) + '</p>' : '') +
+                '</div>' +
+                '<div class="flex flex-col gap-1.5 shrink-0">' +
+                    '<button onclick="completeChapterAndNotify(' + idx + ')" class="px-3 py-2 rounded-lg text-xs font-bold shadow-sm transition ' + (isDone ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white') + '">' +
+                        '<i class="fa-solid fa-check-circle mr-1"></i>' + (isDone ? 'Notify Again' : 'Mark Completed') +
+                    '</button>' +
+                '</div>' +
+            '</div>', 'p-3.5'
+        );
+    }).join('') : card('<p class="text-sm text-slate-400 text-center py-4">No chapters have been added by Admin for <b>' + esc(p.cls) + ' · ' + esc(p.subject) + '</b> yet.<br><span class="text-xs">Ask Admin to configure the Book & Syllabus in Admin Portal, or add a quick chapter below.</span></p>');
+
+    const quickAddChapterCard = card(
+        '<p class="text-xs font-bold text-slate-700 mb-2"><i class="fa-solid fa-plus-circle text-emerald-600 mr-1"></i>Quick Complete a Custom Topic / Chapter</p>' +
+        '<div class="flex gap-2">' +
+            '<input type="text" id="custom-chap-title" placeholder="e.g. Unit 4: Fractions & Decimals" class="flex-1 px-3 py-2 border rounded-lg text-xs">' +
+            '<button onclick="completeCustomTopic()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold whitespace-nowrap">Complete & Notify</button>' +
+        '</div>'
+    );
+
+    const multiCard = chs.some(function(c) { return c.status !== 'Completed'; }) ? card(
+        '<p class="text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-list-check text-emerald-600 mr-1"></i>Complete several chapters together</p>' +
+        '<p class="text-[11px] text-slate-500 mb-2">Tick the chapters above, add your own note (optional) and send <b>one</b> notice to Students, Admin and Parents. Selected: <b id="syl-sel-count">' + Object.keys(sylSelected).length + '</b></p>' +
+        '<textarea id="multi-note" rows="2" placeholder="Your note for students / parents (optional)..." class="w-full px-3 py-2 border rounded-lg text-xs mb-2"></textarea>' +
+        '<button onclick="completeSelectedChapters()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm"><i class="fa-solid fa-paper-plane mr-1"></i>Complete Selected & Send One Notice</button>'
+    ) : '';
+    $('tab-syllabus').innerHTML = heading('Month-Wise Syllabus & Completion', 'مہینہ وار سلیبس') + pairSelector + bookCard + '<div class="space-y-2.5">' + chaptersHtml + '</div>' + multiCard + quickAddChapterCard;
+}
+
+let activeWaContext = null;
+let sylSelected = {};
+
+function toggleSylSel(idx, on) {
+    if (on) sylSelected[idx] = true; else delete sylSelected[idx];
+    const el = $('syl-sel-count');
+    if (el) el.innerText = Object.keys(sylSelected).length;
+}
+
+function buildDefaultWhatsappDraft(cls, subject, bookName, chapterTitle, teacherName, schoolName) {
+    return 'Assalam-o-Alaikum Respected Parents,\n\n' +
+        'Alhamdulillah! Today in ' + cls + ' (' + subject + '), we have successfully completed "' + chapterTitle + '"' + (bookName ? ' from ' + bookName : '') + '.\n\n' +
+        'Kindly review your child\'s classwork notebook and help them revise this chapter at home for the upcoming test.\n\n' +
+        'Regards,\n' + teacherName + '\n' + (schoolName || 'Saira Public School');
+}
+
+async function completeChapterAndNotify(chapIdx) {
+    const p = S.pairs[S.sylPairIdx];
+    if (!p) return;
+    const key = sylKeyOf(p.cls, p.subject);
+    if (!S.syllabus[key]) S.syllabus[key] = { className: p.cls, subject: p.subject, bookName: '', publisher: '', chapters: [] };
+    const entry = S.syllabus[key];
+    const ch = entry.chapters[chapIdx];
+    if (!ch) return;
+
+    await triggerChapterCompletionFlow(p.cls, p.subject, entry.bookName || '', key, ch);
+}
+
+async function completeCustomTopic() {
+    const p = S.pairs[S.sylPairIdx];
+    if (!p) return;
+    const inp = $('custom-chap-title');
+    const title = (inp ? inp.value : '').trim();
+    if (!title) return alert('Please write the chapter or topic name first.');
+    const key = sylKeyOf(p.cls, p.subject);
+    if (!S.syllabus[key]) S.syllabus[key] = { className: p.cls, subject: p.subject, bookName: '', publisher: '', chapters: [] };
+    const entry = S.syllabus[key];
+    if (!Array.isArray(entry.chapters)) entry.chapters = [];
+    const newCh = {
+        id: 'CH-' + Date.now(),
+        no: entry.chapters.length + 1,
+        title: title,
+        month: 'Current Month',
+        status: 'Completed',
+        completedAt: new Date().toLocaleDateString(),
+        completedBy: S.t.name
+    };
+    entry.chapters.push(newCh);
+    if (inp) inp.value = '';
+    await triggerChapterCompletionFlow(p.cls, p.subject, entry.bookName || '', key, newCh);
+}
+
+async function triggerChapterCompletionFlow(cls, subject, bookName, sylKey, ch) {
+    const todayStr = new Date().toLocaleDateString();
+    const nowStr = new Date().toLocaleString();
+    ch.status = 'Completed';
+    ch.completedAt = todayStr;
+    ch.completedBy = S.t.name;
+
+    // 1. Draft initial clean message (and upgrade via Gemini AI if Central Key is available)
+    let draftMsg = buildDefaultWhatsappDraft(cls, subject, bookName, ch.title, S.t.name, S.settings.name);
+
+    activeWaContext = {
+        cls: cls,
+        subject: subject,
+        bookName: bookName,
+        chapterTitle: ch.title,
+        sylKey: sylKey,
+        chapterId: ch.id || ('CH-' + ch.no)
+    };
+
+    // 2. Push to Firebase Inbox:
+    //    (a) syllabusComplete -> updates Admin's Syllabus tracker
+    //    (b) messages -> immediately shows up on Student Portal (Notices tab & Home count) AND Admin Notices
+    //    (c) activityLog -> logs in Admin Portal's "Teacher Chapter Completions & Notification Log"
+    const studentPortalNoticeText = '📚 Syllabus Update (' + subject + '): "' + ch.title + '" has been completed in class today by ' + S.t.name + '. Please revise this chapter at home!';
+    const msgId = 'MSG-' + Date.now();
+    const noticeRecord = {
+        id: msgId,
+        branchId: S.br,
+        from: S.t.name + ' (' + subject + ')',
+        fromId: S.t.id,
+        toClass: cls,
+        text: studentPortalNoticeText,
+        date: nowStr,
+        type: 'teacher'
+    };
+    const logId = 'LOG-' + Date.now();
+    const activityRecord = {
+        id: logId,
+        branchId: S.br,
+        teacherId: S.t.id,
+        teacherName: S.t.name,
+        className: cls,
+        subject: subject,
+        chapterTitle: ch.title,
+        summary: 'Completed "' + ch.title + '" & notified ' + cls + ' students + parents',
+        whatsappDraft: draftMsg,
+        date: nowStr
+    };
+
+    try {
+        await Promise.all([
+            fbPut('saira_inbox/syllabusComplete/' + sylKey + '__' + (ch.id || ch.no), {
+                sylKey: sylKey,
+                chapterId: ch.id || ('CH-' + ch.no),
+                chapterNo: ch.no || 1,
+                status: 'Completed',
+                completedAt: todayStr,
+                completedBy: S.t.name
+            }),
+            fbPut('saira_inbox/messages/' + msgId, noticeRecord),
+            fbPut('saira_inbox/activityLog/' + logId, activityRecord)
+        ]);
+        S.messages.unshift(noticeRecord);
+    } catch (e) {
+        return saveFail();
+    }
+
+    renderSyllabus();
+    openWhatsappParentModal(cls, subject, ch.title, draftMsg, logId);
+}
+
+async function completeSelectedChapters() {
+    const p = S.pairs[S.sylPairIdx];
+    if (!p) return;
+    const key = sylKeyOf(p.cls, p.subject);
+    const entry = S.syllabus[key];
+    if (!entry) return;
+    const chs = toList(entry.chapters);
+    const idxs = Object.keys(sylSelected).filter(function(k) { return sylSelected[k]; }).map(Number).sort(function(a, b) { return a - b; });
+    const chapters = idxs.map(function(i) { return chs[i]; }).filter(function(c) { return c && c.status !== 'Completed'; });
+    if (!chapters.length) return alert('Pehle kam az kam ek chapter tick karein.');
+    const noteEl = $('multi-note');
+    const note = noteEl ? noteEl.value.trim() : '';
+    await triggerMultiChapterFlow(p.cls, p.subject, entry.bookName || '', key, chapters, note);
+    sylSelected = {};
+    renderSyllabus();
+}
+
+async function triggerMultiChapterFlow(cls, subject, bookName, sylKey, chapters, note) {
+    const todayStr = new Date().toLocaleDateString();
+    const nowStr = new Date().toLocaleString();
+    chapters.forEach(function(ch) { ch.status = 'Completed'; ch.completedAt = todayStr; ch.completedBy = S.t.name; });
+    const titles = chapters.map(function(c) { return c.title; });
+    const titleList = titles.length === 1 ? titles[0] : titles.slice(0, -1).join(', ') + ' and ' + titles[titles.length - 1];
+
+    let draftMsg = buildDefaultWhatsappDraft(cls, subject, bookName, titleList, S.t.name, S.settings.name);
+    if (note) draftMsg = draftMsg.replace('Regards,', note + '\n\nRegards,');
+
+    const noticeText = titles.length === 1
+        ? '📚 Syllabus Update (' + subject + '): "' + titles[0] + '" has been completed in class today by ' + S.t.name + '. Please revise this chapter at home!' + (note ? '\n\nNote from teacher: ' + note : '')
+        : '📚 Syllabus Update (' + subject + '): The following chapters have been completed in class by ' + S.t.name + ':\n' +
+          titles.map(function(t, i) { return (i + 1) + '. ' + t; }).join('\n') +
+          (note ? '\n\nNote from teacher: ' + note : '') + '\n\nPlease revise these chapters at home!';
+
+    const msgId = 'MSG-' + Date.now();
+    const logId = 'LOG-' + Date.now();
+    const noticeRecord = { id: msgId, branchId: S.br, from: S.t.name + ' (' + subject + ')', fromId: S.t.id, toClass: cls, text: noticeText, date: nowStr, type: 'teacher' };
+    const activityRecord = {
+        id: logId, branchId: S.br, teacherId: S.t.id, teacherName: S.t.name, className: cls, subject: subject,
+        chapterTitle: titleList, summary: 'Completed ' + chapters.length + ' chapter(s): ' + titleList + ' & notified ' + cls + ' students + parents',
+        whatsappDraft: draftMsg, date: nowStr
+    };
+    activeWaContext = { cls: cls, subject: subject, bookName: bookName, chapterTitle: titleList, sylKey: sylKey,
+        chapterId: chapters.map(function(c) { return c.id || ('CH-' + c.no); }).join(',') };
+
+    try {
+        const jobs = chapters.map(function(ch) {
+            return fbPut('saira_inbox/syllabusComplete/' + sylKey + '__' + (ch.id || ch.no), {
+                sylKey: sylKey, chapterId: ch.id || ('CH-' + ch.no), chapterNo: ch.no || 1,
+                status: 'Completed', completedAt: todayStr, completedBy: S.t.name
+            });
+        });
+        jobs.push(fbPut('saira_inbox/messages/' + msgId, noticeRecord));
+        jobs.push(fbPut('saira_inbox/activityLog/' + logId, activityRecord));
+        await Promise.all(jobs);
+        S.messages.unshift(noticeRecord);
+    } catch (e) {
+        return saveFail();
+    }
+    openWhatsappParentModal(cls, subject, titleList, draftMsg, logId);
+}
+
+function formatWhatsAppPhone(rawPhone) {
+    let digits = String(rawPhone || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.startsWith('00')) digits = digits.slice(2);
+    if (digits.startsWith('03') && digits.length === 11) {
+        digits = '92' + digits.slice(1);
+    } else if (digits.startsWith('0') && digits.length >= 10) {
+        digits = '92' + digits.slice(1);
+    }
+    return digits;
+}
+
+function openWhatsappParentModal(cls, subject, chapterTitle, draftMsg, logId) {
+    $('wa-modal-title').innerText = cls + ' · ' + subject + ' — ' + chapterTitle;
+    $('wa-class-name').innerText = cls;
+    $('wa-draft-text').value = draftMsg;
+    activeWaContext.logId = logId;
+    renderWhatsappParentsList();
+    const m = $('whatsapp-parent-modal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+
+    // Automatically refine message with Gemini AI in background if central key is configured
+    if (getCentralGeminiKey()) {
+        regenerateWhatsappDraftWithAi(true);
+    }
+}
+
+function renderWhatsappParentsList() {
+    if (!activeWaContext) return;
+    const cls = activeWaContext.cls;
+    const list = S.students[cls] || [];
+    const box = $('wa-parents-list');
+    if (!list.length) {
+        box.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">No students found in ' + esc(cls) + '.</p>';
+        return;
+    }
+    box.innerHTML = list.map(function(st, i) {
+        const waPhone = formatWhatsAppPhone(st.phone || st.emergency);
+        return '<div class="flex items-center justify-between gap-2 bg-white p-2 rounded-lg border">' +
+            '<div class="min-w-0"><p class="text-xs font-bold text-slate-800 truncate">' + esc(st.name) + ' <span class="font-normal text-slate-400">(' + esc(st.id) + ')</span></p>' +
+            '<p class="text-[10px] text-slate-500">Father: ' + esc(st.father || '-') + ' • ' + esc(st.phone || 'No phone') + '</p></div>' +
+            (waPhone
+                ? '<button type="button" onclick="sendParentWhatsAppToStudent(' + i + ')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shrink-0 flex items-center gap-1"><i class="fa-brands fa-whatsapp"></i>Send</button>'
+                : '<span class="text-[10px] text-rose-500 font-semibold">No Phone</span>') +
+        '</div>';
+    }).join('');
+}
+
+function sendParentWhatsAppToStudent(stuIdx) {
+    if (!activeWaContext) return;
+    const st = (S.students[activeWaContext.cls] || [])[stuIdx];
+    if (!st) return;
+    const waPhone = formatWhatsAppPhone(st.phone || st.emergency);
+    if (!waPhone) return alert('Phone number not available for this student.');
+    const baseText = $('wa-draft-text').value.trim();
+    const personalized = 'Dear Parent of ' + st.name + ' (' + activeWaContext.cls + '),\n\n' + baseText;
+    const url = 'https://wa.me/' + waPhone + '?text=' + encodeURIComponent(personalized);
+    window.open(url, '_blank');
+}
+
+function copyWhatsappDraft() {
+    const txt = $('wa-draft-text').value;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(txt).then(function() { alert('WhatsApp message copied!'); });
+    } else {
+        $('wa-draft-text').select();
+        document.execCommand('copy');
+        alert('WhatsApp message copied!');
+    }
+}
+
+async function regenerateWhatsappDraftWithAi(silent) {
+    if (!activeWaContext) return;
+    const key = getCentralGeminiKey();
+    if (!key) {
+        if (!silent) alert('Central Gemini API Key is not set in Admin Portal yet.');
+        return;
+    }
+    const btn = $('btn-wa-regen');
+    if (btn) btn.innerText = '⏳ AI Drafting...';
+    try {
+        const prompt = 'Write a polite, warm, professional WhatsApp message for Pakistani parents from Teacher "' + S.t.name + '" at "' + (S.settings.name || 'Saira Public School') + '" informing them that their child in "' + activeWaContext.cls + '" has completed the chapter "' + activeWaContext.chapterTitle + '" in subject "' + activeWaContext.subject + '". Include both English and a short Roman Urdu line encouraging home revision. Do NOT use any ** asterisks.';
+        const reply = await callTeacherGeminiAPI(prompt, true);
+        if (reply) {
+            $('wa-draft-text').value = reply;
+            if (activeWaContext.logId) {
+                fbPut('saira_inbox/activityLog/' + activeWaContext.logId + '/whatsappDraft', reply).catch(function() {});
+            }
+        }
+    } catch (e) {
+        if (!silent) alert('AI Draft note: ' + e.message);
+    } finally {
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Improve with Gemini AI';
+    }
+}
+
+function closeWhatsappModal() {
+    const m = $('whatsapp-parent-modal');
+    if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+}
+
+// ---------- Teacher Admin Task Completion ----------
+async function toggleTeacherTaskDone(idx) {
+    const tk = S.tasks[idx];
+    if (!tk) return;
+    const nextStatus = tk.status === 'Completed' ? 'Pending' : 'Completed';
+    const doneAt = nextStatus === 'Completed' ? new Date().toLocaleString() : '';
+    try {
+        await fbPut('saira_inbox/taskStatus/' + tk.id, {
+            taskId: tk.id,
+            status: nextStatus,
+            completedAt: doneAt
+        });
+        tk.status = nextStatus;
+        tk.completedAt = doneAt;
+        renderHome();
+    } catch (e) { saveFail(); }
+}
+
+// ===================== TEACHER GEMINI AI ASSISTANT (CENTRAL ADMIN KEY + VOICE MIC + 'X' RESET + TIMEOUT FIX) =====================
+function getCentralGeminiKey() {
+    return ((S && S.settings && S.settings.geminiApiKey) || localStorage.getItem('saira_gemini_api_key') || '').trim();
+}
+
+function cleanTeacherMarkdown(t) {
+    return String(t || '').replace(/\*\*/g, '').replace(/^#+\s*/gm, '').trim();
+}
+
+const DEFAULT_TEACHER_AI_WELCOME = '<div class="bg-white p-3 rounded-xl border shadow-sm text-slate-700 leading-relaxed">' +
+    'Assalam-o-Alaikum! Main aapka Teacher AI Assistant hoon. Aap mujh se apni classes ki hazri, syllabus chapters, homework ideas, ya parent WhatsApp messages ke baray mein bol kar (Mic) ya likh kar pooch sakte hain!' +
+    '</div>';
+
+function openTeacherAiModal() {
+    const m = $('teacher-ai-modal');
+    if (!m) return;
+    const box = $('teacher-ai-chat-box');
+    if (box && !box.innerHTML.trim()) box.innerHTML = DEFAULT_TEACHER_AI_WELCOME;
+    const badge = $('t-ai-key-badge');
+    if (badge) {
+        badge.innerText = getCentralGeminiKey()
+            ? 'Central School AI Key Connected ✓'
+            : 'Instant Local Mode Ready (Admin AI Key Optional)';
+    }
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+}
+
+function closeTeacherAiModalAndReset() {
+    stopTeacherVoiceInput();
+    const box = $('teacher-ai-chat-box');
+    if (box) box.innerHTML = DEFAULT_TEACHER_AI_WELCOME;
+    const inp = $('t-ai-input');
+    if (inp) inp.value = '';
+    const m = $('teacher-ai-modal');
+    if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+}
+
+let tSpeechRec = null, tListening = false;
+function toggleTeacherVoiceInput() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return alert('Voice input ke liye Chrome browser istemal karein.');
+    if (tListening && tSpeechRec) { stopTeacherVoiceInput(); return; }
+    tSpeechRec = new SR();
+    tSpeechRec.lang = 'ur-PK';
+    tSpeechRec.interimResults = false;
+    tListening = true;
+    const btn = $('t-ai-mic-btn');
+    if (btn) btn.className = 'w-10 h-10 rounded-xl bg-rose-600 text-white border border-rose-700 flex items-center justify-center shrink-0 animate-pulse shadow';
+    tSpeechRec.onresult = function(ev) {
+        const tr = ev.results[0][0].transcript;
+        const inp = $('t-ai-input');
+        if (inp) inp.value = (inp.value ? inp.value + ' ' : '') + tr;
+    };
+    tSpeechRec.onerror = function() { stopTeacherVoiceInput(); };
+    tSpeechRec.onend = function() { stopTeacherVoiceInput(); };
+    tSpeechRec.start();
+}
+
+function stopTeacherVoiceInput() {
+    tListening = false;
+    if (tSpeechRec) { try { tSpeechRec.stop(); } catch (e) {} tSpeechRec = null; }
+    const btn = $('t-ai-mic-btn');
+    if (btn) btn.className = 'w-10 h-10 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 border border-slate-300 flex items-center justify-center shrink-0 transition';
+}
+
+function appendTeacherAiBubble(sender, text) {
+    const box = $('teacher-ai-chat-box');
+    if (!box) return null;
+    const d = document.createElement('div');
+    if (sender === 'user') {
+        d.className = 'bg-emerald-600 text-white p-2.5 rounded-xl ml-auto max-w-[85%] leading-relaxed shadow-sm';
+        d.innerText = text;
+    } else {
+        d.className = 'bg-white p-3 rounded-xl border border-emerald-200 text-slate-800 max-w-[92%] leading-relaxed shadow-sm whitespace-pre-wrap';
+        d.innerText = cleanTeacherMarkdown(text);
+    }
+    box.appendChild(d);
+    box.scrollTop = box.scrollHeight;
+    return d;
+}
+
+function askTeacherAiQuick(q) {
+    const inp = $('t-ai-input');
+    if (inp) inp.value = q;
+    handleTeacherAiSubmit();
+}
+
+function tryTeacherFastPath(qText) {
+    const q = String(qText || '').toLowerCase().trim();
+    if (!S) return null;
+    if (q.includes('hazri') || q.includes('attendance') || q.includes('syllabus')) {
+        let totalStu = 0, presStu = 0;
+        S.classes.forEach(function(c) {
+            (S.students[c] || []).forEach(function(st) {
+                totalStu++;
+                if (S.att[st.id]) presStu++;
+            });
+        });
+        let sylLines = [];
+        S.pairs.forEach(function(p) {
+            const e = (S.syllabus || {})[sylKeyOf(p.cls, p.subject)];
+            const chs = e && e.chapters ? e.chapters : [];
+            const done = chs.filter(function(c) { return c.status === 'Completed'; }).length;
+            sylLines.push('• ' + p.cls + ' (' + p.subject + '): ' + done + '/' + chs.length + ' chapters completed');
+        });
+        return '📊 Aaj ki Class Hazri & Syllabus Summary:\n• Present Students: ' + presStu + ' / ' + totalStu + '\n' + (sylLines.join('\n') || '• No syllabus chapters configured yet.');
+    }
+    if (q.includes('task') || q.includes('deadline')) {
+        const pending = (S.tasks || []).filter(function(tk) { return tk.status !== 'Completed'; });
+        if (!pending.length) return 'Alhamdulillah! Aapke ذمے Admin ka koi pending task nahi hai.';
+        return '✅ Aapke Pending Admin Tasks (' + pending.length + '):\n' + pending.map(function(tk, i) {
+            return (i + 1) + '. ' + tk.title + ' (Deadline: ' + tk.dueDate + ')';
+        }).join('\n');
+    }
+    return null;
+}
+
+async function callTeacherGeminiAPI(userPrompt, skipContext) {
+    const apiKey = getCentralGeminiKey();
+    if (!apiKey) {
+        throw new Error('Admin ne abhi Central Gemini API Key save nahi ki. Admin Portal mein API Key save hone par AI khud kaam karega.');
+    }
+    const teacherSnapshot = skipContext ? '' : JSON.stringify({
+        school: S.settings.name,
+        teacherName: S.t.name,
+        teacherId: S.t.id,
+        assignedClassesAndSubjects: S.pairs,
+        pendingTasks: (S.tasks || []).filter(function(x) { return x.status !== 'Completed'; }),
+        homeworkCount: S.homework.length
+    });
+    const sys = 'You are the helpful Teacher AI Assistant inside Saira School Teacher Portal. Reply concisely in Pakistani Roman Urdu or English without any ** asterisks.';
+    const payload = {
+        contents: [{ parts: [{ text: sys + (teacherSnapshot ? '\nCONTEXT: ' + teacherSnapshot : '') + '\nREQUEST: ' + userPrompt }] }]
+    };
+
+    // Fast model first, newer model as backup. Retries on busy/overloaded servers.
+    const modelList = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+    let res = null, lastErr = '';
+    for (let i = 0; i < modelList.length; i++) {
+        const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + modelList[i] + ':generateContent';
+        const controller = new AbortController();
+        const timer = setTimeout(function() { controller.abort(); }, 45000);
+        try {
+            res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+            clearTimeout(timer);
+            if (res.ok) break;
+            lastErr = '(' + res.status + ') ' + (await res.text());
+            if ([429, 500, 502, 503, 504].indexOf(res.status) < 0 && res.status !== 404) break;
+        } catch (err) {
+            clearTimeout(timer);
+            lastErr = (err && err.name === 'AbortError') ? 'Timeout' : (err && err.message) || 'Network error';
+            res = null;
+        }
+        await new Promise(function(r) { setTimeout(r, 1000); });
+    }
+    if (!res || !res.ok) {
+        if (/503|429|UNAVAILABLE|high demand/i.test(lastErr)) throw new Error('Google AI server abhi masroof hai. 1-2 minute baad dobara try karein.');
+        if (lastErr === 'Timeout') throw new Error('Jawab nahi aaya (Timeout). Internet check karke dobara try karein.');
+        throw new Error('AI Error ' + lastErr.slice(0, 160));
+    }
+    const data = await res.json();
+    return cleanTeacherMarkdown(data?.candidates?.[0]?.content?.parts?.[0]?.text || '');
+}
+
+async function handleTeacherAiSubmit(e) {
+    if (e) e.preventDefault();
+    const inp = $('t-ai-input');
+    const btn = $('t-ai-send-btn');
+    const text = (inp ? inp.value : '').trim();
+    if (!text) return;
+    inp.value = '';
+    appendTeacherAiBubble('user', text);
+
+    const fast = tryTeacherFastPath(text);
+    if (fast) {
+        appendTeacherAiBubble('ai', fast);
+        return;
+    }
+
+    const waitBubble = appendTeacherAiBubble('ai', '⏳ AI Assistant jawab tayar kar raha hai...');
+    if (btn) btn.disabled = true;
+    try {
+        const reply = await callTeacherGeminiAPI(text, false);
+        waitBubble.innerText = reply || 'Jawab masool nahi hua.';
+    } catch (err) {
+        waitBubble.innerText = '⚠️ ' + err.message;
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
 // ===================== START =====================
 window.onload = async function() {
     $('login-id').addEventListener('keydown', function(e) { if (e.key === 'Enter') $('login-pin').focus(); });
@@ -618,4 +1367,3 @@ window.onload = async function() {
 </script>
 </body>
 </html>
-
