@@ -217,6 +217,8 @@
                             <option value="assignments" class="text-slate-900">📋 Class & Subject Assignment</option>
                             <option value="staff" class="text-slate-900">🛠️ Other Staff</option>
                             <option value="attendance" class="text-slate-900">📷 QR Attendance</option>
+                            <option value="syllabus" class="text-slate-900">📖 Books & Syllabus Setup</option>
+                            <option value="tasks" class="text-slate-900">✅ Teacher Tasks & Activity Log</option>
                             <option value="homework" class="text-slate-900">📚 Homework</option>
                             <option value="timetable" class="text-slate-900">🗓️ Class Timetable</option>
                             <option value="fees" class="text-slate-900">💳 Fees & Dues</option>
@@ -269,6 +271,8 @@
                         <button onclick="switchTab('dashboard')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-chart-pie mr-1 text-indigo-600"></i>Dashboard</button>
                         <button onclick="switchTab('students')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-users mr-1 text-indigo-600"></i>Students</button>
                         <button onclick="switchTab('teachers')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-chalkboard-user mr-1 text-indigo-600"></i>Teachers</button>
+                        <button onclick="switchTab('syllabus')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition"><i class="fa-solid fa-book-bookmark mr-1 text-amber-600"></i>Books & Syllabus</button>
+                        <button onclick="switchTab('tasks')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition"><i class="fa-solid fa-list-check mr-1 text-emerald-600"></i>Tasks & Activity Log</button>
                         <button onclick="switchTab('timetable')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-table-cells mr-1 text-indigo-600"></i>Timetable</button>
                         <button onclick="switchTab('messages')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-envelope mr-1 text-indigo-600"></i>Notices</button>
                         <button onclick="switchTab('exams')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-award mr-1 text-indigo-600"></i>Exams</button>
@@ -924,6 +928,191 @@
                     </div>
                 </section>
 
+                <!-- BOOKS, PUBLISHER & MONTH-WISE SYLLABUS TAB (LIGHTWEIGHT TEXT-ONLY FIREBASE) -->
+                <section id="tab-syllabus" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-5">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                                    <i class="fa-solid fa-book-bookmark text-indigo-600"></i>
+                                    <span>Smart Class Book, Publisher & Month-Wise Syllabus Configuration</span>
+                                </h2>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i><strong>Firebase Spark Free-Tier Protected:</strong> No heavy PDF files are uploaded to Firebase. Only lightweight text (Book Name, Publisher, Chapter Titles & Month-Wise Plan) is stored (~2 KB).
+                                </p>
+                            </div>
+                            <span id="syl-save-status" class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">Text-Only Cloud Sync Ready ✓</span>
+                        </div>
+
+                        <!-- Class & Subject Selector -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">1. Select Class (Prep to Class 10)</label>
+                                <select id="syl-class" onchange="onSyllabusClassChange()" class="w-full px-3 py-2.5 border rounded-lg text-sm font-semibold bg-white focus:ring-2 focus:ring-indigo-500 outline-none"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">2. Select Subject</label>
+                                <select id="syl-subject" onchange="renderSyllabusEditor()" class="w-full px-3 py-2.5 border rounded-lg text-sm font-semibold bg-white focus:ring-2 focus:ring-indigo-500 outline-none"></select>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="button" onclick="aiCheckAllClassBooks()" id="btn-ai-check-all-books" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-2.5 px-3 rounded-lg text-xs shadow transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-magnifying-glass-chart"></i><span>Check All Books in Class with AI</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="ai-class-books-report" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-300 text-xs text-slate-800 whitespace-pre-wrap leading-relaxed"></div>
+
+                        <!-- Book Name & Publisher Configuration -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Book Title / Name *</label>
+                                <input type="text" id="syl-book-name" placeholder="e.g. Oxford Progressive English Book 1 / Sindh Textbook Board" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Publisher / Board Name *</label>
+                                <input type="text" id="syl-publisher" placeholder="e.g. Oxford University Press (OUP) / STBB / Afaq / Gaba" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- AI Book Check + Local Text/TOC Extraction (Zero Firebase Bloat) -->
+                        <div class="p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <h3 class="text-xs font-bold text-indigo-950"><i class="fa-solid fa-wand-magic-sparkles text-amber-600 mr-1"></i>Step A: Check Book Availability with Gemini AI or Paste Chapters</h3>
+                                    <p class="text-[11px] text-slate-600">Ask Gemini if it knows this exact Book & Publisher. If it is a local/custom book not in AI's database, simply paste the chapter names or load a local Table-of-Contents text file (processed 100% in browser memory, never uploaded as a file to Firebase).</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="aiVerifyAndFetchBookChapters()" id="btn-ai-book-check" class="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 rounded-lg text-xs font-bold shadow-sm transition">
+                                        <i class="fa-solid fa-robot mr-1"></i>1. Ask AI: Check Book & Fetch Chapters
+                                    </button>
+                                    <label class="bg-white hover:bg-slate-100 text-indigo-700 border border-indigo-300 px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition shadow-sm" title="Reads chapter lines locally in browser memory—never uploads file to Firebase!">
+                                        <i class="fa-solid fa-file-import mr-1"></i>Load Local .TXT Outline (No Cloud Upload)
+                                        <input type="file" accept=".txt,.csv" onchange="extractLocalTextOutline(this)" class="hidden">
+                                    </label>
+                                </div>
+                            </div>
+                            <p id="syl-ai-feedback" class="text-xs font-medium text-indigo-900 hidden p-2.5 bg-white rounded-lg border border-indigo-200 whitespace-pre-wrap"></p>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Manual / AI Extracted Chapters List (One chapter per line or comma-separated — Editable anytime)</label>
+                                <textarea id="syl-raw-chapters" rows="3" placeholder="Unit 1: Numbers up to 100&#10;Unit 2: Addition and Subtraction&#10;Unit 3: Multiplication Tables..." class="w-full px-3 py-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 pt-1">
+                                <button type="button" onclick="buildChaptersFromTextarea()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+                                    <i class="fa-solid fa-list-ol mr-1"></i>Apply Chapters to Table Below
+                                </button>
+                                <button type="button" onclick="aiAutoDivideMonthWise()" id="btn-ai-month-divide" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow transition">
+                                    <i class="fa-solid fa-calendar-days mr-1"></i>2. AI Auto-Breakdown Month-Wise (Pakistani Academic Term)
+                                </button>
+                                <button type="button" onclick="addSingleChapterRow()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-2 rounded-lg text-xs font-semibold transition">
+                                    <i class="fa-solid fa-plus mr-1"></i>+ Add Chapter Row Manually
+                                </button>
+                                <button type="button" onclick="saveCurrentSyllabusConfig()" class="ml-auto bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-xs font-bold shadow transition">
+                                    <i class="fa-solid fa-floppy-disk mr-1"></i>Save Book & Syllabus to Cloud
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Month-Wise Chapters Table (Manual Override + Live Completion Status) -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-bold text-slate-800">Month-Wise Syllabus & Chapter Completion Tracker (Manual Override Enabled)</h3>
+                                <span id="syl-chapter-counter" class="text-xs text-slate-500 font-semibold"></span>
+                            </div>
+                            <div class="overflow-x-auto border rounded-xl">
+                                <table class="w-full text-left text-xs sm:text-sm">
+                                    <thead class="bg-slate-50 border-b text-slate-600 uppercase text-[11px]">
+                                        <tr>
+                                            <th class="p-2.5 w-12">#</th>
+                                            <th class="p-2.5">Chapter / Unit Title</th>
+                                            <th class="p-2.5 w-40">Target Month / Term</th>
+                                            <th class="p-2.5 w-36">Status</th>
+                                            <th class="p-2.5 w-44">Completed By / Date</th>
+                                            <th class="p-2.5 text-center w-24">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="syl-chapters-tbody" class="divide-y divide-slate-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Overview of All Configured Books in Selected Class -->
+                        <div class="border-t pt-4">
+                            <h3 class="text-sm font-bold text-slate-700 mb-2"><i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i>Configured Books Summary for <span id="syl-summary-cls-label">Selected Class</span></h3>
+                            <div id="syl-class-overview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TEACHER TASKS, DEADLINES & LIVE ACTIVITY / NOTIFICATION LOG TAB -->
+                <section id="tab-tasks" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left: Assign Teacher Tasks with Deadlines -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-indigo-600"></i>
+                                <span>Assign Teacher Tasks & Deadlines</span>
+                            </h2>
+                            <p class="text-xs text-slate-500">Assign academic or administrative tasks to specific teachers with a clear due date. Teachers see these tasks live on their Teacher Portal and can mark them Completed.</p>
+
+                            <form onsubmit="addAdminTeacherTask(event)" class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Select Teacher *</label>
+                                        <select id="task-teacher-select" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Class / Subject (Optional)</label>
+                                        <input type="text" id="task-class-sub" placeholder="e.g. Class 5 · Maths" class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Deadline / Due Date *</label>
+                                        <input type="date" id="task-due-date" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Priority</label>
+                                        <select id="task-priority" class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                                            <option value="Normal">Normal</option>
+                                            <option value="High">High / Urgent</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Task Description / Instructions *</label>
+                                    <textarea id="task-title-input" rows="2" required placeholder="e.g. Complete Unit 3 of Maths and submit monthly test marks before Friday..." class="w-full px-3 py-2 border rounded-lg text-sm bg-white"></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-sm shadow transition">
+                                    <i class="fa-solid fa-paper-plane mr-1.5"></i>Assign Task to Teacher
+                                </button>
+                            </form>
+
+                            <div class="space-y-2 max-h-96 overflow-y-auto" id="admin-tasks-list"></div>
+                        </div>
+
+                        <!-- Right: Teacher Activity & Chapter Completion Notification Log (+ WhatsApp Drafts) -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                                        <i class="fa-solid fa-bell text-emerald-600"></i>
+                                        <span>Teacher Chapter Completions & Notification Log</span>
+                                    </h2>
+                                    <p class="text-xs text-slate-500 mt-0.5">Live feed of every chapter completed, WhatsApp parent messages drafted, and notices sent by teachers to students.</p>
+                                </div>
+                                <button onclick="pullInbox()" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-lg border border-emerald-200">
+                                    <i class="fa-solid fa-rotate mr-1"></i>Sync Now
+                                </button>
+                            </div>
+
+                            <div id="admin-activity-log-list" class="space-y-3 max-h-[540px] overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </section>
+
             </main>
         </div>
     </div>
@@ -1128,7 +1317,7 @@
     </div>
 
     <!-- AI AGENT MODAL (FRONT POPUP) -->
-    <div id="gemini-modal" onclick="if(event.target===this)closeModal('gemini-modal')" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-3 sm:p-4 no-print">
+    <div id="gemini-modal" onclick="if(event.target===this)closeGeminiModalAndReset()" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-3 sm:p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-5 space-y-3.5 relative max-h-[90vh] flex flex-col border-2 border-amber-400">
             <div class="flex justify-between items-center border-b pb-2.5">
                 <div class="flex items-center space-x-2.5">
@@ -1144,7 +1333,7 @@
                     <button type="button" onclick="toggleAiKeyBox()" id="ai-key-status-btn" class="text-[11px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition">
                         <i class="fa-solid fa-key mr-1"></i>API Key
                     </button>
-                    <button onclick="closeModal('gemini-modal')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="closeGeminiModalAndReset()" title="Close & Reset Chat" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
 
@@ -1166,6 +1355,7 @@
                 <button type="button" onclick="askGeminiQuick('Aaj kitne bache aur teachers hazir hain?')" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">📊 Aaj ki Hazri</button>
                 <button type="button" onclick="askGeminiQuick('Kin students ki fee abhi tak Unpaid hai?')" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">💳 Fee Defaulters</button>
                 <button type="button" onclick="askGeminiQuick('School ke tamam teachers aur unki salary ki summary batao.')" class="text-[11px] bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">👨‍🏫 Teachers & Salary</button>
+                <button type="button" onclick="askGeminiQuick('Aaj kis kis teacher ne kaun sa chapter complete kiya hai aur kya tasks pending hain?')" class="text-[11px] bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold px-2.5 py-1 rounded-full border border-teal-200">📖 Syllabus & Teacher Log</button>
                 <button type="button" onclick="askGeminiQuick('Kal school band rehne ka official English notice bana kar sab ko bhej do.')" class="text-[11px] bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full border border-purple-200">📢 Auto-Send Holiday Notice</button>
                 <button type="button" onclick="aiGenerateTimetable('all');closeModal('gemini-modal');switchTab('timetable');" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full border border-rose-200">🗓️ Auto-Make Prep to Class 10 Timetable</button>
             </div>
@@ -1177,11 +1367,14 @@
                 </div>
             </div>
 
-            <!-- Input Box -->
-            <form onsubmit="handleGeminiChatSubmit(event)" class="flex gap-2">
-                <input type="text" id="gemini-user-input" placeholder="Yahan likhein (e.g. Kitne admissions hain? Ya: Kal chutti ka notice bhej do...)" class="flex-1 px-3.5 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-500">
-                <button type="submit" id="gemini-send-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-paper-plane"></i><span>AI Agent</span>
+            <!-- Input Box with Voice Microphone -->
+            <form onsubmit="handleGeminiChatSubmit(event)" class="flex gap-2 items-center">
+                <button type="button" id="gemini-mic-btn" onclick="toggleAdminVoiceInput()" title="Voice Input (Bol kar command dein)" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 border border-slate-300 flex items-center justify-center shrink-0 transition">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <input type="text" id="gemini-user-input" placeholder="Yahan likhein ya Mic dabayein (e.g. Winter holidays 21 Dec se 31 Dec ka notice bhej do...)" class="flex-1 min-w-0 px-3.5 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-500">
+                <button type="submit" id="gemini-send-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center gap-1.5 shrink-0">
+                    <i class="fa-solid fa-paper-plane"></i><span class="hidden sm:inline">AI Agent</span>
                 </button>
             </form>
         </div>
@@ -1215,6 +1408,9 @@
         let expenses = JSON.parse(localStorage.getItem('saira_expenses_v3')) || [];
         let messages = JSON.parse(localStorage.getItem('saira_messages_v3')) || [];
         let homeworks = JSON.parse(localStorage.getItem('saira_homework_v3')) || [];
+        let syllabus = JSON.parse(localStorage.getItem('saira_syllabus_v3')) || {};
+        let teacherTasks = JSON.parse(localStorage.getItem('saira_teacher_tasks_v3')) || [];
+        let teacherActivityLog = JSON.parse(localStorage.getItem('saira_activity_log_v3')) || [];
 
         // ---- Firebase project settings (the app talks to the Realtime Database through its REST address) ----
         const FIREBASE_CONFIG = {
@@ -1445,7 +1641,10 @@
                 ['saira_tests_v3', examTests],
                 ['saira_marks_v3', marks],
                 ['saira_timetables_v3', timetables],
-                ['saira_periodtimes_v3', periodTimes]
+                ['saira_periodtimes_v3', periodTimes],
+                ['saira_syllabus_v3', syllabus],
+                ['saira_teacher_tasks_v3', teacherTasks],
+                ['saira_activity_log_v3', teacherActivityLog]
             ];
             let localSaveFailed = false;
             localPairs.forEach(function(pair) {
@@ -1465,7 +1664,7 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, classSubjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
+                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, classSubjects, examTests, marks, timetables, periodTimes, syllabus, teacherTasks, teacherActivityLog, resetAt, resetStudents
                     })
                 });
                 return !!putRes.ok;
@@ -1498,6 +1697,9 @@
                         if (data.examTests) examTests = data.examTests;
                         if (data.marks) marks = data.marks;
                         if (data.timetables) timetables = data.timetables; if (data.periodTimes) periodTimes = data.periodTimes;
+                        if (data.syllabus && typeof data.syllabus === 'object') syllabus = data.syllabus;
+                        if (Array.isArray(data.teacherTasks)) teacherTasks = data.teacherTasks;
+                        if (Array.isArray(data.teacherActivityLog)) teacherActivityLog = data.teacherActivityLog;
                         // A "Start New Year" reset was done on another device: follow it
                         const cloudReset = Number(data.resetAt || 0);
                         if (cloudReset > resetAt) {
@@ -1610,6 +1812,35 @@
                         }
                     }
                     del['marks/' + k] = null;
+                });
+                each(data.syllabusComplete, function(k, sc) {
+                    if (sc && sc.sylKey && syllabus[sc.sylKey] && Array.isArray(syllabus[sc.sylKey].chapters)) {
+                        const ch = syllabus[sc.sylKey].chapters.find(function(c) { return String(c.id) === String(sc.chapterId) || Number(c.no) === Number(sc.chapterNo); });
+                        if (ch) {
+                            ch.status = sc.status || 'Completed';
+                            ch.completedAt = sc.completedAt || new Date().toLocaleDateString();
+                            ch.completedBy = sc.completedBy || '';
+                        }
+                    }
+                    del['syllabusComplete/' + k] = null;
+                });
+                each(data.taskStatus, function(k, ts) {
+                    if (ts && ts.taskId) {
+                        const tk = teacherTasks.find(function(x) { return x.id === ts.taskId; });
+                        if (tk) {
+                            tk.status = ts.status || 'Completed';
+                            tk.completedAt = ts.completedAt || new Date().toLocaleString();
+                        }
+                    }
+                    del['taskStatus/' + k] = null;
+                });
+                each(data.activityLog, function(k, logItem) {
+                    if (logItem && logItem.id) {
+                        if (!teacherActivityLog.some(function(x) { return x.id === logItem.id; })) {
+                            teacherActivityLog.unshift(logItem);
+                        }
+                    }
+                    del['activityLog/' + k] = null;
                 });
 
                 const n = Object.keys(del).length;
@@ -1768,6 +1999,8 @@
             students: 'Students Directory',
             teachers: 'Teachers Management',
             assignments: 'Class Assignment',
+            syllabus: 'Books & Syllabus Setup',
+            tasks: 'Teacher Tasks & Activity Log',
             staff: 'Other Staff',
             attendance: 'QR Attendance',
             homework: 'Homework',
@@ -1804,6 +2037,8 @@
                 btn('students', 'fa-users', 'Students'),
                 btn('teachers', 'fa-chalkboard-user', 'Teachers'),
                 btn('assignments', 'fa-list-check', 'Class Assignment'),
+                btn('syllabus', 'fa-book-bookmark', 'Books & Syllabus'),
+                btn('tasks', 'fa-bell', 'Tasks & Teacher Log'),
                 btn('staff', 'fa-users-gear', 'Other Staff'),
                 btn('attendance', 'fa-qrcode', 'QR Attendance'),
                 btn('homework', 'fa-book-open', 'Homework'),
@@ -1852,6 +2087,8 @@
             if (targetId === 'staff') renderStaff();
             if (targetId === 'attendance') renderAttendance();
             if (targetId === 'homework') renderHomework();
+            if (targetId === 'syllabus') initAndRenderSyllabusTab();
+            if (targetId === 'tasks') renderTasksAndActivityTab();
             if (targetId === 'fees') renderFees();
             if (targetId === 'exams') renderExams();
             if (targetId === 'timetable') renderTimetable();
@@ -3499,7 +3736,7 @@
         function exportBackupJSON() {
             const backup = {
                 exportedAt: new Date().toISOString(),
-                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, classSubjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
+                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, classSubjects, examTests, marks, timetables, periodTimes, syllabus, teacherTasks, teacherActivityLog, resetAt, resetStudents
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
@@ -3529,6 +3766,9 @@
                     if (data.examTests) examTests = data.examTests;
                     if (data.marks) marks = data.marks;
                     if (data.timetables) timetables = data.timetables; if (data.periodTimes) periodTimes = data.periodTimes;
+                        if (data.syllabus && typeof data.syllabus === 'object') syllabus = data.syllabus;
+                        if (Array.isArray(data.teacherTasks)) teacherTasks = data.teacherTasks;
+                        if (Array.isArray(data.teacherActivityLog)) teacherActivityLog = data.teacherActivityLog;
                     normalizeTeachersAndSubjects();
                     ensurePinsAndTests();
                     syncToFirebaseCloud();
@@ -3643,9 +3883,10 @@
             alert('AI Agent API Key aapke Firebase Cloud aur Browser mein mehfooz ho gayi hai! Ab aap kisi bhi device se login karein ge toh yeh khud kaam karegi.');
         }
 
-        // Instant Fast-Path (< 0.1s) for common operational queries & greetings without network latency
+        // Instant Fast-Path (< 0.1s) for common operational queries, greetings & instant notice publishing without network hang
         function tryInstantFastPath(queryText) {
-            const q = String(queryText || '').toLowerCase().trim();
+            const raw = String(queryText || '').trim();
+            const q = raw.toLowerCase();
             const today = new Date().toISOString().split('T')[0];
             const brStudents = students.filter(function(s) { return matchesBranch(s.branchId); });
             const brTeachers = teachers.filter(function(t) { return matchesBranch(t.branchId); });
@@ -3654,7 +3895,75 @@
             const presentIds = new Set(todayAtt.map(function(a) { return a.id; }));
 
             if (/^(salam|assalam|aoa|hello|hi|hey|kya haal|kaise ho)\b/i.test(q) && q.split(/\s+/).length <= 5) {
-                return 'Wa-Alaikum-us-Salam Yousuf Bhai! Main Saira School System ka AI Agent hoon. Is waqt ' + getBranchName(activeBranch) + ' mein kul ' + brStudents.length + ' students aur ' + brTeachers.length + ' teachers darj hain. Aap hazri, fee defaulters, timetable ya notices ke baray mein foran pooch sakte hain!';
+                return 'Wa-Alaikum-us-Salam Yousuf Bhai! Main Saira School System ka AI Agent hoon. Is waqt ' + getBranchName(activeBranch) + ' mein kul ' + brStudents.length + ' students aur ' + brTeachers.length + ' teachers darj hain. Aap hazri, fee defaulters, books/syllabus, teacher activity log, timetable ya notices ke baray mein foran pooch sakte hain!';
+            }
+
+            // Instant Fast-Path for Teacher Chapter Completion & Tasks Query
+            if (q.includes('chapter') || q.includes('syllabus') || q.includes('task') || q.includes('teacher log') || q.includes('kis teacher ne')) {
+                let msg = '📖 Syllabus, Chapter Completion & Teacher Tasks Report:\n';
+                const recentLogs = teacherActivityLog.slice(0, 8);
+                if (recentLogs.length) {
+                    msg += '\n🔔 Recent Teacher Chapter Completions & Notifications:\n';
+                    recentLogs.forEach(function(l, idx) {
+                        msg += (idx + 1) + '. ' + (l.teacherName || 'Teacher') + ' (' + (l.className || '') + ' · ' + (l.subject || '') + '): ' + (l.summary || l.chapterTitle || '') + ' [' + (l.date || '') + ']\n';
+                    });
+                } else {
+                    msg += '• Abhi tak kisi teacher ka chapter completion notification record nahi aaya.\n';
+                }
+                const pendingTasks = teacherTasks.filter(function(tk) { return tk.status !== 'Completed'; });
+                msg += '\n✅ Pending Teacher Tasks: ' + pendingTasks.length + ' / ' + teacherTasks.length + '\n';
+                pendingTasks.slice(0, 6).forEach(function(tk, idx) {
+                    msg += (idx + 1) + '. ' + tk.teacherName + ' — ' + tk.title + ' (Due: ' + tk.dueDate + ')\n';
+                });
+                return msg.trim();
+            }
+
+            // Instant Fast-Path for Holiday / Winter / Summer / Closure / General Notice sending so it NEVER hangs!
+            const isNoticeRequest = (q.includes('msg') || q.includes('message') || q.includes('notice') || q.includes('circular') || q.includes('bhej') || q.includes('send') || q.includes('inform') || q.includes('holiday') || q.includes('chutti') || q.includes('vacations'));
+            const hasSendIntent = (q.includes('bhej') || q.includes('bhejo') || q.includes('bhejbdo') || q.includes('send') || q.includes('publish') || q.includes('kerdo') || q.includes('kar do'));
+            if (isNoticeRequest && hasSendIntent && (q.includes('holiday') || q.includes('winter') || q.includes('summer') || q.includes('chutti') || q.includes('band') || q.includes('closed') || q.includes('dec') || q.includes('fee') || q.includes('ptm') || q.includes('exam'))) {
+                let target = 'ALL';
+                if (q.includes('sirf teacher') || q.includes('only teacher')) target = 'TEACHERS';
+                else if (q.includes('sirf student') || q.includes('only student')) target = 'STUDENTS';
+                else {
+                    CLASS_LIST.forEach(function(c) {
+                        if (q.includes(c.toLowerCase())) target = c;
+                    });
+                }
+
+                let draftedNotice = '';
+                // Detect date range or custom holiday details (e.g. winter holidays 21st dec to 31st dec 2026)
+                if (q.includes('winter')) {
+                    const dateMatch = raw.match(/(\d{1,2}\s*(?:st|nd|rd|th)?\s*[a-zA-Z]+\s*(?:to|se|-)\s*\d{1,2}\s*(?:st|nd|rd|th)?\s*[a-zA-Z0-9\s]*)/i);
+                    const periodStr = dateMatch ? dateMatch[1].replace(/decb/i, 'December ').replace(/\s+/g, ' ').trim() : '21st December to 31st December 2026';
+                    draftedNotice = 'Official Winter Vacation Notice: Dear Parents, Students, and Respected Teachers, please be informed that ' + appSettings.name + ' will observe Winter Holidays from ' + periodStr + '. The school will reopen on the next working day after the holidays. Wishing everyone a safe, warm, and blessed winter break!';
+                } else if (q.includes('summer')) {
+                    draftedNotice = 'Official Summer Vacation Notice: Dear Parents, Students, and Teachers, please be informed that the school will remain closed for Summer Vacations as per the academic schedule. Enjoy a safe and productive break!';
+                } else if (q.includes('rain') || q.includes('barish') || q.includes('weather')) {
+                    draftedNotice = ENGLISH_NOTICE_TEMPLATES.rain;
+                } else if (q.includes('fee')) {
+                    draftedNotice = ENGLISH_NOTICE_TEMPLATES.fee;
+                } else if (q.includes('ptm') || q.includes('meeting')) {
+                    draftedNotice = ENGLISH_NOTICE_TEMPLATES.ptm;
+                } else if (q.includes('exam')) {
+                    draftedNotice = ENGLISH_NOTICE_TEMPLATES.exam;
+                } else {
+                    draftedNotice = ENGLISH_NOTICE_TEMPLATES.holiday;
+                }
+
+                messages.unshift({
+                    id: 'MSG-' + Date.now(),
+                    branchId: activeBranch === 'ALL' ? 'ALL' : activeBranch,
+                    from: 'Administrator (AI Agent)',
+                    fromId: 'ADMIN',
+                    toClass: target,
+                    text: draftedNotice,
+                    date: new Date().toLocaleString(),
+                    type: 'admin'
+                });
+                syncToFirebaseCloud();
+                renderAdminMessages();
+                return 'Alhamdulillah Yousuf Bhai! Maine aapke hukm ke mutabiq professional English notice tayar kar ke "' + target + '" (Teachers aur Students) ko foran bhej diya hai:\n\n"' + draftedNotice + '"\n\n✅ [Official English Notice Published Instantly to "' + target + '"]';
             }
 
             if ((q.includes('hazir') || q.includes('hazri') || q.includes('attendance') || q.includes('present') || q.includes('bache aaye')) && !q.includes('notice')) {
@@ -3719,7 +4028,7 @@
                     presentTodayTotal: todayAtt.length,
                     unpaidFeeStudentsCount: brStudents.filter(s => s.feeStatus === 'Unpaid').length
                 },
-                studentsSummary: brStudents.map(s => ({
+                studentsSummary: brStudents.slice(0, 60).map(s => ({
                     id: s.id, name: s.name, father: s.father, className: s.className,
                     branch: getBranchName(s.branchId), fee: s.fee, feeStatus: s.feeStatus,
                     presentToday: presentIds.has(s.id)
@@ -3730,10 +4039,15 @@
                     presentToday: presentIds.has(t.id),
                     assignments: teacherPairs(t)
                 })),
-                staffSummary: brStaff.map(st => ({
-                    id: st.id, name: st.name, role: st.type, salary: st.salary,
-                    salaryStatus: st.status, presentToday: presentIds.has(st.id)
+                syllabusSummary: Object.keys(syllabus || {}).map(k => ({
+                    key: k,
+                    bookName: syllabus[k].bookName,
+                    publisher: syllabus[k].publisher,
+                    totalChapters: (syllabus[k].chapters || []).length,
+                    completedChapters: (syllabus[k].chapters || []).filter(c => c.status === 'Completed').length
                 })),
+                teacherTasksSummary: teacherTasks.slice(0, 15),
+                recentTeacherActivityLog: teacherActivityLog.slice(0, 12),
                 recentNotices: messages.slice(0, 6),
                 recentHomework: homeworks.slice(0, 6),
                 examTests: examTests
@@ -3747,13 +4061,29 @@ STRICT RULES:
 3. All official school notices/circulars MUST be drafted in formal, professional English unless explicitly asked otherwise.
 4. If the admin asks you to publish/send a notice to everyone, students, teachers, or a specific class, include a JSON action block at the very end of your response inside <ACTION_JSON>{"action":"SEND_NOTICE","toClass":"ALL","text":"..."}</ACTION_JSON>.`;
 
+        // Timeout-Protected Fetch Helper (14 seconds max so UI NEVER hangs on infinite loading)
+        async function fetchWithTimeout(url, options, timeoutMs) {
+            const controller = new AbortController();
+            const timer = setTimeout(function() { controller.abort(); }, timeoutMs || 14000);
+            try {
+                const response = await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+                clearTimeout(timer);
+                return response;
+            } catch (err) {
+                clearTimeout(timer);
+                if (err && err.name === 'AbortError') {
+                    throw new Error('Internet connection ya AI server slow hone ki wajah se jawab nahi aaya (Timeout). Aapka sawal dobara box mein wapas likh diya hai, bas Send dabayein.');
+                }
+                throw err;
+            }
+        }
+
         async function callGeminiAPI(userPrompt, expectJsonOnly, skipSnapshot) {
             const apiKey = getActiveGeminiKey();
             if (!apiKey) {
                 toggleAiKeyBox();
                 throw new Error('API Key set nahi hai. Barah-e-karam upar API Key box mein apni Gemini API Key paste kar ke Save Key dabayein.');
             }
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
             const contextBlock = skipSnapshot
                 ? ''
                 : `\n\nLIVE SCHOOL DATABASE SNAPSHOT:\n${JSON.stringify(buildSchoolDatabaseSnapshot())}`;
@@ -3767,32 +4097,42 @@ STRICT RULES:
                 payload.generationConfig = { responseMimeType: "application/json" };
             }
 
-            let res = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-goog-api-key': apiKey
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!res.ok) {
-                res = await fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            const modelList = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+            let res = null;
+            let lastErr = '';
+            for (let attempt = 0; attempt < modelList.length; attempt++) {
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelList[attempt]}:generateContent`;
+                try {
+                    res = await fetchWithTimeout(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
+                        body: JSON.stringify(payload)
+                    }, 45000);
+                    if (res.ok) break;
+                    lastErr = `(${res.status}) ` + await res.text();
+                    if (![429, 500, 502, 503, 504].includes(res.status)) break;
+                } catch (netErr) {
+                    lastErr = netErr.message;
+                    res = null;
+                }
+                await new Promise(function(r) { setTimeout(r, 1200); });
             }
 
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(`AI Agent API Error (${res.status}): ${errText}`);
+            if (!res || !res.ok) {
+                const busy = /503|429|UNAVAILABLE|high demand/i.test(lastErr);
+                throw new Error(busy
+                    ? 'Google AI server abhi bohat masroof hai (sab models try kiye). 1-2 minute baad dobara try karein.'
+                    : `AI Agent API Error ${lastErr}`);
             }
 
             const data = await res.json();
             const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
             return cleanAiMarkdown(reply);
         }
+
+        const DEFAULT_AI_WELCOME_HTML = `<div class="bg-white p-3 rounded-xl border shadow-sm text-slate-700 text-xs leading-relaxed">
+                    Assalam-o-Alaikum Yousuf Bhai! Main Saira School System ka AI Agent hoon. Aap mujh se school ke live database (Students, Teachers, Hazri, Fee, Books/Syllabus, Teacher Activity Log, Timetable, Results, Notices) ke baray mein bol kar (Mic) ya likh kar kuch bhi pooch sakte hain!
+                </div>`;
 
         function openGeminiAssistantModal() {
             const modal = document.getElementById('gemini-modal');
@@ -3803,6 +4143,74 @@ STRICT RULES:
                 const inp = document.getElementById('gemini-user-input');
                 if (inp) inp.focus();
             }, 80);
+        }
+
+        // Hard Reset Chat History when closing ('X') so next time it opens 100% fresh
+        function closeGeminiModalAndReset() {
+            stopAdminVoiceInput();
+            const box = document.getElementById('gemini-chat-box');
+            if (box) box.innerHTML = DEFAULT_AI_WELCOME_HTML;
+            const inp = document.getElementById('gemini-user-input');
+            if (inp) inp.value = '';
+            closeModal('gemini-modal');
+        }
+
+        // Voice Input (Microphone) via Web Speech API
+        let adminSpeechRec = null;
+        let adminListening = false;
+        function toggleAdminVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Aapke browser mein Voice Input (Speech Recognition) supported nahi hai. Chrome browser istemal karein.');
+                return;
+            }
+            if (adminListening && adminSpeechRec) {
+                stopAdminVoiceInput();
+                return;
+            }
+            adminSpeechRec = new SpeechRecognition();
+            adminSpeechRec.lang = 'ur-PK';
+            adminSpeechRec.interimResults = false;
+            adminSpeechRec.maxAlternatives = 1;
+            const micBtn = document.getElementById('gemini-mic-btn');
+            adminListening = true;
+            if (micBtn) {
+                micBtn.className = "w-10 h-10 rounded-xl bg-rose-600 text-white border border-rose-700 flex items-center justify-center shrink-0 animate-pulse shadow";
+            }
+            adminSpeechRec.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                const inp = document.getElementById('gemini-user-input');
+                if (inp) inp.value = (inp.value ? inp.value + ' ' : '') + transcript;
+            };
+            adminSpeechRec.onerror = function(ev) {
+                const code = ev && ev.error ? ev.error : 'unknown';
+                stopAdminVoiceInput();
+                if (code === 'not-allowed' || code === 'service-not-allowed') {
+                    alert('Mic ki ijazat nahi mili. Agar file phone se seedha (content:// ya file://) khol rahe hain to Mic kaam nahi karta. App ko https link (GitHub Pages / Firebase Hosting) par kholein aur browser mein Mic Allow karein.');
+                } else if (code === 'language-not-supported') {
+                    alert('Is browser mein Urdu voice support nahi. Keyboard ka mic istemal karein.');
+                } else if (code === 'network') {
+                    alert('Voice ke liye internet zaroori hai. Net check karein.');
+                } else if (code !== 'no-speech' && code !== 'aborted') {
+                    alert('Mic error: ' + code);
+                }
+            };
+            adminSpeechRec.onend = function() {
+                stopAdminVoiceInput();
+            };
+            try { adminSpeechRec.start(); } catch (e) { stopAdminVoiceInput(); alert('Mic start nahi hua: ' + e.message); }
+        }
+
+        function stopAdminVoiceInput() {
+            adminListening = false;
+            if (adminSpeechRec) {
+                try { adminSpeechRec.stop(); } catch (e) {}
+                adminSpeechRec = null;
+            }
+            const micBtn = document.getElementById('gemini-mic-btn');
+            if (micBtn) {
+                micBtn.className = "w-10 h-10 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 border border-slate-300 flex items-center justify-center shrink-0 transition";
+            }
         }
 
         function appendGeminiChatBubble(sender, text) {
@@ -3848,7 +4256,8 @@ STRICT RULES:
             if (btn) btn.disabled = true;
 
             try {
-                let rawReply = await callGeminiAPI(text, false, false);
+                const isSimpleNotice = /\b(msg|message|notice|circular|holiday|vacation|chutti)\b/i.test(text);
+                let rawReply = await callGeminiAPI(text, false, isSimpleNotice);
 
                 const actionMatch = rawReply.match(/<ACTION_JSON>([\s\S]*?)<\/ACTION_JSON>/);
                 if (actionMatch) {
@@ -3876,9 +4285,474 @@ STRICT RULES:
                 loadingBubble.innerText = cleanAiMarkdown(rawReply) || 'Jawab masool nahi hua.';
             } catch (err) {
                 loadingBubble.innerText = '⚠️ Notice: ' + err.message;
+                if (inp && !inp.value) inp.value = text;
             } finally {
                 if (btn) btn.disabled = false;
             }
+        }
+
+        // ==================== SMART BOOKS, PUBLISHER & MONTH-WISE SYLLABUS MODULE ====================
+        const ACADEMIC_MONTHS = ['April', 'May', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March (Revision)'];
+
+        function sylKeyOf(cls, sub) {
+            return String(cls || 'Prep') + '__' + mkey(sub || 'English');
+        }
+
+        function initAndRenderSyllabusTab() {
+            const clsEl = document.getElementById('syl-class');
+            if (!clsEl) return;
+            if (!clsEl.options.length) {
+                clsEl.innerHTML = CLASS_LIST.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+            }
+            onSyllabusClassChange();
+        }
+
+        function onSyllabusClassChange() {
+            const clsEl = document.getElementById('syl-class');
+            const subEl = document.getElementById('syl-subject');
+            if (!clsEl || !subEl) return;
+            const cls = clsEl.value || CLASS_LIST[0];
+            const subs = getSubjectsForClass(cls);
+            const prevSub = subEl.value;
+            subEl.innerHTML = subs.map(function(s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join('');
+            if (subs.indexOf(prevSub) !== -1) subEl.value = prevSub;
+            renderSyllabusEditor();
+        }
+
+        function getOrCreateSyllabusEntry(cls, sub) {
+            const key = sylKeyOf(cls, sub);
+            if (!syllabus[key]) {
+                syllabus[key] = {
+                    className: cls,
+                    subject: sub,
+                    bookName: '',
+                    publisher: '',
+                    chapters: []
+                };
+            }
+            if (!Array.isArray(syllabus[key].chapters)) syllabus[key].chapters = [];
+            return syllabus[key];
+        }
+
+        function renderSyllabusEditor() {
+            const cls = document.getElementById('syl-class')?.value || CLASS_LIST[0];
+            const sub = document.getElementById('syl-subject')?.value || getSubjectsForClass(cls)[0];
+            const entry = getOrCreateSyllabusEntry(cls, sub);
+
+            document.getElementById('syl-book-name').value = entry.bookName || '';
+            document.getElementById('syl-publisher').value = entry.publisher || '';
+            document.getElementById('syl-raw-chapters').value = entry.chapters.map(function(c) { return c.title; }).join('\n');
+            const fb = document.getElementById('syl-ai-feedback');
+            if (fb) fb.classList.add('hidden');
+
+            renderSyllabusChaptersTable(entry);
+            renderClassBooksOverviewGrid(cls);
+        }
+
+        function renderSyllabusChaptersTable(entry) {
+            const tbody = document.getElementById('syl-chapters-tbody');
+            const counter = document.getElementById('syl-chapter-counter');
+            if (!tbody) return;
+            const chs = entry.chapters || [];
+            const doneCount = chs.filter(function(c) { return c.status === 'Completed'; }).length;
+            if (counter) counter.innerText = chs.length ? (doneCount + ' of ' + chs.length + ' Chapters Completed') : 'No chapters added yet';
+
+            if (!chs.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">No chapters configured yet. Enter Book & Publisher above and click "Ask AI" or paste chapter names manually.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = chs.map(function(ch, idx) {
+                const isDone = ch.status === 'Completed';
+                const monthOpts = ACADEMIC_MONTHS.map(function(m) {
+                    return '<option value="' + esc(m) + '"' + (ch.month === m ? ' selected' : '') + '>' + esc(m) + '</option>';
+                }).join('');
+                return '<tr class="hover:bg-slate-50 ' + (isDone ? 'bg-emerald-50/40' : '') + '">' +
+                    '<td class="p-2.5 font-bold text-slate-600">' + (idx + 1) + '</td>' +
+                    '<td class="p-2.5"><input type="text" value="' + esc(ch.title) + '" onchange="updateSyllabusChapterField(' + idx + ',\'title\',this.value)" class="w-full px-2.5 py-1.5 border rounded-lg text-xs font-medium bg-white"></td>' +
+                    '<td class="p-2.5"><select onchange="updateSyllabusChapterField(' + idx + ',\'month\',this.value)" class="w-full px-2 py-1.5 border rounded-lg text-xs bg-white font-semibold text-indigo-800">' + monthOpts + '</select></td>' +
+                    '<td class="p-2.5"><button type="button" onclick="toggleAdminChapterStatus(' + idx + ')" class="px-2.5 py-1 rounded-full text-[11px] font-bold ' + (isDone ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300') + '">' + (isDone ? '✓ Completed' : 'Pending') + '</button></td>' +
+                    '<td class="p-2.5 text-[11px] text-slate-500">' + (isDone ? esc((ch.completedBy || 'Teacher/Admin') + ' • ' + (ch.completedAt || '')) : '—') + '</td>' +
+                    '<td class="p-2.5 text-center"><button type="button" onclick="removeSyllabusChapterRow(' + idx + ')" class="text-rose-500 hover:text-rose-700 px-2"><i class="fa-solid fa-trash"></i></button></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function renderClassBooksOverviewGrid(cls) {
+            const label = document.getElementById('syl-summary-cls-label');
+            if (label) label.innerText = cls;
+            const grid = document.getElementById('syl-class-overview-grid');
+            if (!grid) return;
+            const subs = getSubjectsForClass(cls);
+            grid.innerHTML = subs.map(function(s) {
+                const e = syllabus[sylKeyOf(cls, s)];
+                const hasBook = e && (e.bookName || e.publisher);
+                const total = e && e.chapters ? e.chapters.length : 0;
+                const done = e && e.chapters ? e.chapters.filter(function(c) { return c.status === 'Completed'; }).length : 0;
+                return '<div onclick="document.getElementById(\'syl-subject\').value=\'' + esc(s) + '\';renderSyllabusEditor();" class="cursor-pointer p-3 rounded-xl border transition ' + (hasBook ? 'bg-indigo-50/50 border-indigo-200 hover:border-indigo-400' : 'bg-slate-50 border-slate-200 hover:border-slate-300') + '">' +
+                    '<div class="flex justify-between items-center"><span class="font-bold text-xs text-indigo-950">' + esc(s) + '</span>' +
+                    '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ' + (total ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600') + '">' + done + '/' + total + ' Ch</span></div>' +
+                    '<p class="text-xs font-semibold text-slate-700 mt-1 truncate">' + (hasBook ? esc(e.bookName) : 'Book not set') + '</p>' +
+                    '<p class="text-[11px] text-slate-500 truncate">' + (hasBook && e.publisher ? esc(e.publisher) : 'Click to configure') + '</p></div>';
+            }).join('');
+        }
+
+        function syncSyllabusMetaInputs() {
+            const cls = document.getElementById('syl-class').value;
+            const sub = document.getElementById('syl-subject').value;
+            const entry = getOrCreateSyllabusEntry(cls, sub);
+            entry.bookName = document.getElementById('syl-book-name').value.trim();
+            entry.publisher = document.getElementById('syl-publisher').value.trim();
+            return entry;
+        }
+
+        function buildChaptersFromTextarea() {
+            const entry = syncSyllabusMetaInputs();
+            const raw = document.getElementById('syl-raw-chapters').value.trim();
+            if (!raw) {
+                alert('Pehle chapters ke naam likhein ya paste karein.');
+                return;
+            }
+            const lines = raw.split(/[\r\n]+/).map(function(l) { return l.trim(); }).filter(Boolean);
+            const parts = lines.length > 1 ? lines : raw.split(',').map(function(l) { return l.trim(); }).filter(Boolean);
+            entry.chapters = parts.map(function(title, idx) {
+                const existing = entry.chapters[idx] || {};
+                const mIdx = Math.min(ACADEMIC_MONTHS.length - 1, Math.floor((idx / Math.max(1, parts.length)) * (ACADEMIC_MONTHS.length - 1)));
+                return {
+                    id: existing.id || ('CH-' + (idx + 1)),
+                    no: idx + 1,
+                    title: title,
+                    month: existing.month || ACADEMIC_MONTHS[mIdx],
+                    status: existing.status || 'Pending',
+                    completedAt: existing.completedAt || '',
+                    completedBy: existing.completedBy || ''
+                };
+            });
+            saveCurrentSyllabusConfig(true);
+        }
+
+        function addSingleChapterRow() {
+            const entry = syncSyllabusMetaInputs();
+            const nextNo = entry.chapters.length + 1;
+            const mIdx = Math.min(ACADEMIC_MONTHS.length - 1, nextNo - 1);
+            entry.chapters.push({
+                id: 'CH-' + Date.now() + '-' + nextNo,
+                no: nextNo,
+                title: 'Unit ' + nextNo + ': New Topic',
+                month: ACADEMIC_MONTHS[mIdx],
+                status: 'Pending',
+                completedAt: '',
+                completedBy: ''
+            });
+            document.getElementById('syl-raw-chapters').value = entry.chapters.map(function(c) { return c.title; }).join('\n');
+            saveCurrentSyllabusConfig(true);
+        }
+
+        function updateSyllabusChapterField(idx, field, val) {
+            const entry = syncSyllabusMetaInputs();
+            if (!entry.chapters[idx]) return;
+            entry.chapters[idx][field] = val;
+            if (field === 'title') {
+                document.getElementById('syl-raw-chapters').value = entry.chapters.map(function(c) { return c.title; }).join('\n');
+            }
+            queueSync('syl-save-status');
+        }
+
+        function toggleAdminChapterStatus(idx) {
+            const entry = syncSyllabusMetaInputs();
+            if (!entry.chapters[idx]) return;
+            const ch = entry.chapters[idx];
+            if (ch.status === 'Completed') {
+                ch.status = 'Pending';
+                ch.completedAt = '';
+                ch.completedBy = '';
+            } else {
+                ch.status = 'Completed';
+                ch.completedAt = new Date().toLocaleDateString();
+                ch.completedBy = 'Admin';
+            }
+            saveCurrentSyllabusConfig(true);
+        }
+
+        function removeSyllabusChapterRow(idx) {
+            const entry = syncSyllabusMetaInputs();
+            entry.chapters.splice(idx, 1);
+            entry.chapters.forEach(function(c, i) { c.no = i + 1; });
+            document.getElementById('syl-raw-chapters').value = entry.chapters.map(function(c) { return c.title; }).join('\n');
+            saveCurrentSyllabusConfig(true);
+        }
+
+        async function saveCurrentSyllabusConfig(silent) {
+            const entry = syncSyllabusMetaInputs();
+            await syncToFirebaseCloud();
+            renderSyllabusChaptersTable(entry);
+            renderClassBooksOverviewGrid(entry.className);
+            const badge = document.getElementById('syl-save-status');
+            if (badge) badge.innerText = 'Saved in Firebase Cloud ✓';
+            if (!silent) alert(entry.className + ' (' + entry.subject + ') ki Book aur Month-wise Syllabus Firebase mein save ho gaya hai!');
+        }
+
+        // Local .TXT / .CSV Table-of-Contents Reader (100% In-Browser Memory — Zero Firebase File Upload)
+        function extractLocalTextOutline(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            if (file.size > 150 * 1024) {
+                alert('Yeh text outline file 150 KB se badi hai. Barah-e-karam sirf Table of Contents / Chapters ki lightweight .txt file select karein.');
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = String(e.target.result || '');
+                const lines = content.split(/[\r\n]+/).map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 1 && l.length < 120; }).slice(0, 35);
+                if (!lines.length) {
+                    alert('Is file mein koi chapters nahi mile.');
+                    return;
+                }
+                document.getElementById('syl-raw-chapters').value = lines.join('\n');
+                buildChaptersFromTextarea();
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        async function aiVerifyAndFetchBookChapters() {
+            const entry = syncSyllabusMetaInputs();
+            if (!entry.bookName || !entry.publisher) {
+                alert('Pehle Book Title aur Publisher ka naam likhein (maslan: Oxford Progressive English / OUP ya Sindh Textbook Board).');
+                return;
+            }
+            const btn = document.getElementById('btn-ai-book-check');
+            const fb = document.getElementById('syl-ai-feedback');
+            const oldHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Checking Book with Gemini...';
+            if (fb) {
+                fb.classList.remove('hidden');
+                fb.innerText = '⏳ Gemini AI "' + entry.bookName + '" (' + entry.publisher + ') ko check kar raha hai...';
+            }
+
+            try {
+                const prompt = `You are a Pakistani School Curriculum Specialist.
+Class: "${entry.className}"
+Subject: "${entry.subject}"
+Book Title: "${entry.bookName}"
+Publisher/Board: "${entry.publisher}"
+
+Return ONLY valid JSON in this exact format:
+{
+  "known": true or false,
+  "message": "Short note in Pakistani Roman Urdu explaining if you know this exact book/publisher edition or if you are providing a standard Pakistani curriculum chapter list which the Admin can edit.",
+  "chapters": [
+    {"title": "Unit 1: ...", "month": "April"},
+    {"title": "Unit 2: ...", "month": "May"}
+  ]
+}
+Use months from: April, May, August, September, October, November, December, January, February, March (Revision). Provide 8 to 14 realistic chapters appropriate for ${entry.className} ${entry.subject}.`;
+
+                const rawJson = await callGeminiAPI(prompt, true, true);
+                let parsed = null;
+                try {
+                    parsed = JSON.parse(rawJson);
+                } catch (e) {
+                    const m = rawJson.match(/\{[\s\S]*\}/);
+                    if (m) parsed = JSON.parse(m[0]);
+                }
+
+                if (!parsed || !Array.isArray(parsed.chapters)) {
+                    throw new Error('AI response parse nahi ho saka. Aap neeche box mein manual chapters likh sakte hain.');
+                }
+
+                entry.chapters = parsed.chapters.map(function(c, i) {
+                    return {
+                        id: 'CH-' + (i + 1),
+                        no: i + 1,
+                        title: String(c.title || ('Unit ' + (i + 1))).trim(),
+                        month: ACADEMIC_MONTHS.indexOf(c.month) !== -1 ? c.month : ACADEMIC_MONTHS[i % ACADEMIC_MONTHS.length],
+                        status: 'Pending',
+                        completedAt: '',
+                        completedBy: ''
+                    };
+                });
+                document.getElementById('syl-raw-chapters').value = entry.chapters.map(function(c) { return c.title; }).join('\n');
+                if (fb) {
+                    fb.innerText = (parsed.known ? '✅ Book Verified by AI: ' : 'ℹ️ Local/Custom Book Note: ') + (parsed.message || 'Chapters list aur month-wise plan load kar diya gaya hai.');
+                }
+                await saveCurrentSyllabusConfig(true);
+            } catch (err) {
+                if (fb) fb.innerText = '⚠️ ' + err.message + ' — Aap neeche box mein manual chapters paste kar ke "Apply Chapters" daba sakte hain.';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = oldHtml;
+            }
+        }
+
+        async function aiAutoDivideMonthWise() {
+            const entry = syncSyllabusMetaInputs();
+            const raw = document.getElementById('syl-raw-chapters').value.trim();
+            if (!raw && (!entry.chapters || !entry.chapters.length)) {
+                alert('Pehle chapters list likhein ya "Ask AI: Check Book" par click karein.');
+                return;
+            }
+            if (raw) buildChaptersFromTextarea();
+            const btn = document.getElementById('btn-ai-month-divide');
+            const oldHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>AI Month-Wise Planning...';
+
+            try {
+                const chapterTitles = entry.chapters.map(function(c) { return c.title; });
+                const prompt = `Divide these chapters for Pakistani School Class "${entry.className}" Subject "${entry.subject}" across the Pakistani academic session months (${ACADEMIC_MONTHS.join(', ')}) according to student mental level and term balance:
+Chapters: ${JSON.stringify(chapterTitles)}
+Return ONLY a JSON array of objects: [{"title":"...","month":"April"}, ...]`;
+                const rawJson = await callGeminiAPI(prompt, true, true);
+                let arr = null;
+                try { arr = JSON.parse(rawJson); } catch (e) {
+                    const m = rawJson.match(/\[[\s\S]*\]/);
+                    if (m) arr = JSON.parse(m[0]);
+                }
+                if (Array.isArray(arr) && arr.length) {
+                    entry.chapters.forEach(function(ch, i) {
+                        if (arr[i] && arr[i].month) ch.month = arr[i].month;
+                    });
+                    await saveCurrentSyllabusConfig(true);
+                    alert('AI Agent ne Pakistani academic session ke mutabiq Month-Wise Syllabus tarteeb de kar save kar diya hai!');
+                }
+            } catch (err) {
+                alert('Month-wise division fallback applied automatically. (' + err.message + ')');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = oldHtml;
+            }
+        }
+
+        async function aiCheckAllClassBooks() {
+            const cls = document.getElementById('syl-class')?.value || CLASS_LIST[0];
+            const subs = getSubjectsForClass(cls);
+            const box = document.getElementById('ai-class-books-report');
+            const btn = document.getElementById('btn-ai-check-all-books');
+            if (!box) return;
+
+            const configured = subs.map(function(s) {
+                const e = syllabus[sylKeyOf(cls, s)] || {};
+                return { subject: s, bookName: e.bookName || 'Not Set', publisher: e.publisher || 'Not Set', chaptersCount: (e.chapters || []).length };
+            });
+
+            box.classList.remove('hidden');
+            box.innerText = '⏳ AI Agent ' + cls + ' ki tamam books aur publishers check kar raha hai...';
+            if (btn) btn.disabled = true;
+
+            try {
+                const prompt = `Review the configured books and publishers for "${cls}" in a Pakistani school:
+${JSON.stringify(configured)}
+In concise Pakistani Roman Urdu (no ** asterisks), list:
+1. Which subjects have recognized books/publishers ready for AI syllabus generation.
+2. Which subjects have local/custom or missing books where the Admin should either enter the Book/Publisher or paste manual chapter names.`;
+                const reply = await callGeminiAPI(prompt, false, true);
+                box.innerText = cleanAiMarkdown(reply);
+            } catch (err) {
+                box.innerText = '⚠️ ' + err.message;
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // ==================== TEACHER TASKS, DEADLINES & NOTIFICATION LOG MODULE ====================
+        function renderTasksAndActivityTab() {
+            const tSel = document.getElementById('task-teacher-select');
+            const dueInp = document.getElementById('task-due-date');
+            if (dueInp && !dueInp.value) {
+                const d = new Date();
+                d.setDate(d.getDate() + 3);
+                dueInp.value = d.toISOString().split('T')[0];
+            }
+            if (tSel) {
+                const list = teachers.filter(function(t) { return matchesBranch(t.branchId); });
+                tSel.innerHTML = list.length
+                    ? list.map(function(t) { return '<option value="' + esc(t.id) + '">' + esc(t.name) + ' (' + esc(t.id) + ')</option>'; }).join('')
+                    : '<option value="">No teachers in this branch</option>';
+            }
+            renderAdminTasksList();
+            renderAdminActivityLog();
+        }
+
+        function addAdminTeacherTask(e) {
+            e.preventDefault();
+            const tid = document.getElementById('task-teacher-select').value;
+            const t = teachers.find(function(x) { return x.id === tid; });
+            if (!t) {
+                alert('Pehle teacher select karein.');
+                return;
+            }
+            const task = {
+                id: 'TSK-' + Date.now(),
+                branchId: t.branchId || 'main',
+                teacherId: t.id,
+                teacherName: t.name,
+                classSubject: document.getElementById('task-class-sub').value.trim(),
+                dueDate: document.getElementById('task-due-date').value,
+                priority: document.getElementById('task-priority').value || 'Normal',
+                title: document.getElementById('task-title-input').value.trim(),
+                status: 'Pending',
+                createdAt: new Date().toLocaleDateString()
+            };
+            teacherTasks.unshift(task);
+            syncToFirebaseCloud();
+            document.getElementById('task-title-input').value = '';
+            document.getElementById('task-class-sub').value = '';
+            renderAdminTasksList();
+        }
+
+        function renderAdminTasksList() {
+            const box = document.getElementById('admin-tasks-list');
+            if (!box) return;
+            const list = teacherTasks.filter(function(tk) { return matchesBranch(tk.branchId); });
+            if (!list.length) {
+                box.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No tasks assigned to teachers yet.</p>';
+                return;
+            }
+            box.innerHTML = list.map(function(tk) {
+                const done = tk.status === 'Completed';
+                return '<div class="p-3 rounded-xl border ' + (done ? 'bg-emerald-50/50 border-emerald-200' : 'bg-white border-slate-200') + ' flex justify-between items-start gap-2">' +
+                    '<div class="min-w-0 flex-1">' +
+                        '<div class="flex flex-wrap items-center gap-1.5">' +
+                            '<span class="font-bold text-xs text-indigo-900">' + esc(tk.teacherName) + '</span>' +
+                            (tk.classSubject ? '<span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-semibold">' + esc(tk.classSubject) + '</span>' : '') +
+                            '<span class="text-[10px] px-2 py-0.5 rounded font-bold ' + (tk.priority === 'High' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600') + '">' + esc(tk.priority) + '</span>' +
+                            '<span class="text-[10px] px-2 py-0.5 rounded font-bold ' + (done ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700') + '">' + esc(tk.status) + '</span>' +
+                        '</div>' +
+                        '<p class="text-xs text-slate-800 mt-1">' + esc(tk.title) + '</p>' +
+                        '<p class="text-[11px] text-slate-500 mt-1">Deadline: <strong>' + esc(tk.dueDate) + '</strong>' + (tk.completedAt ? ' • Completed: ' + esc(tk.completedAt) : '') + '</p>' +
+                    '</div>' +
+                    '<button onclick="deleteAdminTeacherTask(\'' + esc(tk.id) + '\')" class="text-rose-500 hover:text-rose-700 text-xs px-1.5"><i class="fa-solid fa-trash"></i></button>' +
+                '</div>';
+            }).join('');
+        }
+
+        function deleteAdminTeacherTask(id) {
+            teacherTasks = teacherTasks.filter(function(tk) { return tk.id !== id; });
+            syncToFirebaseCloud();
+            renderAdminTasksList();
+        }
+
+        function renderAdminActivityLog() {
+            const box = document.getElementById('admin-activity-log-list');
+            if (!box) return;
+            const logs = teacherActivityLog.filter(function(l) { return matchesBranch(l.branchId); });
+            if (!logs.length) {
+                box.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs border rounded-xl bg-slate-50">Abhi tak kisi teacher ne chapter completion ya student alert nahi bheja. Jab teacher apne portal par chapter "Completed" mark karega toh uska live record aur WhatsApp message yahan show hoga.</div>';
+                return;
+            }
+            box.innerHTML = logs.map(function(l) {
+                return '<div class="p-3.5 rounded-xl bg-emerald-50/40 border border-emerald-200 space-y-1.5">' +
+                    '<div class="flex flex-wrap items-center justify-between gap-2">' +
+                        '<span class="text-xs font-bold text-emerald-900"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>' + esc(l.teacherName || 'Teacher') + ' • ' + esc(l.className || '') + ' (' + esc(l.subject || '') + ')</span>' +
+                        '<span class="text-[11px] text-slate-500">' + esc(l.date || '') + '</span>' +
+                    '</div>' +
+                    '<p class="text-xs font-semibold text-slate-800">Chapter Completed: ' + esc(l.chapterTitle || l.summary || '') + '</p>' +
+                    (l.whatsappDraft ? '<div class="p-2.5 bg-white rounded-lg border border-emerald-200 text-[11px] text-slate-700 whitespace-pre-line"><strong>WhatsApp Parent Message & Student Portal Notice:</strong>\n' + esc(l.whatsappDraft) + '</div>' : '') +
+                '</div>';
+            }).join('');
         }
 
         // ========== PROFESSIONAL ENGLISH NOTICE DRAFTER & 1-CLICK TEMPLATES ==========
