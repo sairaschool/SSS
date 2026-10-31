@@ -229,7 +229,7 @@
                     </div>
 
                     <button onclick="openGeminiAssistantModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold shadow transition flex items-center space-x-1.5 border border-amber-300">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>Gemini AI</span>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Agent</span>
                     </button>
 
                     <span id="db-status-badge" class="text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-semibold">
@@ -276,7 +276,7 @@
                 </div>
 
                 <button onclick="openGeminiAssistantModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-robot"></i><span>Ask Gemini AI (Live DB)</span>
+                    <i class="fa-solid fa-robot"></i><span>AI Agent</span>
                 </button>
             </div>
 
@@ -333,7 +333,8 @@
                                     <option value="Class 6">Class 6</option>
                                     <option value="Class 7">Class 7</option>
                                     <option value="Class 8">Class 8</option>
-                                    <option value="Matric">Matric</option>
+                                    <option value="Class 9">Class 9</option>
+                                    <option value="Class 10">Class 10</option>
                                 </select>
                             </div>
                             <div>
@@ -673,7 +674,7 @@
                             <button onclick="printTimetable('class')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF - this class</button>
                             <button onclick="printTimetable('all')" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF - all classes</button>
                             <button onclick="aiGenerateTimetable('single')" id="btn-ai-tt-single" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Auto-Make This Class</button>
-                            <button onclick="aiGenerateTimetable('all')" id="btn-ai-tt-all" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-robot mr-1"></i>AI Auto-Make All Classes (Prep-Matric)</button>
+                            <button onclick="aiGenerateTimetable('all')" id="btn-ai-tt-all" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-robot mr-1"></i>AI Auto-Make All Classes (Prep-Class 10)</button>
                         </div>
                         <details class="mb-3 border rounded-lg p-3 bg-slate-50">
                             <summary class="text-xs font-bold text-slate-700 cursor-pointer"><i class="fa-regular fa-clock mr-1 text-indigo-600"></i>Period times (same for the whole school)</summary>
@@ -830,17 +831,27 @@
                                     <option value="Class 3">Class: Class 3</option><option value="Class 4">Class: Class 4</option>
                                     <option value="Class 5">Class: Class 5</option><option value="Class 6">Class: Class 6</option>
                                     <option value="Class 7">Class: Class 7</option><option value="Class 8">Class: Class 8</option>
-                                    <option value="Matric">Class: Matric</option>
+                                    <option value="Class 9">Class: Class 9</option><option value="Class 10">Class: Class 10</option>
                                 </select>
                             </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Message / Circular Text</label>
-                            <div class="mb-2 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex flex-col sm:flex-row gap-2 items-center">
-                                <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
-                                <input type="text" id="ai-notice-prompt" placeholder="Gemini ko batayein (maslan: Kal barish ki wajah se school band rahega)..." class="flex-1 w-full px-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500">
-                                <button type="button" onclick="aiDraftNotice(false)" id="btn-ai-notice" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition shadow-sm">✨ AI Draft Notice</button>
-                                <button type="button" onclick="aiDraftNotice(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition shadow-sm">🚀 AI Draft & Publish</button>
+                            <div class="mb-2.5 p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="text-[11px] font-bold text-amber-900 mr-1"><i class="fa-solid fa-bolt text-amber-600 mr-1"></i>1-Click English Templates:</span>
+                                    <button type="button" onclick="applyEnglishNoticeTemplate('holiday')" class="text-[11px] bg-white hover:bg-amber-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition shadow-sm">🏖️ Holiday Tomorrow</button>
+                                    <button type="button" onclick="applyEnglishNoticeTemplate('rain')" class="text-[11px] bg-white hover:bg-amber-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition shadow-sm">🌧️ Weather / Rain Closure</button>
+                                    <button type="button" onclick="applyEnglishNoticeTemplate('fee')" class="text-[11px] bg-white hover:bg-amber-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition shadow-sm">💳 Fee Reminder</button>
+                                    <button type="button" onclick="applyEnglishNoticeTemplate('ptm')" class="text-[11px] bg-white hover:bg-amber-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition shadow-sm">🤝 Parent-Teacher Meeting</button>
+                                    <button type="button" onclick="applyEnglishNoticeTemplate('exam')" class="text-[11px] bg-white hover:bg-amber-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition shadow-sm">📝 Exam Schedule Alert</button>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-600 hidden sm:inline"></i>
+                                    <input type="text" id="ai-notice-prompt" placeholder="Write topic in Urdu / Roman Urdu / English (e.g. Kal barish ki wajah se school band rahega) -> AI Agent drafts in English..." class="flex-1 w-full px-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500">
+                                    <button type="button" onclick="aiDraftNotice(false)" id="btn-ai-notice" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition shadow-sm">✨ AI Agent Draft (English)</button>
+                                    <button type="button" onclick="aiDraftNotice(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition shadow-sm">🚀 Draft & Publish</button>
+                                </div>
                             </div>
                             <textarea id="msg-text" rows="3" placeholder="e.g. School will remain closed tomorrow..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
                         </div>
@@ -1087,19 +1098,22 @@
                     <input type="text" id="set-admin-pass" class="w-full px-3 py-2 border rounded-lg text-sm">
                 </div>
                 <div class="border-t pt-3">
-                    <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-book mr-1 text-indigo-600"></i>Manage Subjects</label>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <label class="block text-xs font-bold text-slate-700"><i class="fa-solid fa-book mr-1 text-indigo-600"></i>Class-Wise Subjects Manager (Prep to Class 10)</label>
+                        <select id="set-subject-class" onchange="renderSubjectsManager()" class="px-2.5 py-1 border rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-900 outline-none"></select>
+                    </div>
                     <div id="subjects-list" class="flex flex-wrap gap-1.5 mb-2"></div>
                     <div class="flex gap-2">
-                        <input type="text" id="new-subject-input" maxlength="40" placeholder="New subject (e.g. Urdu, Computer, اسلامیات)" class="flex-1 min-w-0 px-3 py-2 border rounded-lg text-xs">
-                        <button type="button" onclick="addSubject()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold">Add</button>
+                        <input type="text" id="new-subject-input" maxlength="40" placeholder="Add subject for selected class (e.g. Physics, Nazra, Drawing)" class="flex-1 min-w-0 px-3 py-2 border rounded-lg text-xs">
+                        <button type="button" onclick="addSubject()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold">Add to Class</button>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-1">Subjects are saved immediately. A subject that is assigned to a teacher cannot be deleted.</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Each class (Prep to Class 10) has its own subject list. Changes sync automatically with Firebase.</p>
                 </div>
                 <div class="border-t pt-3">
                     <div class="mb-3 pb-3 border-b">
-                        <label class="block text-xs font-bold text-amber-800 mb-1"><i class="fa-solid fa-wand-magic-sparkles text-amber-600 mr-1"></i>Gemini AI API Key (Google AI Studio)</label>
-                        <input type="text" id="set-gemini-key" placeholder="Paste Gemini API Key (AIzaSy... or AQ...)" class="w-full px-3 py-2 border rounded-lg text-xs font-mono bg-amber-50/40">
-                        <p class="text-[11px] text-slate-500 mt-1">Pre-configured with your Saira School System key. You can update it anytime from Google AI Studio.</p>
+                        <label class="block text-xs font-bold text-amber-800 mb-1"><i class="fa-solid fa-key text-amber-600 mr-1"></i>AI Agent API Key (Synced Safely via Firebase Cloud)</label>
+                        <input type="password" id="set-gemini-key" placeholder="Paste your Gemini API Key here..." class="w-full px-3 py-2 border rounded-lg text-xs font-mono bg-amber-50/40">
+                        <p class="text-[11px] text-slate-500 mt-1">Stored privately in your Firebase Realtime Database &amp; browser—never exposed in GitHub code.</p>
                     </div>
                     <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-cloud text-indigo-600 mr-1"></i>Firebase Realtime Database URL (Optional for Cloud Sync)</label>
                     <input type="url" id="set-firebase-url" placeholder="https://your-school-default-rtdb.firebaseio.com" class="w-full px-3 py-2 border rounded-lg text-xs font-mono">
@@ -1113,43 +1127,61 @@
         </div>
     </div>
 
-    <!-- GEMINI AI SMART ASSISTANT MODAL (FRONT POPUP) -->
+    <!-- AI AGENT MODAL (FRONT POPUP) -->
     <div id="gemini-modal" onclick="if(event.target===this)closeModal('gemini-modal')" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-3 sm:p-4 no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-5 space-y-4 relative max-h-[90vh] flex flex-col border-2 border-amber-400">
-            <div class="flex justify-between items-center border-b pb-3">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-5 space-y-3.5 relative max-h-[90vh] flex flex-col border-2 border-amber-400">
+            <div class="flex justify-between items-center border-b pb-2.5">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-lg shadow">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <i class="fa-solid fa-robot"></i>
                     </div>
                     <div>
-                        <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-tight">Saira School Gemini AI Assistant</h3>
-                        <p class="text-[11px] text-slate-500">Connected to Live Firebase School Database • Pure Urdu / Roman Urdu / English</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-tight">AI Agent</h3>
+                        <p class="text-[11px] text-slate-500">Ultra-Fast School ERP Intelligence • Live Firebase Sync</p>
                     </div>
                 </div>
-                <button onclick="closeModal('gemini-modal')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="toggleAiKeyBox()" id="ai-key-status-btn" class="text-[11px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold px-2.5 py-1 rounded-lg border border-amber-300 transition">
+                        <i class="fa-solid fa-key mr-1"></i>API Key
+                    </button>
+                    <button onclick="closeModal('gemini-modal')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <!-- Cloud-Synced API Key Input Box (Hidden once key is saved in Firebase, or toggled anytime) -->
+            <div id="ai-agent-key-bar" class="p-3 bg-amber-50 border border-amber-300 rounded-xl space-y-1.5 hidden">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-amber-900"><i class="fa-solid fa-shield-halved mr-1 text-amber-600"></i>Enter Gemini API Key (Saves to Firebase for All Devices)</label>
+                    <span id="ai-key-saved-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 hidden">Saved in Cloud ✓</span>
+                </div>
+                <div class="flex gap-2">
+                    <input type="password" id="modal-gemini-key-input" placeholder="Paste API Key here (e.g. AQ... or AIza...) and press Save" class="flex-1 px-3 py-1.5 border rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-amber-500">
+                    <button type="button" onclick="saveGeminiKeyFromModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow transition">Save Key</button>
+                </div>
+                <p class="text-[10px] text-slate-500">Paste your key once and click <strong>Save Key</strong>. It automatically syncs with your private Firebase database so Admin can login from any mobile or laptop without GitHub alerts.</p>
             </div>
 
             <!-- Quick One-Click Prompts -->
             <div class="flex flex-wrap gap-1.5">
-                <button type="button" onclick="askGeminiQuick('Aaj kitne bache aur teachers hazir hain? Aur kaun ghair hazir hai?')" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">📊 Aaj ki Hazri (Attendance)</button>
-                <button type="button" onclick="askGeminiQuick('Kin students ki fee abhi tak Unpaid hai? Total kitni raqam baki hai?')" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">💳 Fee Defaulters List</button>
-                <button type="button" onclick="askGeminiQuick('School ke tamam teachers aur unki classes/salary ki summary batao.')" class="text-[11px] bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">👨‍🏫 Teachers & Salary</button>
-                <button type="button" onclick="askGeminiQuick('Kal school band rehne ka official notice bana kar sab ko bhej do.')" class="text-[11px] bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full border border-purple-200">📢 Auto-Send Holiday Notice</button>
-                <button type="button" onclick="aiGenerateTimetable('all');closeModal('gemini-modal');switchTab('timetable');" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full border border-rose-200">🗓️ Auto-Make Prep to Matric Timetable</button>
+                <button type="button" onclick="askGeminiQuick('Aaj kitne bache aur teachers hazir hain?')" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">📊 Aaj ki Hazri</button>
+                <button type="button" onclick="askGeminiQuick('Kin students ki fee abhi tak Unpaid hai?')" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">💳 Fee Defaulters</button>
+                <button type="button" onclick="askGeminiQuick('School ke tamam teachers aur unki salary ki summary batao.')" class="text-[11px] bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">👨‍🏫 Teachers & Salary</button>
+                <button type="button" onclick="askGeminiQuick('Kal school band rehne ka official English notice bana kar sab ko bhej do.')" class="text-[11px] bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full border border-purple-200">📢 Auto-Send Holiday Notice</button>
+                <button type="button" onclick="aiGenerateTimetable('all');closeModal('gemini-modal');switchTab('timetable');" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full border border-rose-200">🗓️ Auto-Make Prep to Class 10 Timetable</button>
             </div>
 
             <!-- Chat / Response Area -->
             <div id="gemini-chat-box" class="flex-1 overflow-y-auto bg-slate-50 border rounded-xl p-3.5 space-y-3 min-h-[240px] max-h-[360px] text-sm">
                 <div class="bg-white p-3 rounded-xl border shadow-sm text-slate-700 text-xs leading-relaxed">
-                    <strong>Assalam-o-Alaikum Yousuf Bhai!</strong> Main Saira School System ka AI Assistant hoon. Aap mujh se school ke live database (Students, Teachers, Hazri, Fee, Timetable, Results, Notices) ke baray mein Roman Urdu, Urdu ya English mein kuch bhi pooch sakte hain ya kaam karwa sakte hain!
+                    Assalam-o-Alaikum Yousuf Bhai! Main Saira School System ka AI Agent hoon. Aap mujh se school ke live database (Students, Teachers, Hazri, Fee, Timetable, Results, Notices) ke baray mein kuch bhi pooch sakte hain!
                 </div>
             </div>
 
             <!-- Input Box -->
             <form onsubmit="handleGeminiChatSubmit(event)" class="flex gap-2">
-                <input type="text" id="gemini-user-input" placeholder="Yahan likhein (e.g. Aaj kitne bache aaye hain? Ya: Sab ko notice bhej do...)" class="flex-1 px-3.5 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-500">
+                <input type="text" id="gemini-user-input" placeholder="Yahan likhein (e.g. Kitne admissions hain? Ya: Kal chutti ka notice bhej do...)" class="flex-1 px-3.5 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-500">
                 <button type="submit" id="gemini-send-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-paper-plane"></i><span>Ask AI</span>
+                    <i class="fa-solid fa-paper-plane"></i><span>AI Agent</span>
                 </button>
             </form>
         </div>
@@ -1198,14 +1230,48 @@
         };
         if (!appSettings.firebaseUrl) appSettings.firebaseUrl = FIREBASE_CONFIG.databaseURL;
 
-        // ---- Subjects list (admin-managed) and class list ----
-        const DEFAULT_SUBJECTS = ['Maths', 'English', 'Science', 'Urdu', 'Islamiyat', 'Computer'];
-        const CLASS_LIST = ['Prep', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Matric'];
-        let subjects = DEFAULT_SUBJECTS.slice();
+        // ---- Class-wise Subjects map (Prep to Class 10) and class list ----
+        const CLASS_LIST = ['Prep', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'];
+        const DEFAULT_CLASS_SUBJECTS = {
+            'Prep': ['English', 'Urdu', 'Maths', 'Nazra / Qaida', 'General Knowledge', 'Drawing'],
+            'Class 1': ['English', 'Urdu', 'Maths', 'General Knowledge', 'Islamiyat', 'Computer', 'Social Studies'],
+            'Class 2': ['English', 'Urdu', 'Maths', 'General Knowledge', 'Islamiyat', 'Computer', 'Social Studies'],
+            'Class 3': ['English', 'Urdu', 'Maths', 'General Knowledge', 'Islamiyat', 'Computer', 'Social Studies'],
+            'Class 4': ['English', 'Urdu', 'Maths', 'General Science', 'Islamiyat', 'History / Geography', 'Computer', 'Pak Studies'],
+            'Class 5': ['English', 'Urdu', 'Maths', 'General Science', 'Islamiyat', 'History / Geography', 'Computer', 'Pak Studies'],
+            'Class 6': ['English', 'Urdu', 'Maths', 'General Science', 'Islamiyat', 'History / Geography', 'Computer', 'Pak Studies'],
+            'Class 7': ['English', 'Urdu', 'Maths', 'General Science', 'Islamiyat', 'History / Geography', 'Computer', 'Pak Studies'],
+            'Class 8': ['English', 'Urdu', 'Maths', 'General Science', 'Islamiyat', 'History / Geography', 'Computer', 'Pak Studies'],
+            'Class 9': ['English', 'Urdu', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Pak Studies', 'Islamiyat'],
+            'Class 10': ['English', 'Urdu', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Pak Studies', 'Islamiyat']
+        };
+        const DEFAULT_SUBJECTS = ['English', 'Urdu', 'Maths', 'General Science', 'Islamiyat', 'Computer', 'Physics', 'Chemistry', 'Biology', 'Pak Studies', 'Nazra / Qaida', 'General Knowledge', 'Drawing', 'Social Studies', 'History / Geography', 'Computer Science'];
+        let classSubjects = JSON.parse(JSON.stringify(DEFAULT_CLASS_SUBJECTS));
         try {
-            const savedSubjects = JSON.parse(localStorage.getItem('saira_subjects_v3'));
-            if (Array.isArray(savedSubjects) && savedSubjects.length) subjects = savedSubjects;
+            const savedCS = JSON.parse(localStorage.getItem('saira_class_subjects_v3'));
+            if (savedCS && typeof savedCS === 'object') {
+                CLASS_LIST.forEach(function(c) {
+                    if (Array.isArray(savedCS[c]) && savedCS[c].length) classSubjects[c] = savedCS[c];
+                });
+            }
         } catch (err) { /* keep defaults */ }
+
+        function getSubjectsForClass(cls) {
+            if (cls && classSubjects[cls] && Array.isArray(classSubjects[cls]) && classSubjects[cls].length) {
+                return classSubjects[cls];
+            }
+            return DEFAULT_SUBJECTS.slice();
+        }
+        function getAllUniqueSubjects() {
+            const out = [];
+            CLASS_LIST.forEach(function(c) {
+                (classSubjects[c] || []).forEach(function(s) {
+                    if (s && out.indexOf(s) === -1) out.push(s);
+                });
+            });
+            return out.length ? out : DEFAULT_SUBJECTS.slice();
+        }
+        let subjects = getAllUniqueSubjects();
 
         // ---- Year reset markers (so old devices do not bring back cleared data) ----
         let resetAt = Number(localStorage.getItem('saira_reset_at') || 0);
@@ -1221,20 +1287,34 @@
         // Old teachers had one subject + one class. Convert them to the new "assignments" list
         // WITHOUT removing the old fields (so nothing is lost and old portals keep working).
         function normalizeTeachersAndSubjects() {
-            if (!Array.isArray(subjects) || subjects.length === 0) subjects = DEFAULT_SUBJECTS.slice();
+            if (!classSubjects || typeof classSubjects !== 'object') {
+                classSubjects = JSON.parse(JSON.stringify(DEFAULT_CLASS_SUBJECTS));
+            }
+            CLASS_LIST.forEach(function(c) {
+                if (!Array.isArray(classSubjects[c]) || !classSubjects[c].length) {
+                    classSubjects[c] = (DEFAULT_CLASS_SUBJECTS[c] || DEFAULT_SUBJECTS).slice();
+                }
+            });
+            students.forEach(function(s) {
+                if (s.className === 'Matric') s.className = 'Class 10';
+            });
             teachers.forEach(function(t) {
+                if (t.assignedClass === 'Matric') t.assignedClass = 'Class 10';
                 if (!Array.isArray(t.assignments)) {
                     t.assignments = (t.subject || t.assignedClass)
                         ? [{ cls: t.assignedClass || '', subject: t.subject || '' }]
                         : [];
                 }
                 t.assignments.forEach(function(a) {
+                    if (a.cls === 'Matric') a.cls = 'Class 10';
                     if (!a.subject) return;
-                    const found = subjects.find(function(x) { return x.toLowerCase() === String(a.subject).toLowerCase(); });
+                    const cList = (a.cls && classSubjects[a.cls]) ? classSubjects[a.cls] : [];
+                    const found = cList.find(function(x) { return x.toLowerCase() === String(a.subject).toLowerCase(); });
                     if (found) a.subject = found;
-                    else subjects.push(a.subject);
+                    else if (a.cls && classSubjects[a.cls]) classSubjects[a.cls].push(a.subject);
                 });
             });
+            subjects = getAllUniqueSubjects();
         }
 
         // ---- Exams (tests + per-subject marks), timetables, PINs ----
@@ -1361,6 +1441,7 @@
                 ['saira_messages_v3', messages],
                 ['saira_homework_v3', homeworks],
                 ['saira_subjects_v3', subjects],
+                ['saira_class_subjects_v3', classSubjects],
                 ['saira_tests_v3', examTests],
                 ['saira_marks_v3', marks],
                 ['saira_timetables_v3', timetables],
@@ -1384,7 +1465,7 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
+                        settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, classSubjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
                     })
                 });
                 return !!putRes.ok;
@@ -1413,6 +1494,7 @@
                         if (data.messages) messages = data.messages;
                         if (data.homeworks) homeworks = data.homeworks;
                         if (data.subjects) subjects = data.subjects;
+                        if (data.classSubjects) classSubjects = data.classSubjects;
                         if (data.examTests) examTests = data.examTests;
                         if (data.marks) marks = data.marks;
                         if (data.timetables) timetables = data.timetables; if (data.periodTimes) periodTimes = data.periodTimes;
@@ -1952,7 +2034,11 @@
             document.getElementById('set-admin-pass').value = appSettings.adminPassword || 'admin123';
             document.getElementById('set-firebase-url').value = appSettings.firebaseUrl || '';
             if (document.getElementById('set-gemini-key')) {
-                document.getElementById('set-gemini-key').value = appSettings.geminiApiKey || DEFAULT_GEMINI_API_KEY;
+                document.getElementById('set-gemini-key').value = appSettings.geminiApiKey || '';
+            }
+            const clsSel = document.getElementById('set-subject-class');
+            if (clsSel && !clsSel.options.length) {
+                clsSel.innerHTML = CLASS_LIST.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
             }
             renderSubjectsManager();
             const prev = document.getElementById('set-logo-preview');
@@ -1973,7 +2059,7 @@
             appSettings.adminPassword = document.getElementById('set-admin-pass').value.trim() || 'admin123';
             appSettings.firebaseUrl = document.getElementById('set-firebase-url').value.trim();
             if (document.getElementById('set-gemini-key')) {
-                appSettings.geminiApiKey = document.getElementById('set-gemini-key').value.trim() || DEFAULT_GEMINI_API_KEY;
+                appSettings.geminiApiKey = document.getElementById('set-gemini-key').value.trim();
             }
             await syncToFirebaseCloud();
             applySettings();
@@ -2140,8 +2226,9 @@
             modal.classList.add('flex');
         }
 
-        // ========== SUBJECTS ==========
+        // ========== CLASS-WISE SUBJECTS (PREP TO CLASS 10) ==========
         function refreshSubjectDropdowns() {
+            subjects = getAllUniqueSubjects();
             ['t-subject', 'hw-subject'].forEach(function(id) {
                 const el = document.getElementById(id);
                 if (!el) return;
@@ -2154,18 +2241,27 @@
         function renderSubjectsManager() {
             const box = document.getElementById('subjects-list');
             if (!box) return;
-            box.innerHTML = subjects.map(function(x, i) {
+            const clsSel = document.getElementById('set-subject-class');
+            if (clsSel && !clsSel.options.length) {
+                clsSel.innerHTML = CLASS_LIST.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+            }
+            const activeCls = (clsSel && clsSel.value) ? clsSel.value : CLASS_LIST[0];
+            const list = getSubjectsForClass(activeCls);
+            box.innerHTML = list.map(function(x, i) {
                 return '<span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs font-semibold pl-2.5 pr-1 py-1 rounded-full">' + esc(x) +
-                    '<button type="button" onclick="deleteSubject(' + i + ')" class="ml-1 w-5 h-5 rounded-full hover:bg-rose-100 text-rose-500" title="Delete">&times;</button></span>';
+                    '<button type="button" onclick="deleteSubject(' + i + ')" class="ml-1 w-5 h-5 rounded-full hover:bg-rose-100 text-rose-500" title="Remove from ' + esc(activeCls) + '">&times;</button></span>';
             }).join('');
         }
 
-        function addSubjectName(raw) {
+        function addSubjectName(raw, targetClass) {
             const name = String(raw || '').replace(/[.$#\[\]\/\\]/g, ' ').trim().replace(/\s+/g, ' ');
             if (!name) return null;
-            const found = subjects.find(function(x) { return x.toLowerCase() === name.toLowerCase(); });
+            const cls = targetClass || (document.getElementById('set-subject-class') ? document.getElementById('set-subject-class').value : CLASS_LIST[0]);
+            if (!Array.isArray(classSubjects[cls])) classSubjects[cls] = getSubjectsForClass(cls);
+            const found = classSubjects[cls].find(function(x) { return x.toLowerCase() === name.toLowerCase(); });
             if (found) return found;
-            subjects.push(name);
+            classSubjects[cls].push(name);
+            subjects = getAllUniqueSubjects();
             syncToFirebaseCloud();
             refreshSubjectDropdowns();
             renderSubjectsManager();
@@ -2174,24 +2270,30 @@
 
         function addSubject() {
             const inp = document.getElementById('new-subject-input');
-            const added = addSubjectName(inp.value);
+            const clsSel = document.getElementById('set-subject-class');
+            const cls = clsSel ? clsSel.value : CLASS_LIST[0];
+            const added = addSubjectName(inp.value, cls);
             if (!added) { alert('Please type a subject name.'); return; }
             inp.value = '';
         }
 
         function deleteSubject(i) {
-            const name = subjects[i];
+            const clsSel = document.getElementById('set-subject-class');
+            const cls = (clsSel && clsSel.value) ? clsSel.value : CLASS_LIST[0];
+            const list = getSubjectsForClass(cls);
+            const name = list[i];
             if (name === undefined) return;
-            if (subjects.length <= 1) { alert('At least one subject is required.'); return; }
+            if (list.length <= 1) { alert('At least one subject is required for ' + cls + '.'); return; }
             const users = teachers.filter(function(t) {
-                return teacherPairs(t).some(function(a) { return a.subject === name; });
+                return teacherPairs(t).some(function(a) { return a.cls === cls && a.subject === name; });
             });
             if (users.length) {
-                alert('Cannot delete "' + name + '" because it is assigned to: ' + users.map(function(t) { return t.name; }).join(', ') + '.\n\nRemove it from their assignments first.');
+                alert('Cannot delete "' + name + '" from ' + cls + ' because it is assigned to: ' + users.map(function(t) { return t.name; }).join(', ') + '.\n\nRemove it from their assignments first.');
                 return;
             }
-            if (!confirm('Delete subject "' + name + '"? (Old homework records keep their text.)')) return;
-            subjects.splice(i, 1);
+            if (!confirm('Remove subject "' + name + '" from ' + cls + '?')) return;
+            classSubjects[cls].splice(i, 1);
+            subjects = getAllUniqueSubjects();
             syncToFirebaseCloud();
             refreshSubjectDropdowns();
             renderSubjectsManager();
@@ -2273,7 +2375,11 @@
             if (!t) return;
             assignTeacherId = id;
             assignDraft = teacherPairs(t).map(function(a) { return { cls: a.cls, subject: a.subject }; });
-            if (assignDraft.length === 0) assignDraft.push({ cls: CLASS_LIST[0], subject: subjects[0] || '' });
+            if (assignDraft.length === 0) {
+                const c0 = CLASS_LIST[0];
+                const s0 = getSubjectsForClass(c0)[0] || '';
+                assignDraft.push({ cls: c0, subject: s0 });
+            }
             document.getElementById('assign-teacher-name').innerText = t.name + ' (' + t.id + ')';
             document.getElementById('assign-error').classList.add('hidden');
             renderAssignRows();
@@ -2284,21 +2390,32 @@
 
         function renderAssignRows() {
             document.getElementById('assign-rows').innerHTML = assignDraft.map(function(a, i) {
+                const clsSubs = getSubjectsForClass(a.cls);
                 return '<div class="flex items-center gap-2">' +
                     '<select onchange="updateAssignRow(' + i + ',\'cls\',this.value)" class="flex-1 min-w-0 px-2 py-2 border rounded-lg text-sm">' + optionsHtml(CLASS_LIST, a.cls) + '</select>' +
-                    '<select onchange="updateAssignRow(' + i + ',\'subject\',this.value)" class="flex-1 min-w-0 px-2 py-2 border rounded-lg text-sm">' + optionsHtml(subjects, a.subject) + '</select>' +
+                    '<select onchange="updateAssignRow(' + i + ',\'subject\',this.value)" class="flex-1 min-w-0 px-2 py-2 border rounded-lg text-sm">' + optionsHtml(clsSubs, a.subject) + '</select>' +
                     '<button type="button" onclick="removeAssignRow(' + i + ')" class="text-rose-500 hover:text-rose-700 px-1.5" title="Remove"><i class="fa-solid fa-trash"></i></button>' +
                     '</div>';
             }).join('');
         }
 
         function updateAssignRow(i, key, val) {
-            if (assignDraft[i]) assignDraft[i][key] = val;
+            if (!assignDraft[i]) return;
+            assignDraft[i][key] = val;
+            if (key === 'cls') {
+                const clsSubs = getSubjectsForClass(val);
+                if (clsSubs.indexOf(assignDraft[i].subject) === -1) {
+                    assignDraft[i].subject = clsSubs[0] || '';
+                }
+                renderAssignRows();
+            }
         }
 
         function addAssignRow() {
             const last = assignDraft[assignDraft.length - 1];
-            assignDraft.push({ cls: last ? last.cls : CLASS_LIST[0], subject: subjects[0] || '' });
+            const nextCls = last ? last.cls : CLASS_LIST[0];
+            const nextSub = getSubjectsForClass(nextCls)[0] || '';
+            assignDraft.push({ cls: nextCls, subject: nextSub });
             renderAssignRows();
         }
 
@@ -2713,7 +2830,8 @@
                 const first = classes.find(function(c) { return students.some(function(st) { return matchesBranch(st.branchId) && st.className === c; }); });
                 if (first) classEl.value = first;
             }
-            fillSelect('ex-subject', [{ v: '__sheet__', l: 'Result Sheet (all subjects)' }].concat(subjects.map(function(x) { return { v: x, l: x }; })));
+            const clsSubjectsForExam = getSubjectsForClass(classEl.value);
+            fillSelect('ex-subject', [{ v: '__sheet__', l: 'Result Sheet (all subjects)' }].concat(clsSubjectsForExam.map(function(x) { return { v: x, l: x }; })));
             renderTestsManager();
 
             const test = examTests.find(function(t) { return t.id === document.getElementById('ex-test').value; });
@@ -3012,7 +3130,7 @@
                     html += '<td class="p-1 border align-top' + (busy.length ? ' bg-rose-50 border-rose-400' : '') + '">' +
                         '<select onchange="setTTTeacher(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px] mb-1">' + tOpts + '</select>' +
                         '<select onchange="setTTSubject(\'' + d + '\',' + i + ',this.value)" class="w-32 px-1 py-1 border rounded text-[11px]">' +
-                        '<option value="">— Subject —</option>' + optionsHtml(subjects, cell.s) + '</select>' +
+                        '<option value="">— Subject —</option>' + optionsHtml(getSubjectsForClass(c.cls), cell.s) + '</select>' +
                         (busy.length ? '<div class="text-[10px] text-rose-600 font-semibold mt-0.5">Busy: ' + esc(busy.join(', ')) + '</div>' : '') + '</td>';
                 });
                 html += '</tr>';
@@ -3381,7 +3499,7 @@
         function exportBackupJSON() {
             const backup = {
                 exportedAt: new Date().toISOString(),
-                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
+                settings: appSettings, branches, students, teachers, staffList, attendance, exams, expenses, messages, homeworks, subjects, classSubjects, examTests, marks, timetables, periodTimes, resetAt, resetStudents
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
@@ -3407,6 +3525,7 @@
                     if (data.messages) messages = data.messages;
                     if (data.homeworks) homeworks = data.homeworks;
                     if (data.subjects) subjects = data.subjects;
+                        if (data.classSubjects) classSubjects = data.classSubjects;
                     if (data.examTests) examTests = data.examTests;
                     if (data.marks) marks = data.marks;
                     if (data.timetables) timetables = data.timetables; if (data.periodTimes) periodTimes = data.periodTimes;
@@ -3463,13 +3582,120 @@
         }
 
 
-        // ==================== GEMINI AI INTEGRATION (LIVE SCHOOL ERP ASSISTANT) ====================
-        const DEFAULT_GEMINI_API_KEY = "AQ.Ab8RN6JWcGxCBXM5dyWgTg0X0PxDKbQZuJvQZgHUijP2LmrheA";
-        const GEMINI_PROJECT_NUMBER = "860674367727";
-        if (!appSettings.geminiApiKey) appSettings.geminiApiKey = DEFAULT_GEMINI_API_KEY;
-
+        // ==================== AI AGENT INTEGRATION (SECURE CLOUD KEY + ULTRA-FAST ROUTING) ====================
         function getActiveGeminiKey() {
-            return (appSettings.geminiApiKey || DEFAULT_GEMINI_API_KEY).trim();
+            return (appSettings.geminiApiKey || localStorage.getItem('saira_gemini_api_key') || '').trim();
+        }
+
+        function cleanAiMarkdown(text) {
+            return String(text || '')
+                .replace(/\*\*/g, '')
+                .replace(/^#+\s*/gm, '')
+                .trim();
+        }
+
+        function updateAiKeyUiStatus() {
+            const hasKey = !!getActiveGeminiKey();
+            const badge = document.getElementById('ai-key-saved-badge');
+            const bar = document.getElementById('ai-agent-key-bar');
+            const btn = document.getElementById('ai-key-status-btn');
+            const inp = document.getElementById('modal-gemini-key-input');
+            if (inp) inp.value = getActiveGeminiKey();
+            if (badge) {
+                if (hasKey) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+            if (btn) {
+                btn.innerHTML = hasKey
+                    ? '<i class="fa-solid fa-check-circle text-emerald-600 mr-1"></i>API Key Ready'
+                    : '<i class="fa-solid fa-key text-rose-600 mr-1"></i>Set API Key';
+            }
+            if (bar && !hasKey) {
+                bar.classList.remove('hidden');
+            }
+        }
+
+        function toggleAiKeyBox() {
+            const bar = document.getElementById('ai-agent-key-bar');
+            if (!bar) return;
+            bar.classList.toggle('hidden');
+            const inp = document.getElementById('modal-gemini-key-input');
+            if (inp) inp.value = getActiveGeminiKey();
+        }
+
+        async function saveGeminiKeyFromModal() {
+            const inp = document.getElementById('modal-gemini-key-input');
+            if (!inp) return;
+            const key = inp.value.trim();
+            if (!key) {
+                alert('Barah-e-karam apni Gemini API Key paste karein.');
+                return;
+            }
+            appSettings.geminiApiKey = key;
+            localStorage.setItem('saira_gemini_api_key', key);
+            if (document.getElementById('set-gemini-key')) {
+                document.getElementById('set-gemini-key').value = key;
+            }
+            await syncToFirebaseCloud();
+            updateAiKeyUiStatus();
+            const bar = document.getElementById('ai-agent-key-bar');
+            if (bar) bar.classList.add('hidden');
+            alert('AI Agent API Key aapke Firebase Cloud aur Browser mein mehfooz ho gayi hai! Ab aap kisi bhi device se login karein ge toh yeh khud kaam karegi.');
+        }
+
+        // Instant Fast-Path (< 0.1s) for common operational queries & greetings without network latency
+        function tryInstantFastPath(queryText) {
+            const q = String(queryText || '').toLowerCase().trim();
+            const today = new Date().toISOString().split('T')[0];
+            const brStudents = students.filter(function(s) { return matchesBranch(s.branchId); });
+            const brTeachers = teachers.filter(function(t) { return matchesBranch(t.branchId); });
+            const brStaff = staffList.filter(function(st) { return matchesBranch(st.branchId); });
+            const todayAtt = attendance.filter(function(a) { return a.date === today && matchesBranch(a.branchId); });
+            const presentIds = new Set(todayAtt.map(function(a) { return a.id; }));
+
+            if (/^(salam|assalam|aoa|hello|hi|hey|kya haal|kaise ho)\b/i.test(q) && q.split(/\s+/).length <= 5) {
+                return 'Wa-Alaikum-us-Salam Yousuf Bhai! Main Saira School System ka AI Agent hoon. Is waqt ' + getBranchName(activeBranch) + ' mein kul ' + brStudents.length + ' students aur ' + brTeachers.length + ' teachers darj hain. Aap hazri, fee defaulters, timetable ya notices ke baray mein foran pooch sakte hain!';
+            }
+
+            if ((q.includes('hazir') || q.includes('hazri') || q.includes('attendance') || q.includes('present') || q.includes('bache aaye')) && !q.includes('notice')) {
+                const presStudents = brStudents.filter(function(s) { return presentIds.has(s.id); });
+                const absStudents = brStudents.filter(function(s) { return !presentIds.has(s.id); });
+                const presTeachers = brTeachers.filter(function(t) { return presentIds.has(t.id); });
+                const absTeachers = brTeachers.filter(function(t) { return !presentIds.has(t.id); });
+                let msg = 'Aaj ki Hazri Summary (' + today + ' - ' + getBranchName(activeBranch) + '):\n';
+                msg += '• Hazir Students: ' + presStudents.length + ' / ' + brStudents.length + '\n';
+                msg += '• Ghair Hazir Students: ' + absStudents.length + (absStudents.length ? ' (' + absStudents.slice(0, 10).map(function(s) { return s.name + ' [' + s.className + ']'; }).join(', ') + (absStudents.length > 10 ? '...' : '') + ')' : '') + '\n';
+                msg += '• Hazir Teachers: ' + presTeachers.length + ' / ' + brTeachers.length + '\n';
+                msg += '• Ghair Hazir Teachers: ' + absTeachers.length + (absTeachers.length ? ' (' + absTeachers.map(function(t) { return t.name; }).join(', ') + ')' : '');
+                return msg;
+            }
+
+            if ((q.includes('unpaid') || q.includes('defaulter') || q.includes('fee baki') || q.includes('raqam baki')) && !q.includes('notice')) {
+                const unpaidList = brStudents.filter(function(s) { return s.feeStatus === 'Unpaid'; });
+                const totalDue = unpaidList.reduce(function(acc, s) { return acc + (Number(s.fee) || 0); }, 0);
+                if (!unpaidList.length) return 'Alhamdulillah! ' + getBranchName(activeBranch) + ' mein tamam students ki fee Paid hai. Koi defaulter nahi hai.';
+                let msg = 'Fee Defaulters Summary (' + getBranchName(activeBranch) + '):\n';
+                msg += '• Unpaid Students: ' + unpaidList.length + ' (Total Baki Raqam: Rs. ' + totalDue.toLocaleString() + ')\n';
+                unpaidList.slice(0, 15).forEach(function(s, i) {
+                    msg += (i + 1) + '. ' + s.name + ' (' + s.className + ' - ' + s.id + ') — Rs. ' + s.fee + '\n';
+                });
+                if (unpaidList.length > 15) msg += '...aur mazeed ' + (unpaidList.length - 15) + ' students.';
+                return msg.trim();
+            }
+
+            if ((q.includes('teachers') && q.includes('salary')) || q.includes('tamam teachers')) {
+                if (!brTeachers.length) return 'Is branch mein abhi koi teacher add nahi kiya gaya.';
+                const totalSal = brTeachers.reduce(function(acc, t) { return acc + (Number(t.salary) || 0); }, 0);
+                let msg = 'Teachers & Salary Summary (' + getBranchName(activeBranch) + '):\n';
+                msg += '• Total Teachers: ' + brTeachers.length + ' | Total Monthly Salary: Rs. ' + totalSal.toLocaleString() + '\n';
+                brTeachers.forEach(function(t, i) {
+                    const pairs = teacherPairs(t).map(function(a) { return a.cls + ' (' + a.subject + ')'; }).join(', ') || 'No class assigned';
+                    msg += (i + 1) + '. ' + t.name + ' [' + t.id + '] — Rs. ' + t.salary + ' (' + t.status + ') — Teaches: ' + pairs + '\n';
+                });
+                return msg.trim();
+            }
+
+            return null;
         }
 
         function buildSchoolDatabaseSnapshot() {
@@ -3485,7 +3711,7 @@
                 activeBranch: getBranchName(activeBranch),
                 todayDate: today,
                 classes: CLASS_LIST,
-                subjects: subjects,
+                classWiseSubjects: classSubjects,
                 counts: {
                     totalStudents: brStudents.length,
                     totalTeachers: brTeachers.length,
@@ -3508,35 +3734,31 @@
                     id: st.id, name: st.name, role: st.type, salary: st.salary,
                     salaryStatus: st.status, presentToday: presentIds.has(st.id)
                 })),
-                recentNotices: messages.slice(0, 8),
-                recentHomework: homeworks.slice(0, 10),
+                recentNotices: messages.slice(0, 6),
+                recentHomework: homeworks.slice(0, 6),
                 examTests: examTests
             };
         }
 
-        const SAIRA_SYSTEM_INSTRUCTION = `You are the official Smart AI Assistant built exclusively inside the Saira School Management System (Admin ERP Portal).
-STRICT RULES YOU MUST ALWAYS FOLLOW:
-1. DOMAIN RESTRICTION: You must ONLY answer questions or perform tasks related to this school portal and its live Firebase database (Students, Admissions, Teachers, Class Assignments, Staff, QR Attendance, Homework, Weekly Timetables from Prep to Matric, Fees & Dues, Exams & Results, Salaries, Expenses, and Official Notices). If asked about any unrelated outside topic, politely decline and state that you only work for Saira School Management System.
-2. STRICT PAKISTANI LANGUAGE & SCRIPT RULE:
-   - Never use Hindi / Devanagari script (अ, आ, क, ख) or Sanskritized Hindi words (such as कृपया, धन्यवाद, विद्यालय, छात्र, परीक्षा, उपस्थिति).
-   - If the user writes in Roman Urdu, reply in clean Pakistani Roman Urdu using authentic Urdu vocabulary (maslan: Asatiza, Talaba, Hazri, Imtihanat, Timetable, Fee, Wajib-ul-Ada, Chutti, Notice).
-   - If the user writes in Urdu script (اردو), reply in clean Pakistani Nastaliq Urdu script (اردو).
-   - If the user writes in English, reply in professional English.
-3. LIVE DATABASE ACTIONS:
-   - If the admin asks you to publish/send a notice or announcement to everyone, students, teachers, or a specific class, include a JSON action block at the very end of your response inside <ACTION_JSON>{"action":"SEND_NOTICE","toClass":"ALL","text":"..."}</ACTION_JSON> so the portal automatically publishes it to Firebase!`;
+        const SAIRA_SYSTEM_INSTRUCTION = `You are the official AI Agent built inside the Saira School Management System (Admin ERP Portal).
+STRICT RULES:
+1. Answer concisely and directly using plain text without markdown asterisks (**).
+2. Never use Hindi / Devanagari script or Sanskritized Hindi words. Reply in clean Pakistani Roman Urdu, Nastaliq Urdu, or professional English.
+3. All official school notices/circulars MUST be drafted in formal, professional English unless explicitly asked otherwise.
+4. If the admin asks you to publish/send a notice to everyone, students, teachers, or a specific class, include a JSON action block at the very end of your response inside <ACTION_JSON>{"action":"SEND_NOTICE","toClass":"ALL","text":"..."}</ACTION_JSON>.`;
 
-        async function callGeminiAPI(userPrompt, expectJsonOnly) {
+        async function callGeminiAPI(userPrompt, expectJsonOnly, skipSnapshot) {
             const apiKey = getActiveGeminiKey();
+            if (!apiKey) {
+                toggleAiKeyBox();
+                throw new Error('API Key set nahi hai. Barah-e-karam upar API Key box mein apni Gemini API Key paste kar ke Save Key dabayein.');
+            }
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
-            const dbSnapshot = buildSchoolDatabaseSnapshot();
+            const contextBlock = skipSnapshot
+                ? ''
+                : `\n\nLIVE SCHOOL DATABASE SNAPSHOT:\n${JSON.stringify(buildSchoolDatabaseSnapshot())}`;
 
-            const fullText = `${SAIRA_SYSTEM_INSTRUCTION}
-
-LIVE SCHOOL FIREBASE DATABASE SNAPSHOT:
-${JSON.stringify(dbSnapshot)}
-
-ADMIN REQUEST:
-${userPrompt}`;
+            const fullText = `${SAIRA_SYSTEM_INSTRUCTION}${contextBlock}\n\nADMIN REQUEST:\n${userPrompt}`;
 
             const payload = {
                 contents: [{ parts: [{ text: fullText }] }]
@@ -3555,7 +3777,6 @@ ${userPrompt}`;
             });
 
             if (!res.ok) {
-                // Fallback with query param if header is blocked by browser CORS policy
                 res = await fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -3565,22 +3786,23 @@ ${userPrompt}`;
 
             if (!res.ok) {
                 const errText = await res.text();
-                throw new Error(`Gemini API Error (${res.status}): ${errText}`);
+                throw new Error(`AI Agent API Error (${res.status}): ${errText}`);
             }
 
             const data = await res.json();
             const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            return reply;
+            return cleanAiMarkdown(reply);
         }
 
         function openGeminiAssistantModal() {
             const modal = document.getElementById('gemini-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            updateAiKeyUiStatus();
             setTimeout(() => {
                 const inp = document.getElementById('gemini-user-input');
                 if (inp) inp.focus();
-            }, 100);
+            }, 80);
         }
 
         function appendGeminiChatBubble(sender, text) {
@@ -3592,7 +3814,7 @@ ${userPrompt}`;
                 div.innerText = text;
             } else {
                 div.className = "bg-white p-3.5 rounded-xl border border-amber-200 text-slate-800 max-w-[92%] text-xs leading-relaxed shadow-sm whitespace-pre-wrap";
-                div.innerText = text;
+                div.innerText = cleanAiMarkdown(text);
             }
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
@@ -3614,13 +3836,20 @@ ${userPrompt}`;
 
             inp.value = '';
             appendGeminiChatBubble('user', text);
-            const loadingBubble = appendGeminiChatBubble('ai', '⏳ Gemini school database check kar raha hai...');
+
+            // Check Ultra-Fast Local Path first (< 0.1s)
+            const fastReply = tryInstantFastPath(text);
+            if (fastReply) {
+                appendGeminiChatBubble('ai', fastReply);
+                return;
+            }
+
+            const loadingBubble = appendGeminiChatBubble('ai', '⏳ AI Agent jawab tayar kar raha hai...');
             if (btn) btn.disabled = true;
 
             try {
-                let rawReply = await callGeminiAPI(text, false);
+                let rawReply = await callGeminiAPI(text, false, false);
 
-                // Check if AI included an automatic action like SEND_NOTICE
                 const actionMatch = rawReply.match(/<ACTION_JSON>([\s\S]*?)<\/ACTION_JSON>/);
                 if (actionMatch) {
                     rawReply = rawReply.replace(actionMatch[0], '').trim();
@@ -3630,61 +3859,75 @@ ${userPrompt}`;
                             messages.unshift({
                                 id: 'MSG-' + Date.now(),
                                 branchId: activeBranch === 'ALL' ? 'ALL' : activeBranch,
-                                from: 'Administrator (via Gemini AI)',
+                                from: 'Administrator (AI Agent)',
                                 fromId: 'ADMIN',
                                 toClass: act.toClass || 'ALL',
-                                text: act.text,
+                                text: cleanAiMarkdown(act.text),
                                 date: new Date().toLocaleString(),
                                 type: 'admin'
                             });
                             syncToFirebaseCloud();
                             renderAdminMessages();
-                            rawReply += `
-
-✅ [Notice Automatically Published to "${act.toClass || 'ALL'}" in Firebase Database]`;
+                            rawReply += `\n\n✅ [Official English Notice Published to "${act.toClass || 'ALL'}"]`;
                         }
                     } catch (jsonErr) { console.warn('Action parse warning:', jsonErr); }
                 }
 
-                loadingBubble.innerText = rawReply || 'Jawab masool nahi hua.';
+                loadingBubble.innerText = cleanAiMarkdown(rawReply) || 'Jawab masool nahi hua.';
             } catch (err) {
-                loadingBubble.innerText = '⚠️ Connection Notice: ' + err.message + '\n\nBarah-e-karam Settings mein apni Gemini API Key check karein.';
+                loadingBubble.innerText = '⚠️ Notice: ' + err.message;
             } finally {
                 if (btn) btn.disabled = false;
             }
         }
 
-        // ========== AI SMART NOTICE DRAFTER ==========
+        // ========== PROFESSIONAL ENGLISH NOTICE DRAFTER & 1-CLICK TEMPLATES ==========
+        const ENGLISH_NOTICE_TEMPLATES = {
+            holiday: "Dear Parents and Students, please be informed that the school will remain closed tomorrow on account of an official holiday. Regular classes will resume on the next working day.",
+            rain: "Circular: In light of severe weather conditions and heavy rainfall, the school will remain closed tomorrow for the safety of all students and staff. Stay safe!",
+            fee: "Official Reminder: Dear Parents, you are kindly requested to clear the monthly school tuition fee and any pending dues before the 10th of this month to avoid late charges.",
+            ptm: "Dear Parents, a Parent-Teacher Meeting (PTM) will be held this Saturday from 9:00 AM to 12:30 PM to discuss your child's academic progress. Your presence is highly appreciated.",
+            exam: "Examination Alert: Dear Students and Parents, the upcoming term examinations are scheduled to commence next week. Please ensure full attendance and timely preparation."
+        };
+
+        function applyEnglishNoticeTemplate(key) {
+            const msgBox = document.getElementById('msg-text');
+            if (msgBox && ENGLISH_NOTICE_TEMPLATES[key]) {
+                msgBox.value = ENGLISH_NOTICE_TEMPLATES[key];
+                msgBox.focus();
+            }
+        }
+
         async function aiDraftNotice(autoPublish) {
             const promptEl = document.getElementById('ai-notice-prompt');
             const msgBox = document.getElementById('msg-text');
             const toTarget = document.getElementById('msg-to').value;
             const userInstruction = (promptEl.value || msgBox.value || '').trim();
             if (!userInstruction) {
-                alert('Pehle upar box mein likhein ke kis baray mein notice bhejna hai (maslan: Kal school band rahega).');
+                alert('Pehle upar box mein topic likhein (maslan: Kal barish ki wajah se school band rahega) ya 1-Click English Template select karein.');
                 return;
             }
             const btn = document.getElementById('btn-ai-notice');
             const oldText = btn ? btn.innerText : '';
-            if (btn) btn.innerText = '⏳ Writing...';
+            if (btn) btn.innerText = '⏳ Drafting in English...';
 
             try {
-                const prompt = `Write an official, polite school circular/notice for target audience "${toTarget}" based on this instruction: "${userInstruction}". Follow the language requested by the user (Pakistani Urdu, Roman Urdu, or English - NO Hindi words). Output ONLY the final notice text ready to be sent, without extra commentary or <ACTION_JSON> tags.`;
-                const noticeText = await callGeminiAPI(prompt, false);
-                msgBox.value = noticeText.replace(/<ACTION_JSON>[\s\S]*?<\/ACTION_JSON>/g, '').trim();
+                const prompt = `Draft a clear, polite, formal, and professional school circular/notice IN ENGLISH ONLY for target audience "${toTarget}" at "${appSettings.name}" based on this instruction/topic: "${userInstruction}". Output ONLY the final English notice text ready to be published, with no asterisks (**) or extra commentary.`;
+                const noticeText = await callGeminiAPI(prompt, false, true);
+                msgBox.value = cleanAiMarkdown(noticeText.replace(/<ACTION_JSON>[\s\S]*?<\/ACTION_JSON>/g, ''));
                 if (autoPublish && msgBox.value) {
                     sendAdminMessage();
                     promptEl.value = '';
-                    alert('Gemini AI ne notice تیار kar ke sab ko publish kar diya hai!');
+                    alert('AI Agent ne professional English notice tayar kar ke publish kar diya hai!');
                 }
             } catch (err) {
-                alert('Gemini AI Notice Error: ' + err.message);
+                alert('AI Agent Notice Error: ' + err.message);
             } finally {
                 if (btn) btn.innerText = oldText;
             }
         }
 
-        // ========== AI AUTOMATED WEEKLY TIMETABLE (SINGLE OR ALL CLASSES PREP TO MATRIC) ==========
+        // ========== AI AUTOMATED WEEKLY TIMETABLE (PREP TO CLASS 10 WITH CLASS-WISE SUBJECTS) ==========
         async function aiGenerateTimetable(mode) {
             const c = ttCurrent();
             const br = c.br;
@@ -3692,17 +3935,14 @@ ${userPrompt}`;
             const brTeachers = teachers.filter(t => (t.branchId || 'main') === br);
 
             if (!confirm(mode === 'all'
-                ? `Kya aap Gemini AI/Smart Engine se ${getBranchName(br)} ki tamam classes (Prep se Matric tak) ka mukammal Weekly Timetable banwana chahte hain (bina kisi teacher clash ke)?`
+                ? `Kya aap AI Agent se ${getBranchName(br)} ki tamam classes (Prep se Class 10 tak) ka mukammal Class-Wise Weekly Timetable banwana chahte hain (bina kisi teacher clash ke)?`
                 : `Kya aap ${c.cls} (${getBranchName(br)}) ka Weekly Timetable auto-generate karna chahte hain?`)) {
                 return;
             }
 
-            // Deterministic clash-free scheduler + Gemini AI optimization
-            // Tracks busy teachers across the entire branch: busyMap[day][periodIndex] = Set of teacherIds
             const busyMap = {};
             PERIOD_DAYS.forEach(d => { busyMap[d] = {}; });
 
-            // Pre-populate busyMap from classes we are NOT regenerating right now
             CLASS_LIST.forEach(cl => {
                 if (classesToBuild.indexOf(cl) !== -1) return;
                 const existing = timetables[ttKey(br, cl)];
@@ -3723,8 +3963,8 @@ ${userPrompt}`;
                 const curTT = timetables[key] || { periods: 8, times: [], days: {} };
                 const numPeriods = Number(curTT.periods) || 8;
                 const newDays = {};
+                const clsSubs = getSubjectsForClass(clsName);
 
-                // Find teachers assigned to this class in this branch
                 let pairs = [];
                 brTeachers.forEach(t => {
                     teacherPairs(t).forEach(a => {
@@ -3734,9 +3974,8 @@ ${userPrompt}`;
                     });
                 });
 
-                // If no teacher is assigned yet to this class, still fill balanced subjects so timetable is ready
                 if (pairs.length === 0) {
-                    subjects.forEach((sub, idx) => {
+                    clsSubs.forEach((sub, idx) => {
                         const fallbackT = brTeachers.length ? brTeachers[(classIdx + idx) % brTeachers.length] : null;
                         pairs.push({ t: fallbackT ? fallbackT.id : '', n: fallbackT ? fallbackT.name : '', s: sub });
                     });
@@ -3746,7 +3985,6 @@ ${userPrompt}`;
                     newDays[day] = [];
                     for (let p = 0; p < numPeriods; p++) {
                         if (!busyMap[day][p]) busyMap[day][p] = new Set();
-                        // Rotate starting index by class, day, and period so subjects spread evenly across the week
                         let chosen = null;
                         for (let step = 0; step < pairs.length; step++) {
                             const candidate = pairs[(classIdx * 3 + dIdx * 2 + p + step) % pairs.length];
@@ -3759,8 +3997,7 @@ ${userPrompt}`;
                             if (chosen.t) busyMap[day][p].add(chosen.t);
                             newDays[day][p] = { t: chosen.t, s: chosen.s, n: chosen.n };
                         } else {
-                            // All assigned teachers busy in this slot -> place subject for self-study/library
-                            const subOnly = subjects[(p + dIdx) % subjects.length] || 'Study';
+                            const subOnly = clsSubs[(p + dIdx) % clsSubs.length] || 'Study';
                             newDays[day][p] = { t: '', s: subOnly, n: '' };
                         }
                     }
@@ -3773,7 +4010,6 @@ ${userPrompt}`;
                 };
             });
 
-            // Also ensure default period times are populated if empty
             if (!periodTimes || !periodTimes.some(Boolean)) {
                 periodTimes = ['08:00-08:40', '08:40-09:20', '09:20-10:00', '10:00-10:40', '11:00-11:40', '11:40-12:20', '12:20-01:00', '01:00-01:40'];
             }
@@ -3781,11 +4017,11 @@ ${userPrompt}`;
             await syncToFirebaseCloud();
             renderTimetable();
             alert(mode === 'all'
-                ? 'Alhamdulillah! Prep se Matric tak tamam classes ka clash-free Weekly Timetable ban kar Firebase mein save ho gaya hai!'
+                ? 'Alhamdulillah! Prep se Class 10 tak tamam classes ka clash-free Class-Wise Weekly Timetable ban kar Firebase mein save ho gaya hai!'
                 : `${c.cls} ka Weekly Timetable ban kar save ho gaya hai!`);
         }
 
-        // ========== AI AUTO-SUGGEST TEACHER CLASS ASSIGNMENTS ==========
+        // ========== AI AUTO-SUGGEST TEACHER CLASS ASSIGNMENTS (CLASS-WISE SUBJECTS) ==========
         async function aiAutoAssignTeachers() {
             const brTeachers = teachers.filter(t => matchesBranch(t.branchId));
             if (!brTeachers.length) {
@@ -3797,13 +4033,15 @@ ${userPrompt}`;
                 alert('Tamam teachers ko pehle hi classes aur subjects assign ho chuke hain! Aap kisi bhi teacher par click kar ke manual tabdeeli bhi kar sakte hain.');
                 return;
             }
-            if (!confirm(`${unassigned.length} unassigned teacher(s) ko Gemini Smart Balance ke mutabiq classes aur subjects assign kar diye jayein?`)) return;
+            if (!confirm(`${unassigned.length} unassigned teacher(s) ko Class-Wise subjects ke mutabiq classes aur subjects assign kar diye jayein?`)) return;
 
             unassigned.forEach((t, idx) => {
                 const c1 = CLASS_LIST[(idx * 2) % CLASS_LIST.length];
                 const c2 = CLASS_LIST[(idx * 2 + 1) % CLASS_LIST.length];
-                const s1 = subjects[idx % subjects.length] || 'Maths';
-                const s2 = subjects[(idx + 1) % subjects.length] || 'English';
+                const subs1 = getSubjectsForClass(c1);
+                const subs2 = getSubjectsForClass(c2);
+                const s1 = subs1[idx % subs1.length] || 'Maths';
+                const s2 = subs2[(idx + 1) % subs2.length] || 'English';
                 t.assignments = [
                     { cls: c1, subject: s1 },
                     { cls: c2, subject: s2 }
@@ -3815,7 +4053,7 @@ ${userPrompt}`;
             await syncToFirebaseCloud();
             renderTeachers();
             renderAssignments();
-            alert('Unassigned teachers ko classes aur subjects assign kar ke Firebase mein save kar diya gaya hai!');
+            alert('Unassigned teachers ko Class-Wise subjects assign kar ke Firebase mein save kar diya gaya hai!');
         }
 
         // ========== AI CLASS EXAM RESULT & POSITION ANALYZER ==========
@@ -3833,7 +4071,7 @@ ${userPrompt}`;
             }
 
             box.classList.remove('hidden');
-            box.innerText = '⏳ Gemini AI ' + cls + ' (' + test.name + ') ke results aur positions analyze kar raha hai...';
+            box.innerText = '⏳ AI Agent ' + cls + ' (' + test.name + ') ke results aur positions analyze kar raha hai...';
 
             const cols = testColumns(test.id, list);
             const studentScores = list.map(st => {
@@ -3850,12 +4088,12 @@ ${userPrompt}`;
             try {
                 const prompt = `Analyze this exam result data for Class "${cls}" in Test "${test.name}" (Max marks per subject: ${test.max}).
 Data: ${JSON.stringify(studentScores)}
-Write a concise, clear report in Pakistani Roman Urdu covering:
+Write a concise, clear report in Pakistani Roman Urdu without any asterisks (**) covering:
 1. Top 3 Position Holders (with marks and percentage)
 2. Weak students or subjects needing attention
 3. Short encouraging remarks for the class.`;
-                const reply = await callGeminiAPI(prompt, false);
-                box.innerText = reply;
+                const reply = await callGeminiAPI(prompt, false, true);
+                box.innerText = cleanAiMarkdown(reply);
             } catch (err) {
                 box.innerText = '⚠️ AI Result Analysis Error: ' + err.message;
             }
