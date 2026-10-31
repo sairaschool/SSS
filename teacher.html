@@ -1,1 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        body { padding-bottom: 76px; }
+        .nav-btn { color: #64748b; }
+        .nav-btn.active { color: #047857; font-weight: 700; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen">
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-emerald-800 to-teal-900 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-7 space-y-5">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-chalkboard-user text-3xl text-emerald-700"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-emerald-900">Teacher Portal</h1>
+                <p class="text-sm text-slate-500 mt-1" id="login-school-name">ٹیچر پورٹل</p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Teacher ID</label>
+                <input type="text" id="login-id" autocapitalize="characters" placeholder="e.g. T-4521" class="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">PIN</label>
+                <input type="password" id="login-pin" inputmode="numeric" placeholder="6-digit PIN" class="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                <p class="text-xs text-slate-400 mt-1">Teacher ID and PIN are written on your ID card.</p>
+            </div>
+            <button id="login-btn" onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg transition">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>Login
+            </button>
+            <p id="login-error" class="text-sm text-rose-600 text-center hidden"></p>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="main-app" class="hidden">
+        <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white px-4 pt-4 pb-5 shadow">
+            <div class="max-w-2xl mx-auto flex items-center gap-3">
+                <div id="hdr-logo" class="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div class="min-w-0 flex-1">
+                    <p id="hdr-school" class="font-bold truncate"></p>
+                    <p id="hdr-name" class="text-xs text-emerald-100 truncate"></p>
+                </div>
+                <button onclick="refreshAll()" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
+                <button onclick="logout()" class="w-9 h-9 rounded-full bg-rose-500/90 hover:bg-rose-600" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </header>
+
+        <main class="max-w-2xl mx-auto p-4 space-y-4">
+            <p id="load-status" class="text-xs text-center text-slate-400"></p>
+            <section id="tab-home" class="tab space-y-4"></section>
+            <section id="tab-timetable" class="tab hidden space-y-4"></section>
+            <section id="tab-students" class="tab hidden space-y-3"></section>
+            <section id="tab-attendance" class="tab hidden space-y-3"></section>
+            <section id="tab-marks" class="tab hidden space-y-3"></section>
+            <section id="tab-homework" class="tab hidden space-y-3"></section>
+            <section id="tab-messages" class="tab hidden space-y-3"></section>
+        </main>
+
+        <nav class="fixed bottom-0 inset-x-0 bg-white border-t shadow-lg z-50">
+            <div class="max-w-2xl mx-auto grid grid-cols-7 text-[9px]">
+                <button data-tab="home" onclick="showTab('home')" class="nav-btn active py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-house text-base"></i>Home</button>
+                <button data-tab="timetable" onclick="showTab('timetable')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-table-cells text-base"></i>Timetable</button>
+                <button data-tab="students" onclick="showTab('students')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-user-graduate text-base"></i>Students</button>
+                <button data-tab="attendance" onclick="showTab('attendance')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-check-to-slot text-base"></i>Attend.</button>
+                <button data-tab="marks" onclick="showTab('marks')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-award text-base"></i>Marks</button>
+                <button data-tab="homework" onclick="showTab('homework')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-book-open text-base"></i>Homework</button>
+                <button data-tab="messages" onclick="showTab('messages')" class="nav-btn py-2 flex flex-col items-center gap-0.5"><i class="fa-solid fa-envelope text-base"></i>Messages</button>
+            </div>
+        </nav>
+    </div>
+
+<script>
+// ===================== SETTINGS =====================
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCF7LN_MRBI-e3pLKU53ngy9eeKuMufirY",
+    authDomain: "saira-school-system.firebaseapp.com",
+    projectId: "saira-school-system",
+    storageBucket: "saira-school-system.firebasestorage.app",
+    messagingSenderId: "860674367727",
+    appId: "1:860674367727:web:840e46c10b46ea35a43b1a",
+    // Realtime Database address. If the Firebase console shows a different address
+    // (for example ...asia-southeast1.firebasedatabase.app), paste it here.
+    databaseURL: "https://saira-school-system-default-rtdb.firebaseio.com"
+};
+const FB = FIREBASE_CONFIG.databaseURL.replace(/\/$/, '');
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DEFAULT_AVATAR = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23d1fae5'/%3E%3Ccircle cx='50' cy='38' r='18' fill='%2310b981'/%3E%3Cpath d='M18 90c0-18 14-30 32-30s32 12 32 30z' fill='%2310b981'/%3E%3C/svg%3E";
+
+// ===================== HELPERS =====================
+function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}
+function $(id) { return document.getElementById(id); }
+function mkey(sub) { return String(sub).replace(/[.$#\[\]\/\\]/g, '_'); }
+function toList(x) {
+    if (Array.isArray(x)) return x.filter(function(v) { return v !== null && v !== undefined; });
+    if (x && typeof x === 'object') return Object.keys(x).map(function(k) { return x[k]; });
+    return [];
+}
+function keepHoles(x) {
+    if (Array.isArray(x)) return x;
+    if (x && typeof x === 'object') { const a = []; Object.keys(x).forEach(function(k) { a[Number(k)] = x[k]; }); return a; }
+    return [];
+}
+function isoOf(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function isoToday() { return isoOf(new Date()); }
+function isoTomorrow() { const d = new Date(); d.setDate(d.getDate() + 1); return isoOf(d); }
+function todayDay() { const d = new Date().getDay(); return d === 0 ? 'Mon' : (DAYS[d - 1] || 'Mon'); }
+
+// ===================== CLOUD =====================
+function urlOf(path) { return FB + '/' + path.split('/').map(encodeURIComponent).join('/') + '.json'; }
+async function fbGet(path) {
+    const res = await fetch(urlOf(path));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+}
+async function fbQuery(path, key, val) {
+    try {
+        const res = await fetch(urlOf(path) + '?orderBy=' + encodeURIComponent(JSON.stringify(key)) + '&equalTo=' + encodeURIComponent(JSON.stringify(val)));
+        if (res.ok) return toList(await res.json());
+    } catch (e) { /* fall through */ }
+    return toList(await fbGet(path)).filter(function(x) { return x && x[key] === val; });
+}
+// The teacher never changes the school's main data. Every action is written as a small record into
+// "saira_inbox"; the admin page merges it into the main data (so nothing can be overwritten).
+async function fbPut(path, value) {
+    const res = await fetch(urlOf(path), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+}
+async function fbDel(path) {
+    const res = await fetch(urlOf(path), { method: 'DELETE' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+}
+
+// ===================== STATE =====================
+let S = null;
+let qr = null, lastScan = { id: '', at: 0 };
+
+function teacherPairs(t) {
+    const a = toList(t.assignments);
+    if (a.length) return a;
+    if (t.subject || t.assignedClass) return [{ cls: t.assignedClass || '', subject: t.subject || '' }];
+    return [];
+}
+
+async function loadTeacher(id) {
+    const list = await fbQuery('saira_erp/teachers', 'id', id);
+    return list.find(function(x) { return x.id === id; }) || null;
+}
+
+async function loadAll(t) {
+    const br = t.branchId || 'main', tid = t.id, today = isoToday();
+    const pairs = teacherPairs(t);
+    const classes = [];
+    pairs.forEach(function(p) { if (p.cls && classes.indexOf(p.cls) === -1) classes.push(p.cls); });
+    const safe = function(p, fallback) { return p.catch(function() { return fallback; }); };
+
+    const r = await Promise.all([
+        safe(fbGet('saira_erp/settings'), {}),
+        safe(fbGet('saira_erp/branches'), []),
+        safe(fbGet('saira_erp/examTests'), []),
+        safe(fbGet('saira_erp/subjects'), []),
+        safe(fbGet('saira_erp/periodTimes'), []),
+        safe(fbGet('saira_erp/timetables'), {}),
+        safe(fbQuery('saira_erp/homeworks', 'teacherId', tid), []),
+        safe(fbQuery('saira_erp/attendance', 'date', today), []),
+        safe(fbGet('saira_erp/messages'), []),
+        safe(fbGet('saira_inbox'), null),
+        Promise.all(classes.map(function(c) { return safe(fbQuery('saira_erp/students', 'className', c), []); }))
+    ]);
+    const settings = r[0] || {}, branches = toList(r[1]), tests = toList(r[2]), subjects = toList(r[3]);
+    const inbox = r[9] || {};
+
+    // students of my classes (this branch)
+    const students = {};
+    classes.forEach(function(c, i) {
+        students[c] = r[10][i].filter(function(s) { return (s.branchId || 'main') === br; }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+    });
+
+    // homework: mine, including records the admin has not merged yet, minus deleted ones
+    const hw = {};
+    r[6].forEach(function(h) { if (h && h.id) hw[h.id] = h; });
+    Object.keys(inbox.homeworks || {}).forEach(function(id) { if (inbox.homeworks[id] && inbox.homeworks[id].teacherId === tid) hw[id] = inbox.homeworks[id]; });
+    Object.keys(inbox.homeworkDel || {}).forEach(function(id) { delete hw[id]; });
+    const homework = Object.keys(hw).map(function(k) { return hw[k]; }).sort(function(a, b) { return String(b.id).localeCompare(String(a.id)); });
+
+    // today's attendance of my students
+    const mine = {};
+    classes.forEach(function(c) { students[c].forEach(function(s) { mine[s.id] = true; }); });
+    const att = {};
+    r[7].forEach(function(a) { if (a && mine[a.id]) att[a.id] = a; });
+    Object.keys(inbox.attendance || {}).forEach(function(k) {
+        const a = inbox.attendance[k];
+        if (a && a.date === today && mine[a.id]) { if (a.status === 'Absent') delete att[a.id]; else att[a.id] = a; }
+    });
+
+    // messages
+    const mm = {};
+    toList(r[8]).forEach(function(m) { if (m && m.id) mm[m.id] = m; });
+    Object.keys(inbox.messages || {}).forEach(function(id) { mm[id] = inbox.messages[id]; });
+    Object.keys(inbox.messageDel || {}).forEach(function(id) { delete mm[id]; });
+    const messages = Object.keys(mm).map(function(k) { return mm[k]; }).sort(function(a, b) { return String(b.id).localeCompare(String(a.id)); });
+
+    // marks of every test (+ records the admin has not merged yet)
+    const marks = {};
+    const mr = await Promise.all(tests.map(function(tt) { return safe(fbGet('saira_erp/marks/' + tt.id), {}); }));
+    tests.forEach(function(tt, i) { marks[tt.id] = JSON.parse(JSON.stringify(mr[i] || {})); });
+    Object.keys(inbox.marks || {}).forEach(function(k) {
+        const m = inbox.marks[k];
+        if (!m || !marks[m.testId]) return;
+        if (m.v === '' || m.v == null) { if (marks[m.testId][m.sid]) delete marks[m.testId][m.sid][m.key]; }
+        else { if (!marks[m.testId][m.sid]) marks[m.testId][m.sid] = {}; marks[m.testId][m.sid][m.key] = Number(m.v); }
+    });
+
+    S = { t: t, br: br, pairs: pairs, classes: classes, settings: settings, branches: branches, tests: tests, subjects: subjects,
+          periodTimes: toList(r[4]), timetables: r[5] || {}, students: students, homework: homework, att: att, messages: messages, marks: marks,
+          tab: 'home', day: null, cls: classes[0] || '', cur: [], mk: { test: '', cls: '', sub: '' }, filter: '' };
+}
+
+// ===================== LOGIN =====================
+function showLoginError(msg) { const e = $('login-error'); e.innerText = msg; e.classList.remove('hidden'); }
+
+async function handleLogin() {
+    const id = $('login-id').value.trim().toUpperCase();
+    const pin = $('login-pin').value.trim();
+    $('login-error').classList.add('hidden');
+    if (!id || !pin) return showLoginError('Please enter Teacher ID and PIN.');
+    const btn = $('login-btn'); btn.disabled = true;
+    try {
+        const t = await loadTeacher(id);
+        if (!t) { btn.disabled = false; return showLoginError('Teacher ID not found.'); }
+        if (!t.pin) { btn.disabled = false; return showLoginError('PIN is not set yet. Please ask the school office.'); }
+        if (String(t.pin) !== pin) { btn.disabled = false; return showLoginError('Wrong PIN.'); }
+        localStorage.setItem('saira_teacher_login', JSON.stringify({ id: id, pin: pin }));
+        await openApp(t);
+    } catch (e) {
+        showLoginError('Could not connect. Please check your internet and try again.');
+    }
+    btn.disabled = false;
+}
+
+async function openApp(t) {
+    await loadAll(t);
+    $('login-screen').classList.add('hidden');
+    $('main-app').classList.remove('hidden');
+    $('hdr-school').innerText = S.settings.name || 'School';
+    $('hdr-name').innerText = t.name + ' • ' + t.id;
+    if (S.settings.logo) $('hdr-logo').innerHTML = '<img src="' + esc(S.settings.logo) + '" class="w-full h-full object-cover">';
+    showTab('home');
+}
+
+async function refreshAll() {
+    if (!S) return;
+    $('load-status').innerText = 'Refreshing...';
+    const keep = { tab: S.tab, cls: S.cls, mk: S.mk, day: S.day };
+    try {
+        const t = await loadTeacher(S.t.id);
+        if (t) await loadAll(t);
+        S.cls = S.classes.indexOf(keep.cls) >= 0 ? keep.cls : (S.classes[0] || '');
+        S.mk = keep.mk; S.day = keep.day;
+        showTab(keep.tab);
+        $('load-status').innerText = '';
+    } catch (e) { $('load-status').innerText = 'Could not refresh. Check your internet.'; }
+}
+
+function logout() {
+    stopScan();
+    localStorage.removeItem('saira_teacher_login');
+    S = null;
+    $('main-app').classList.add('hidden');
+    $('login-screen').classList.remove('hidden');
+    $('login-pin').value = '';
+}
+
+// ===================== TABS =====================
+function showTab(name) {
+    if (S.tab === 'attendance' && name !== 'attendance') stopScan();
+    S.tab = name;
+    document.querySelectorAll('.tab').forEach(function(el) { el.classList.add('hidden'); });
+    $('tab-' + name).classList.remove('hidden');
+    document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
+    ({ home: renderHome, timetable: renderTimetable, students: renderStudents, attendance: renderAttendance, marks: renderMarks, homework: renderHomework, messages: renderMessages })[name]();
+    window.scrollTo(0, 0);
+}
+
+function card(inner, extra) { return '<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 ' + (extra || '') + '">' + inner + '</div>'; }
+function heading(en, ur) { return '<h2 class="font-bold text-slate-800 flex items-baseline gap-2">' + esc(en) + ' <span class="text-xs font-normal text-slate-400">' + esc(ur) + '</span></h2>'; }
+function noClasses() { return card('<p class="text-sm text-amber-700 text-center">No classes have been given to you yet.<br>Please contact the school office.</p>'); }
+function branchName(id) { const b = S.branches.find(function(x) { return x.id === id; }); return b ? b.name : (id || ''); }
+function classSelect(handler, selected, id) {
+    return '<select ' + (id ? 'id="' + id + '" ' : '') + 'onchange="' + handler + '" class="w-full px-3 py-2.5 border rounded-lg text-sm bg-white">' +
+        S.classes.map(function(c) { return '<option value="' + esc(c) + '"' + (c === selected ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>';
+}
+function subjectsOfClass(cls) {
+    const out = [];
+    S.pairs.forEach(function(p) { if (p.cls === cls && p.subject && out.indexOf(p.subject) === -1) out.push(p.subject); });
+    return out;
+}
+function saveFail() { alert('Could not save. Please check your internet and try again.\n\nمحفوظ نہیں ہو سکا۔ انٹرنیٹ چیک کریں۔'); }
+
+// ---------- timetable data ----------
+function cellOf(v) {
+    if (v && typeof v === 'object') return { t: v.t || '', s: v.s || '', n: v.n || '' };
+    if (typeof v === 'string' && v) return { t: '', s: v, n: '' };
+    return { t: '', s: '', n: '' };
+}
+// my periods on a day: [{i, time, cls, subject}]
+function myPeriods(day) {
+    const out = [];
+    Object.keys(S.timetables).forEach(function(key) {
+        const sep = key.indexOf('|');
+        if (key.slice(0, sep) !== S.br) return;
+        const cls = key.slice(sep + 1), tt = S.timetables[key] || {};
+        const arr = keepHoles((tt.days || {})[day]);
+        for (let i = 0; i < (tt.periods || 8); i++) {
+            const c = cellOf(arr[i]);
+            if (!c.s) continue;
+            const mine = c.t ? c.t === S.t.id : S.pairs.some(function(p) { return p.cls === cls && p.subject === c.s; });
+            if (mine) out.push({ i: i, time: S.periodTimes[i] || '', cls: cls, subject: c.s });
+        }
+    });
+    return out.sort(function(a, b) { return a.i - b.i; });
+}
+
+// ---------- Home ----------
+function renderHome() {
+    const t = S.t, today = myPeriods(todayDay());
+    const given = S.homework.length;
+    let h = card('<div class="flex items-center gap-4"><img src="' + esc(t.photo || DEFAULT_AVATAR) + '" class="w-20 h-20 rounded-xl object-cover border-2 border-emerald-100">' +
+        '<div class="min-w-0"><p class="text-lg font-bold truncate">' + esc(t.name) + '</p><p class="text-sm text-slate-600">' + esc(branchName(t.branchId)) + '</p>' +
+        '<p class="text-xs text-emerald-700 font-semibold mt-1">' + esc(t.id) + (t.phone ? ' • ' + esc(t.phone) : '') + '</p></div></div>');
+    h += card(heading('My Classes & Subjects', 'میری کلاسیں اور مضامین') + '<div class="flex flex-wrap gap-1.5 mt-2">' +
+        (S.pairs.length ? S.pairs.map(function(p) { return '<span class="bg-emerald-50 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">' + esc(p.cls) + ' · ' + esc(p.subject) + '</span>'; }).join('') :
+            '<span class="text-sm text-amber-700">Not assigned yet. Please contact the school office.</span>') + '</div>');
+    h += '<div class="grid grid-cols-2 gap-3">' +
+        card('<p class="text-xs text-slate-400">My students</p><p class="text-2xl font-bold text-emerald-700">' + S.classes.reduce(function(a, c) { return a + S.students[c].length; }, 0) + '</p>') +
+        card('<p class="text-xs text-slate-400">Homework given</p><p class="text-2xl font-bold text-emerald-700">' + given + '</p>') + '</div>';
+    h += card(heading("Today's Periods", 'آج کے پیریڈ') + '<div class="mt-2 space-y-1.5">' + (today.length ? today.map(function(p) {
+        return '<div class="flex items-center gap-3 text-sm"><span class="w-16 text-[11px] text-slate-400">P' + (p.i + 1) + (p.time ? '<br>' + esc(p.time) : '') + '</span><span class="font-semibold">' + esc(p.cls) + '</span><span class="text-xs text-slate-500">' + esc(p.subject) + '</span></div>';
+    }).join('') : '<p class="text-sm text-slate-400">No periods found for today.</p>') + '</div>');
+    const notices = S.messages.filter(function(m) { return (m.toClass === 'ALL' || m.toClass === 'TEACHERS') && (!m.branchId || m.branchId === 'ALL' || m.branchId === S.br); }).slice(0, 3);
+    if (notices.length) h += card(heading('School Notices', 'اسکول نوٹس') + notices.map(function(m) { return '<p class="text-sm mt-2 border-t pt-2 whitespace-pre-line">' + esc(m.text) + '<span class="block text-[11px] text-slate-400">' + esc(m.date) + '</span></p>'; }).join(''));
+    $('tab-home').innerHTML = h;
+}
+
+// ---------- Timetable ----------
+function renderTimetable() {
+    if (!S.day) S.day = todayDay();
+    const tabs = DAYS.map(function(d) {
+        return '<button onclick="S.day=\'' + d + '\';renderTimetable()" class="px-3 py-1.5 rounded-full text-xs font-semibold ' + (d === S.day ? 'bg-emerald-600 text-white' : 'bg-white border text-slate-600') + '">' + d + '</button>';
+    }).join('');
+    const list = myPeriods(S.day);
+    $('tab-timetable').innerHTML = heading('My Timetable', 'میرا ٹائم ٹیبل') + '<div class="flex gap-2 overflow-x-auto pb-1">' + tabs + '</div>' +
+        card(list.length ? list.map(function(p) {
+            return '<div class="flex items-center gap-3 py-2 border-b last:border-0"><div class="w-16 text-center"><p class="text-xs font-bold text-emerald-700">Period ' + (p.i + 1) + '</p><p class="text-[10px] text-slate-400">' + esc(p.time) + '</p></div>' +
+                '<div><p class="font-semibold text-sm">' + esc(p.cls) + '</p><p class="text-xs text-slate-500">' + esc(p.subject) + '</p></div></div>';
+        }).join('') : '<p class="text-sm text-slate-400 text-center py-4">You have no periods on this day.</p>');
+}
+
+// ---------- Students ----------
+function setClass(c) { S.cls = c; S.filter = ''; showTab(S.tab); }
+function renderStudents() {
+    if (!S.classes.length) { $('tab-students').innerHTML = heading('My Students', 'میرے طلبہ') + noClasses(); return; }
+    const f = S.filter.toLowerCase();
+    const list = S.students[S.cls].filter(function(s) { return !f || String(s.name).toLowerCase().indexOf(f) >= 0 || String(s.id).toLowerCase().indexOf(f) >= 0; });
+    $('tab-students').innerHTML = heading('My Students', 'میرے طلبہ') + classSelect('setClass(this.value)', S.cls) +
+        '<input type="text" id="stu-filter" value="' + esc(S.filter) + '" placeholder="Search name or ID" oninput="S.filter=this.value;renderStudentRows()" class="w-full px-3 py-2.5 border rounded-lg text-sm">' +
+        '<p class="text-xs text-slate-400" id="stu-count"></p><div id="stu-rows" class="space-y-2"></div>';
+    renderStudentRows();
+}
+function renderStudentRows() {
+    const f = S.filter.toLowerCase();
+    const all = S.students[S.cls] || [];
+    const list = all.filter(function(s) { return !f || String(s.name).toLowerCase().indexOf(f) >= 0 || String(s.id).toLowerCase().indexOf(f) >= 0; });
+    $('stu-count').innerText = list.length + ' of ' + all.length + ' students';
+    $('stu-rows').innerHTML = list.map(function(s) {
+        return card('<div class="flex items-center gap-3"><img src="' + esc(s.photo || DEFAULT_AVATAR) + '" loading="lazy" class="w-12 h-12 rounded-lg object-cover border"><div class="min-w-0 flex-1">' +
+            '<p class="font-semibold text-sm truncate">' + esc(s.name) + '</p><p class="text-xs text-slate-500 truncate">' + esc(s.id) + ' • Father: ' + esc(s.father) + '</p></div>' +
+            (s.phone ? '<a href="tel:' + esc(s.phone) + '" class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center"><i class="fa-solid fa-phone"></i></a>' : '') + '</div>', 'p-3');
+    }).join('') || '<p class="text-sm text-slate-400 text-center py-4">No students found.</p>';
+}
+
+// ---------- Attendance ----------
+async function setAttendance(st, status) {
+    const today = isoToday();
+    const rec = { id: st.id, name: st.name, branchId: st.branchId || 'main', date: today, time: new Date().toLocaleTimeString(), status: status };
+    await fbPut('saira_inbox/attendance/' + today + '__' + st.id, rec);
+    if (status === 'Present') S.att[st.id] = rec; else delete S.att[st.id];
+}
+function renderAttendance() {
+    stopScan();
+    if (!S.classes.length) { $('tab-attendance').innerHTML = heading('Attendance', 'حاضری') + noClasses(); return; }
+    S.cur = S.students[S.cls] || [];
+    $('tab-attendance').innerHTML = heading('Attendance', 'حاضری') + '<p class="text-xs text-slate-500">Today: ' + esc(isoToday()) + '</p>' + classSelect('setClass(this.value)', S.cls, 'att-class') +
+        '<div class="flex gap-2"><button onclick="markAll()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 rounded-lg"><i class="fa-solid fa-check-double mr-1"></i>Mark all present</button>' +
+        '<button onclick="startScan()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2.5 rounded-lg"><i class="fa-solid fa-qrcode mr-1"></i>Scan QR</button></div>' +
+        '<div id="reader-wrap" class="hidden"><div id="reader" class="w-full rounded-lg overflow-hidden"></div><button onclick="stopScan()" class="mt-2 text-xs text-rose-600 font-semibold">Close camera</button></div>' +
+        '<p id="scan-result" class="text-sm font-medium hidden"></p>' +
+        '<p class="text-sm font-semibold">Present: <span id="att-count" class="text-emerald-700"></span></p>' +
+        '<div id="att-list" class="space-y-2"></div>';
+    renderAttList();
+}
+function renderAttList() {
+    const present = S.cur.filter(function(s) { return S.att[s.id]; }).length;
+    $('att-count').innerText = present + ' / ' + S.cur.length;
+    $('att-list').innerHTML = S.cur.map(function(s, i) {
+        const p = !!S.att[s.id];
+        return card('<div class="flex items-center gap-3"><img src="' + esc(s.photo || DEFAULT_AVATAR) + '" loading="lazy" class="w-10 h-10 rounded-lg object-cover border"><div class="min-w-0 flex-1"><p class="font-semibold text-sm truncate">' + esc(s.name) + '</p><p class="text-[11px] text-slate-400">' + esc(s.id) + '</p></div>' +
+            '<button onclick="toggleAtt(' + i + ')" class="px-3.5 py-2 rounded-lg text-xs font-bold ' + (p ? 'bg-emerald-600 text-white' : 'bg-rose-50 text-rose-600 border border-rose-200') + '">' + (p ? 'Present' : 'Absent') + '</button></div>', 'p-3');
+    }).join('') || '<p class="text-sm text-slate-400 text-center py-4">No students in this class.</p>';
+}
+async function toggleAtt(i) {
+    const st = S.cur[i];
+    if (!st) return;
+    try { await setAttendance(st, S.att[st.id] ? 'Absent' : 'Present'); } catch (e) { return saveFail(); }
+    renderAttList();
+}
+async function markAll() {
+    const todo = S.cur.filter(function(s) { return !S.att[s.id]; });
+    if (!todo.length) return;
+    try { await Promise.all(todo.map(function(s) { return setAttendance(s, 'Present'); })); } catch (e) { saveFail(); }
+    renderAttList();
+}
+function startScan() {
+    if (qr || typeof Html5Qrcode === 'undefined') { if (typeof Html5Qrcode === 'undefined') alert('QR scanner could not load. Use the Present / Absent buttons.'); return; }
+    $('reader-wrap').classList.remove('hidden');
+    qr = new Html5Qrcode('reader');
+    qr.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 240, height: 240 } }, onScan, function() {}).catch(function() {
+        qr = null; $('reader-wrap').classList.add('hidden');
+        alert('Camera could not start. Please allow camera permission.');
+    });
+}
+function stopScan() {
+    if (qr) { const q = qr; qr = null; q.stop().then(function() { q.clear(); }).catch(function() {}); }
+    const w = $('reader-wrap'); if (w) w.classList.add('hidden');
+}
+function scanMsg(text, kind) {
+    const el = $('scan-result');
+    el.innerText = text;
+    el.className = 'text-sm font-medium p-3 rounded-lg ' + (kind === 'ok' ? 'bg-emerald-50 text-emerald-700' : kind === 'warn' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700');
+}
+async function onScan(text) {
+    let id = String(text).trim().toUpperCase();
+    const m = String(text).match(/(SR-\d+)/i);
+    if (m) id = m[1].toUpperCase();
+    const now = Date.now();
+    if (lastScan.id === id && now - lastScan.at < 3000) return;
+    lastScan = { id: id, at: now };
+    let st = null;
+    S.classes.forEach(function(c) { S.students[c].forEach(function(s) { if (s.id === id) st = s; }); });
+    if (!st) return scanMsg('This student is not in your classes.', 'bad');
+    if (S.att[st.id]) return scanMsg('Already present: ' + st.name, 'warn');
+    try { await setAttendance(st, 'Present'); } catch (e) { return scanMsg('Could not save. Check internet.', 'bad'); }
+    scanMsg('Marked present: ' + st.name + ' (' + st.id + ')', 'ok');
+    if (S.cls !== st.className) { S.cls = st.className; $('att-class').value = S.cls; }
+    S.cur = S.students[S.cls] || [];
+    renderAttList();
+}
+
+// ---------- Marks ----------
+function renderMarks() {
+    if (!S.classes.length) { $('tab-marks').innerHTML = heading('Enter Marks', 'نمبر') + noClasses(); return; }
+    if (!S.tests.length) { $('tab-marks').innerHTML = heading('Enter Marks', 'نمبر') + card('<p class="text-sm text-slate-400 text-center">No tests have been created by the school yet.</p>'); return; }
+    const mk = S.mk;
+    if (!S.tests.some(function(t) { return t.id === mk.test; })) mk.test = S.tests[S.tests.length - 1].id;
+    if (S.classes.indexOf(mk.cls) < 0) mk.cls = S.classes[0];
+    const subs = subjectsOfClass(mk.cls);
+    if (subs.indexOf(mk.sub) < 0) mk.sub = subs[0] || '';
+    const test = S.tests.find(function(t) { return t.id === mk.test; });
+    S.cur = S.students[mk.cls] || [];
+    const box = function(label, inner) { return '<div><label class="block text-[11px] font-semibold text-slate-500 mb-1">' + label + '</label>' + inner + '</div>'; };
+    $('tab-marks').innerHTML = heading('Enter Marks', 'نمبر') +
+        '<div class="grid grid-cols-3 gap-2">' +
+        box('Test', '<select onchange="S.mk.test=this.value;renderMarks()" class="w-full px-2 py-2.5 border rounded-lg text-sm bg-white">' + S.tests.map(function(t) { return '<option value="' + esc(t.id) + '"' + (t.id === mk.test ? ' selected' : '') + '>' + esc(t.name) + '</option>'; }).join('') + '</select>') +
+        box('Class', '<select onchange="S.mk.cls=this.value;renderMarks()" class="w-full px-2 py-2.5 border rounded-lg text-sm bg-white">' + S.classes.map(function(c) { return '<option value="' + esc(c) + '"' + (c === mk.cls ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>') +
+        box('Subject', '<select onchange="S.mk.sub=this.value;renderMarks()" class="w-full px-2 py-2.5 border rounded-lg text-sm bg-white">' + subs.map(function(x) { return '<option value="' + esc(x) + '"' + (x === mk.sub ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select>') + '</div>' +
+        '<p class="text-xs text-slate-500">Marks are out of <b>' + esc(test.max) + '</b>. <span id="mk-status" class="font-semibold text-emerald-600"></span></p>' +
+        '<div class="space-y-2">' + (S.cur.map(function(s, i) {
+            const v = (S.marks[test.id][s.id] || {})[mkey(mk.sub)];
+            return card('<div class="flex items-center gap-3"><div class="min-w-0 flex-1"><p class="font-semibold text-sm truncate">' + esc(s.name) + '</p><p class="text-[11px] text-slate-400">' + esc(s.id) + '</p></div>' +
+                '<input type="number" inputmode="decimal" min="0" max="' + esc(test.max) + '" step="any" value="' + (v === undefined ? '' : esc(v)) + '" onchange="saveMark(' + i + ',this)" class="w-24 px-2 py-2 border rounded-lg text-sm text-center"></div>', 'p-3');
+        }).join('') || '<p class="text-sm text-slate-400 text-center py-4">No students in this class.</p>') + '</div>';
+}
+async function saveMark(i, el) {
+    const st = S.cur[i], mk = S.mk;
+    const test = S.tests.find(function(t) { return t.id === mk.test; });
+    if (!st || !test || !mk.sub) return;
+    const key = mkey(mk.sub);
+    const prev = (S.marks[test.id][st.id] || {})[key];
+    const raw = String(el.value).trim();
+    let v = '';
+    if (raw !== '') {
+        const n = Number(raw);
+        if (isNaN(n) || n < 0 || n > test.max) { alert('Marks must be between 0 and ' + test.max + '.'); el.value = prev === undefined ? '' : prev; return; }
+        v = Math.round(n * 100) / 100;
+    }
+    try {
+        await fbPut('saira_inbox/marks/' + test.id + '__' + st.id + '__' + key, { testId: test.id, sid: st.id, key: key, v: v });
+    } catch (e) { el.value = prev === undefined ? '' : prev; return saveFail(); }
+    if (!S.marks[test.id][st.id]) S.marks[test.id][st.id] = {};
+    if (v === '') delete S.marks[test.id][st.id][key]; else S.marks[test.id][st.id][key] = v;
+    const s = $('mk-status'); if (s) s.innerText = 'Saved ✓ ' + st.name;
+}
+
+// ---------- Homework ----------
+function renderHomework() {
+    if (!S.pairs.length) { $('tab-homework').innerHTML = heading('Homework', 'ہوم ورک') + noClasses(); return; }
+    const form = card('<p class="font-semibold text-sm mb-2">Give new homework</p>' +
+        '<select id="hw-pair" class="w-full px-3 py-2.5 border rounded-lg text-sm bg-white mb-2">' + S.pairs.map(function(p, i) { return '<option value="' + i + '">' + esc(p.cls) + ' · ' + esc(p.subject) + '</option>'; }).join('') + '</select>' +
+        '<label class="block text-[11px] font-semibold text-slate-500 mb-1">Due date</label><input type="date" id="hw-due" value="' + isoTomorrow() + '" class="w-full px-3 py-2.5 border rounded-lg text-sm mb-2">' +
+        '<textarea id="hw-text" rows="3" placeholder="Write the homework here..." class="w-full px-3 py-2.5 border rounded-lg text-sm mb-2"></textarea>' +
+        '<button onclick="giveHomework()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm"><i class="fa-solid fa-paper-plane mr-1"></i>Give Homework</button>');
+    const list = S.homework.map(function(h, i) {
+        return card('<div class="flex items-center justify-between gap-2"><span class="font-bold text-sm">' + esc(h.className) + ' · ' + esc(h.subject) + '</span><span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-700">Due ' + esc(h.dueDate) + '</span></div>' +
+            '<p class="text-sm text-slate-700 mt-1.5 whitespace-pre-line">' + esc(h.description) + '</p>' +
+            '<div class="flex gap-3 mt-3 text-xs font-semibold"><button onclick="editHomework(' + i + ')" class="text-emerald-700"><i class="fa-solid fa-pen mr-1"></i>Edit</button>' +
+            '<button onclick="deleteHomework(' + i + ')" class="text-rose-600"><i class="fa-solid fa-trash mr-1"></i>Delete</button></div>');
+    }).join('');
+    $('tab-homework').innerHTML = heading('Homework', 'ہوم ورک') + form + '<p class="text-xs font-semibold text-slate-400 pt-1">My homework</p>' + (list || card('<p class="text-sm text-slate-400 text-center">You have not given any homework yet.</p>'));
+}
+async function giveHomework() {
+    const p = S.pairs[Number($('hw-pair').value)];
+    const due = $('hw-due').value, text = $('hw-text').value.trim();
+    if (!p) return;
+    if (!text) return alert('Please write the homework.');
+    if (!due) return alert('Please choose the due date.');
+    const h = { id: 'HW-' + Date.now(), branchId: S.br, className: p.cls, subject: p.subject, dueDate: due, description: text,
+                assignedBy: S.t.name, teacherId: S.t.id, date: new Date().toLocaleDateString() };
+    try { await fbPut('saira_inbox/homeworks/' + h.id, h); } catch (e) { return saveFail(); }
+    S.homework.unshift(h);
+    renderHomework();
+}
+async function editHomework(i) {
+    const h = S.homework[i];
+    if (!h) return;
+    const text = prompt('Homework details:', h.description);
+    if (text === null) return;
+    const due = prompt('Due date (YYYY-MM-DD):', h.dueDate);
+    if (due === null) return;
+    if (!text.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(due.trim())) return alert('Please enter the details and a date like 2026-11-05.');
+    const upd = Object.assign({}, h, { description: text.trim(), dueDate: due.trim() });
+    try { await fbPut('saira_inbox/homeworks/' + h.id, upd); } catch (e) { return saveFail(); }
+    S.homework[i] = upd;
+    renderHomework();
+}
+async function deleteHomework(i) {
+    const h = S.homework[i];
+    if (!h || !confirm('Delete this homework?')) return;
+    try {
+        await fbPut('saira_inbox/homeworkDel/' + h.id, true);
+        await fbDel('saira_inbox/homeworks/' + h.id);
+    } catch (e) { return saveFail(); }
+    S.homework.splice(i, 1);
+    renderHomework();
+}
+
+// ---------- Messages ----------
+function renderMessages() {
+    if (!S.classes.length) { $('tab-messages').innerHTML = heading('Messages', 'پیغامات') + noClasses(); return; }
+    const sent = S.messages.filter(function(m) { return m.fromId === S.t.id; });
+    $('tab-messages').innerHTML = heading('Messages', 'پیغامات') +
+        card('<p class="font-semibold text-sm mb-2">Send a message to a class</p>' +
+            '<select id="msg-class" class="w-full px-3 py-2.5 border rounded-lg text-sm bg-white mb-2">' + S.classes.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('') + '</select>' +
+            '<textarea id="msg-text" rows="3" placeholder="Write your message..." class="w-full px-3 py-2.5 border rounded-lg text-sm mb-2"></textarea>' +
+            '<button onclick="sendMessage()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm"><i class="fa-solid fa-paper-plane mr-1"></i>Send</button>') +
+        '<p class="text-xs font-semibold text-slate-400 pt-1">Sent by me</p>' +
+        (sent.length ? sent.map(function(m, i) {
+            return card('<div class="flex items-center justify-between"><span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">To ' + esc(m.toClass) + '</span><span class="text-[11px] text-slate-400">' + esc(m.date) + '</span></div>' +
+                '<p class="text-sm mt-1.5 whitespace-pre-line">' + esc(m.text) + '</p><button onclick="deleteMessage(' + i + ')" class="mt-2 text-xs font-semibold text-rose-600"><i class="fa-solid fa-trash mr-1"></i>Delete</button>');
+        }).join('') : card('<p class="text-sm text-slate-400 text-center">No messages sent yet.</p>'));
+}
+async function sendMessage() {
+    const cls = $('msg-class').value, text = $('msg-text').value.trim();
+    if (!text) return alert('Please write a message.');
+    if (S.classes.indexOf(cls) < 0) return;
+    const m = { id: 'MSG-' + Date.now(), branchId: S.br, from: S.t.name, fromId: S.t.id, toClass: cls, text: text, date: new Date().toLocaleString(), type: 'teacher' };
+    try { await fbPut('saira_inbox/messages/' + m.id, m); } catch (e) { return saveFail(); }
+    S.messages.unshift(m);
+    renderMessages();
+}
+async function deleteMessage(i) {
+    const mine = S.messages.filter(function(m) { return m.fromId === S.t.id; });
+    const m = mine[i];
+    if (!m || !confirm('Delete this message?')) return;
+    try {
+        await fbPut('saira_inbox/messageDel/' + m.id, true);
+        await fbDel('saira_inbox/messages/' + m.id);
+    } catch (e) { return saveFail(); }
+    S.messages = S.messages.filter(function(x) { return x.id !== m.id; });
+    renderMessages();
+}
+
+// ===================== START =====================
+window.onload = async function() {
+    $('login-id').addEventListener('keydown', function(e) { if (e.key === 'Enter') $('login-pin').focus(); });
+    $('login-pin').addEventListener('keydown', function(e) { if (e.key === 'Enter') handleLogin(); });
+    try { const st = await fbGet('saira_erp/settings'); if (st && st.name) $('login-school-name').innerText = st.name; } catch (e) { /* offline */ }
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('saira_teacher_login')); } catch (e) { saved = null; }
+    if (saved && saved.id && saved.pin) {
+        $('login-id').value = saved.id;
+        $('login-pin').value = saved.pin;
+        handleLogin();
+    }
+};
+</script>
+</body>
+</html>
 
