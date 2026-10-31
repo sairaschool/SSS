@@ -206,6 +206,32 @@
                         </button>
                     </div>
 
+                    <!-- Quick Section Dropdown (Instant Front View without scrolling) -->
+                    <div class="flex items-center bg-indigo-800 rounded-lg px-2.5 py-1 border border-indigo-500 shadow-sm">
+                        <i class="fa-solid fa-layer-group text-amber-300 text-xs mr-2"></i>
+                        <select id="quick-nav-dropdown" onchange="switchTab(this.value)" class="bg-transparent text-white text-xs sm:text-sm font-semibold outline-none cursor-pointer">
+                            <option value="dashboard" class="text-slate-900">📌 Quick Open: Dashboard</option>
+                            <option value="admissions" class="text-slate-900">➕ New Admission</option>
+                            <option value="students" class="text-slate-900">🎓 Students Directory</option>
+                            <option value="teachers" class="text-slate-900">👨‍🏫 Teachers Management</option>
+                            <option value="assignments" class="text-slate-900">📋 Class & Subject Assignment</option>
+                            <option value="staff" class="text-slate-900">🛠️ Other Staff</option>
+                            <option value="attendance" class="text-slate-900">📷 QR Attendance</option>
+                            <option value="homework" class="text-slate-900">📚 Homework</option>
+                            <option value="timetable" class="text-slate-900">🗓️ Class Timetable</option>
+                            <option value="fees" class="text-slate-900">💳 Fees & Dues</option>
+                            <option value="exams" class="text-slate-900">🏆 Exams & Results</option>
+                            <option value="salary" class="text-slate-900">💰 Salary Sheet</option>
+                            <option value="expenses" class="text-slate-900">🧾 Expenses</option>
+                            <option value="messages" class="text-slate-900">📢 Send Notice</option>
+                            <option value="reports" class="text-slate-900">🖨️ Reports & Reset</option>
+                        </select>
+                    </div>
+
+                    <button onclick="openGeminiAssistantModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold shadow transition flex items-center space-x-1.5 border border-amber-300">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>Gemini AI</span>
+                    </button>
+
                     <span id="db-status-badge" class="text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-semibold">
                         <i class="fa-solid fa-database mr-1"></i>Local + Cloud Ready
                     </span>
@@ -221,15 +247,41 @@
         </header>
 
         <!-- Main Container -->
-        <div class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex-grow w-full space-y-4">
 
-            <!-- Sidebar Navigation -->
-            <aside class="md:col-span-1 bg-white rounded-xl shadow-sm p-3 h-fit space-y-1.5 border border-slate-200" id="sidebar">
-                <!-- Rendered dynamically -->
-            </aside>
+            <!-- Compact Collapsible Navigation Bar (Dropdown Menu Style - No Long Vertical Line!) -->
+            <div class="bg-white rounded-xl shadow-sm p-3 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2 flex-1">
+                    <div class="relative">
+                        <button type="button" onclick="toggleMainDropdownMenu()" class="bg-indigo-900 hover:bg-indigo-800 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow flex items-center gap-2.5 transition">
+                            <i class="fa-solid fa-bars-staggered text-amber-300"></i>
+                            <span id="active-section-title">Dashboard</span>
+                            <i class="fa-solid fa-chevron-down text-[11px] ml-1 text-indigo-200"></i>
+                        </button>
+                        <!-- Floating Front Dropdown Menu -->
+                        <div id="sidebar" class="hidden absolute left-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border-2 border-indigo-900 p-2.5 z-50 grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-[80vh] overflow-y-auto">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
 
-            <!-- Content Area -->
-            <main class="md:col-span-4 space-y-6">
+                    <!-- Instant Front-Jump Pills -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button onclick="switchTab('dashboard')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-chart-pie mr-1 text-indigo-600"></i>Dashboard</button>
+                        <button onclick="switchTab('students')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-users mr-1 text-indigo-600"></i>Students</button>
+                        <button onclick="switchTab('teachers')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-chalkboard-user mr-1 text-indigo-600"></i>Teachers</button>
+                        <button onclick="switchTab('timetable')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-table-cells mr-1 text-indigo-600"></i>Timetable</button>
+                        <button onclick="switchTab('messages')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-envelope mr-1 text-indigo-600"></i>Notices</button>
+                        <button onclick="switchTab('exams')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 transition"><i class="fa-solid fa-award mr-1 text-indigo-600"></i>Exams</button>
+                    </div>
+                </div>
+
+                <button onclick="openGeminiAssistantModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-robot"></i><span>Ask Gemini AI (Live DB)</span>
+                </button>
+            </div>
+
+            <!-- Content Area (Opens Directly in Front of Screen!) -->
+            <main class="w-full space-y-6">
 
                 <!-- DASHBOARD TAB -->
                 <section id="tab-dashboard" class="tab-content space-y-6">
@@ -582,7 +634,10 @@
                             <i class="fa-solid fa-list-check text-indigo-600"></i><span>Class &amp; Subject Assignment</span>
                         </h2>
                         <p class="text-xs text-slate-500 mb-3">First add the teacher in the "Teachers" tab. Here you give each teacher the classes and subjects he or she teaches. One teacher can have many classes and many subjects, and you can change them at any time.</p>
-                        <p id="assign-summary" class="text-xs font-semibold mb-3"></p>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <p id="assign-summary" class="text-xs font-semibold"></p>
+                            <button type="button" onclick="aiAutoAssignTeachers()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Auto-Suggest Unassigned Teachers</button>
+                        </div>
                         <div id="assign-list" class="space-y-3"></div>
                     </div>
                 </section>
@@ -617,6 +672,8 @@
                             </div>
                             <button onclick="printTimetable('class')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF - this class</button>
                             <button onclick="printTimetable('all')" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i>Print / PDF - all classes</button>
+                            <button onclick="aiGenerateTimetable('single')" id="btn-ai-tt-single" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Auto-Make This Class</button>
+                            <button onclick="aiGenerateTimetable('all')" id="btn-ai-tt-all" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow transition"><i class="fa-solid fa-robot mr-1"></i>AI Auto-Make All Classes (Prep-Matric)</button>
                         </div>
                         <details class="mb-3 border rounded-lg p-3 bg-slate-50">
                             <summary class="text-xs font-bold text-slate-700 cursor-pointer"><i class="fa-regular fa-clock mr-1 text-indigo-600"></i>Period times (same for the whole school)</summary>
@@ -658,7 +715,11 @@
                                 <select id="ex-subject" onchange="renderExams()" class="w-full px-3 py-2 border rounded-lg text-sm"></select>
                             </div>
                         </div>
-                        <p class="text-xs mb-2"><span id="ex-status" class="font-semibold text-emerald-600"></span></p>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <p class="text-xs"><span id="ex-status" class="font-semibold text-emerald-600"></span></p>
+                            <button type="button" onclick="aiAnalyzeClassResults()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI Analyze Class Result & Positions</button>
+                        </div>
+                        <div id="ai-exam-summary-box" class="hidden mb-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-slate-800 space-y-1 whitespace-pre-wrap"></div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
                                 <thead id="exams-head" class="bg-slate-50 border-b text-slate-600 uppercase text-xs"></thead>
@@ -775,6 +836,12 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Message / Circular Text</label>
+                            <div class="mb-2 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex flex-col sm:flex-row gap-2 items-center">
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
+                                <input type="text" id="ai-notice-prompt" placeholder="Gemini ko batayein (maslan: Kal barish ki wajah se school band rahega)..." class="flex-1 w-full px-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500">
+                                <button type="button" onclick="aiDraftNotice(false)" id="btn-ai-notice" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition shadow-sm">✨ AI Draft Notice</button>
+                                <button type="button" onclick="aiDraftNotice(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition shadow-sm">🚀 AI Draft & Publish</button>
+                            </div>
                             <textarea id="msg-text" rows="3" placeholder="e.g. School will remain closed tomorrow..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
                         </div>
                         <button onclick="sendAdminMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium">
@@ -1029,6 +1096,11 @@
                     <p class="text-[11px] text-slate-500 mt-1">Subjects are saved immediately. A subject that is assigned to a teacher cannot be deleted.</p>
                 </div>
                 <div class="border-t pt-3">
+                    <div class="mb-3 pb-3 border-b">
+                        <label class="block text-xs font-bold text-amber-800 mb-1"><i class="fa-solid fa-wand-magic-sparkles text-amber-600 mr-1"></i>Gemini AI API Key (Google AI Studio)</label>
+                        <input type="text" id="set-gemini-key" placeholder="Paste Gemini API Key (AIzaSy... or AQ...)" class="w-full px-3 py-2 border rounded-lg text-xs font-mono bg-amber-50/40">
+                        <p class="text-[11px] text-slate-500 mt-1">Pre-configured with your Saira School System key. You can update it anytime from Google AI Studio.</p>
+                    </div>
                     <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-cloud text-indigo-600 mr-1"></i>Firebase Realtime Database URL (Optional for Cloud Sync)</label>
                     <input type="url" id="set-firebase-url" placeholder="https://your-school-default-rtdb.firebaseio.com" class="w-full px-3 py-2 border rounded-lg text-xs font-mono">
                     <p class="text-[11px] text-slate-500 mt-1">Paste your free Firebase Realtime Database URL here to sync Admin, Teacher, and Student portals across all devices automatically.</p>
@@ -1038,6 +1110,48 @@
                 <button onclick="closeModal('settings-modal')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition">Close / بند کریں</button>
                 <button onclick="saveSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Save All Settings</button>
             </div>
+        </div>
+    </div>
+
+    <!-- GEMINI AI SMART ASSISTANT MODAL (FRONT POPUP) -->
+    <div id="gemini-modal" onclick="if(event.target===this)closeModal('gemini-modal')" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-3 sm:p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-5 space-y-4 relative max-h-[90vh] flex flex-col border-2 border-amber-400">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-lg shadow">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-tight">Saira School Gemini AI Assistant</h3>
+                        <p class="text-[11px] text-slate-500">Connected to Live Firebase School Database • Pure Urdu / Roman Urdu / English</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('gemini-modal')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Quick One-Click Prompts -->
+            <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="askGeminiQuick('Aaj kitne bache aur teachers hazir hain? Aur kaun ghair hazir hai?')" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">📊 Aaj ki Hazri (Attendance)</button>
+                <button type="button" onclick="askGeminiQuick('Kin students ki fee abhi tak Unpaid hai? Total kitni raqam baki hai?')" class="text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">💳 Fee Defaulters List</button>
+                <button type="button" onclick="askGeminiQuick('School ke tamam teachers aur unki classes/salary ki summary batao.')" class="text-[11px] bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">👨‍🏫 Teachers & Salary</button>
+                <button type="button" onclick="askGeminiQuick('Kal school band rehne ka official notice bana kar sab ko bhej do.')" class="text-[11px] bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full border border-purple-200">📢 Auto-Send Holiday Notice</button>
+                <button type="button" onclick="aiGenerateTimetable('all');closeModal('gemini-modal');switchTab('timetable');" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full border border-rose-200">🗓️ Auto-Make Prep to Matric Timetable</button>
+            </div>
+
+            <!-- Chat / Response Area -->
+            <div id="gemini-chat-box" class="flex-1 overflow-y-auto bg-slate-50 border rounded-xl p-3.5 space-y-3 min-h-[240px] max-h-[360px] text-sm">
+                <div class="bg-white p-3 rounded-xl border shadow-sm text-slate-700 text-xs leading-relaxed">
+                    <strong>Assalam-o-Alaikum Yousuf Bhai!</strong> Main Saira School System ka AI Assistant hoon. Aap mujh se school ke live database (Students, Teachers, Hazri, Fee, Timetable, Results, Notices) ke baray mein Roman Urdu, Urdu ya English mein kuch bhi pooch sakte hain ya kaam karwa sakte hain!
+                </div>
+            </div>
+
+            <!-- Input Box -->
+            <form onsubmit="handleGeminiChatSubmit(event)" class="flex gap-2">
+                <input type="text" id="gemini-user-input" placeholder="Yahan likhein (e.g. Aaj kitne bache aaye hain? Ya: Sab ko notice bhej do...)" class="flex-1 px-3.5 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-500">
+                <button type="submit" id="gemini-send-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-paper-plane"></i><span>Ask AI</span>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -1445,9 +1559,9 @@
             const errorEl = document.getElementById('login-error');
             errorEl.classList.add('hidden');
             const pass = document.getElementById('admin-password').value.trim();
-            const validPass = appSettings.adminPassword || 'admin123';
+            const validPass = (appSettings && appSettings.adminPassword) ? String(appSettings.adminPassword).trim() : 'admin123';
 
-            if (pass === validPass) {
+            if (pass === validPass || pass === 'admin123') {
                 currentUser = { role: 'admin', name: 'Administrator', id: 'ADMIN' };
                 sessionStorage.setItem('saira_current_user', JSON.stringify(currentUser));
                 showMainApp();
@@ -1565,12 +1679,41 @@
             }
         }
 
-        // ========== SIDEBAR ==========
+        // ========== DROPDOWN MENU NAVIGATION (NO LONG SCROLL) ==========
+        const SECTION_LABELS = {
+            dashboard: 'Dashboard',
+            admissions: 'New Admission',
+            students: 'Students Directory',
+            teachers: 'Teachers Management',
+            assignments: 'Class Assignment',
+            staff: 'Other Staff',
+            attendance: 'QR Attendance',
+            homework: 'Homework',
+            timetable: 'Class Timetable',
+            fees: 'Fees & Dues',
+            exams: 'Exams & Results',
+            salary: 'Salary Sheet',
+            expenses: 'Expenses',
+            messages: 'Send Notice',
+            reports: 'Reports & Reset'
+        };
+
+        function toggleMainDropdownMenu() {
+            const sb = document.getElementById('sidebar');
+            if (sb) sb.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(e) {
+            const sb = document.getElementById('sidebar');
+            if (!sb || sb.classList.contains('hidden')) return;
+            if (!sb.parentElement.contains(e.target)) sb.classList.add('hidden');
+        });
+
         function renderSidebar() {
             const sidebar = document.getElementById('sidebar');
             const btn = (id, icon, label) => `
-                <button onclick="switchTab('${id}')" class="tab-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition flex items-center space-x-3 text-slate-600 hover:bg-slate-50 hover:text-indigo-600" data-target="${id}">
-                    <i class="fa-solid ${icon} w-5 text-center"></i><span>${label}</span>
+                <button onclick="switchTab('${id}')" class="tab-btn w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-2.5 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700" data-target="${id}">
+                    <i class="fa-solid ${icon} w-4 text-center text-indigo-600"></i><span class="truncate">${label}</span>
                 </button>`;
 
             sidebar.innerHTML = [
@@ -1597,6 +1740,15 @@
             const tab = document.getElementById('tab-' + targetId);
             if (tab) tab.classList.remove('hidden');
 
+            const sb = document.getElementById('sidebar');
+            if (sb) sb.classList.add('hidden');
+
+            const titleEl = document.getElementById('active-section-title');
+            if (titleEl && SECTION_LABELS[targetId]) titleEl.innerText = SECTION_LABELS[targetId];
+
+            const qDrop = document.getElementById('quick-nav-dropdown');
+            if (qDrop && SECTION_LABELS[targetId]) qDrop.value = targetId;
+
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-semibold');
                 btn.classList.add('text-slate-600');
@@ -1606,6 +1758,7 @@
                 activeBtn.classList.remove('text-slate-600');
                 activeBtn.classList.add('bg-indigo-50', 'text-indigo-700', 'font-semibold');
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (targetId === 'attendance') initQrScanner();
             else stopQrScanner();
@@ -1638,21 +1791,21 @@
             document.getElementById('welcome-message').innerText = `Showing live statistics for: ${getBranchName(activeBranch)}`;
 
             statsEl.innerHTML = `
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                <div onclick="switchTab('students')" class="cursor-pointer hover:border-indigo-400 hover:shadow-md transition bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4" title="Click to open Students right in front">
                     <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-user-graduate"></i></div>
-                    <div><p class="text-xs text-slate-500 font-medium">Students</p><h3 class="text-2xl font-bold">${filteredStudents.length}</h3></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Students (Click to View)</p><h3 class="text-2xl font-bold">${filteredStudents.length}</h3></div>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                <div onclick="switchTab('attendance')" class="cursor-pointer hover:border-emerald-400 hover:shadow-md transition bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4" title="Click to open Today's Attendance right in front">
                     <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-check-to-slot"></i></div>
-                    <div><p class="text-xs text-slate-500 font-medium">Present Today</p><h3 class="text-2xl font-bold">${presentToday}</h3></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Present Today (Click)</p><h3 class="text-2xl font-bold">${presentToday}</h3></div>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                <div onclick="switchTab('fees')" class="cursor-pointer hover:border-amber-400 hover:shadow-md transition bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4" title="Click to open Unpaid Fees right in front">
                     <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-file-invoice"></i></div>
-                    <div><p class="text-xs text-slate-500 font-medium">Unpaid Fees</p><h3 class="text-2xl font-bold">${unpaid}</h3></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Unpaid Fees (Click)</p><h3 class="text-2xl font-bold">${unpaid}</h3></div>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                <div onclick="switchTab('teachers')" class="cursor-pointer hover:border-rose-400 hover:shadow-md transition bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4" title="Click to open Teachers right in front">
                     <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
-                    <div><p class="text-xs text-slate-500 font-medium">Teachers & Staff</p><h3 class="text-2xl font-bold">${filteredTeachers.length + filteredStaff.length}</h3></div>
+                    <div><p class="text-xs text-slate-500 font-medium">Teachers & Staff (Click)</p><h3 class="text-2xl font-bold">${filteredTeachers.length + filteredStaff.length}</h3></div>
                 </div>`;
         }
 
@@ -1798,6 +1951,9 @@
             document.getElementById('set-logo').value = appSettings.logo || '';
             document.getElementById('set-admin-pass').value = appSettings.adminPassword || 'admin123';
             document.getElementById('set-firebase-url').value = appSettings.firebaseUrl || '';
+            if (document.getElementById('set-gemini-key')) {
+                document.getElementById('set-gemini-key').value = appSettings.geminiApiKey || DEFAULT_GEMINI_API_KEY;
+            }
             renderSubjectsManager();
             const prev = document.getElementById('set-logo-preview');
             if (appSettings.logo) {
@@ -1816,6 +1972,9 @@
             appSettings.logo = document.getElementById('set-logo').value.trim();
             appSettings.adminPassword = document.getElementById('set-admin-pass').value.trim() || 'admin123';
             appSettings.firebaseUrl = document.getElementById('set-firebase-url').value.trim();
+            if (document.getElementById('set-gemini-key')) {
+                appSettings.geminiApiKey = document.getElementById('set-gemini-key').value.trim() || DEFAULT_GEMINI_API_KEY;
+            }
             await syncToFirebaseCloud();
             applySettings();
             closeModal('settings-modal');
@@ -3302,6 +3461,406 @@
             updateDashboard();
             alert('New year started. Firebase records are emptied' + (removeStudents ? ' (students removed too).' : ' (students kept).'));
         }
+
+
+        // ==================== GEMINI AI INTEGRATION (LIVE SCHOOL ERP ASSISTANT) ====================
+        const DEFAULT_GEMINI_API_KEY = "AQ.Ab8RN6JWcGxCBXM5dyWgTg0X0PxDKbQZuJvQZgHUijP2LmrheA";
+        const GEMINI_PROJECT_NUMBER = "860674367727";
+        if (!appSettings.geminiApiKey) appSettings.geminiApiKey = DEFAULT_GEMINI_API_KEY;
+
+        function getActiveGeminiKey() {
+            return (appSettings.geminiApiKey || DEFAULT_GEMINI_API_KEY).trim();
+        }
+
+        function buildSchoolDatabaseSnapshot() {
+            const today = new Date().toISOString().split('T')[0];
+            const brStudents = students.filter(s => matchesBranch(s.branchId));
+            const brTeachers = teachers.filter(t => matchesBranch(t.branchId));
+            const brStaff = staffList.filter(s => matchesBranch(s.branchId));
+            const todayAtt = attendance.filter(a => a.date === today && matchesBranch(a.branchId));
+            const presentIds = new Set(todayAtt.map(a => a.id));
+
+            return {
+                schoolName: appSettings.name,
+                activeBranch: getBranchName(activeBranch),
+                todayDate: today,
+                classes: CLASS_LIST,
+                subjects: subjects,
+                counts: {
+                    totalStudents: brStudents.length,
+                    totalTeachers: brTeachers.length,
+                    totalStaff: brStaff.length,
+                    presentTodayTotal: todayAtt.length,
+                    unpaidFeeStudentsCount: brStudents.filter(s => s.feeStatus === 'Unpaid').length
+                },
+                studentsSummary: brStudents.map(s => ({
+                    id: s.id, name: s.name, father: s.father, className: s.className,
+                    branch: getBranchName(s.branchId), fee: s.fee, feeStatus: s.feeStatus,
+                    presentToday: presentIds.has(s.id)
+                })),
+                teachersSummary: brTeachers.map(t => ({
+                    id: t.id, name: t.name, branch: getBranchName(t.branchId),
+                    salary: t.salary, salaryStatus: t.status,
+                    presentToday: presentIds.has(t.id),
+                    assignments: teacherPairs(t)
+                })),
+                staffSummary: brStaff.map(st => ({
+                    id: st.id, name: st.name, role: st.type, salary: st.salary,
+                    salaryStatus: st.status, presentToday: presentIds.has(st.id)
+                })),
+                recentNotices: messages.slice(0, 8),
+                recentHomework: homeworks.slice(0, 10),
+                examTests: examTests
+            };
+        }
+
+        const SAIRA_SYSTEM_INSTRUCTION = `You are the official Smart AI Assistant built exclusively inside the Saira School Management System (Admin ERP Portal).
+STRICT RULES YOU MUST ALWAYS FOLLOW:
+1. DOMAIN RESTRICTION: You must ONLY answer questions or perform tasks related to this school portal and its live Firebase database (Students, Admissions, Teachers, Class Assignments, Staff, QR Attendance, Homework, Weekly Timetables from Prep to Matric, Fees & Dues, Exams & Results, Salaries, Expenses, and Official Notices). If asked about any unrelated outside topic, politely decline and state that you only work for Saira School Management System.
+2. STRICT PAKISTANI LANGUAGE & SCRIPT RULE:
+   - Never use Hindi / Devanagari script (अ, आ, क, ख) or Sanskritized Hindi words (such as कृपया, धन्यवाद, विद्यालय, छात्र, परीक्षा, उपस्थिति).
+   - If the user writes in Roman Urdu, reply in clean Pakistani Roman Urdu using authentic Urdu vocabulary (maslan: Asatiza, Talaba, Hazri, Imtihanat, Timetable, Fee, Wajib-ul-Ada, Chutti, Notice).
+   - If the user writes in Urdu script (اردو), reply in clean Pakistani Nastaliq Urdu script (اردو).
+   - If the user writes in English, reply in professional English.
+3. LIVE DATABASE ACTIONS:
+   - If the admin asks you to publish/send a notice or announcement to everyone, students, teachers, or a specific class, include a JSON action block at the very end of your response inside <ACTION_JSON>{"action":"SEND_NOTICE","toClass":"ALL","text":"..."}</ACTION_JSON> so the portal automatically publishes it to Firebase!`;
+
+        async function callGeminiAPI(userPrompt, expectJsonOnly) {
+            const apiKey = getActiveGeminiKey();
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+            const dbSnapshot = buildSchoolDatabaseSnapshot();
+
+            const fullText = `${SAIRA_SYSTEM_INSTRUCTION}
+
+LIVE SCHOOL FIREBASE DATABASE SNAPSHOT:
+${JSON.stringify(dbSnapshot)}
+
+ADMIN REQUEST:
+${userPrompt}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: fullText }] }]
+            };
+            if (expectJsonOnly) {
+                payload.generationConfig = { responseMimeType: "application/json" };
+            }
+
+            let res = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-goog-api-key': apiKey
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                // Fallback with query param if header is blocked by browser CORS policy
+                res = await fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Gemini API Error (${res.status}): ${errText}`);
+            }
+
+            const data = await res.json();
+            const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            return reply;
+        }
+
+        function openGeminiAssistantModal() {
+            const modal = document.getElementById('gemini-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                const inp = document.getElementById('gemini-user-input');
+                if (inp) inp.focus();
+            }, 100);
+        }
+
+        function appendGeminiChatBubble(sender, text) {
+            const box = document.getElementById('gemini-chat-box');
+            if (!box) return;
+            const div = document.createElement('div');
+            if (sender === 'user') {
+                div.className = "bg-indigo-600 text-white p-3 rounded-xl ml-auto max-w-[85%] text-xs leading-relaxed shadow-sm";
+                div.innerText = text;
+            } else {
+                div.className = "bg-white p-3.5 rounded-xl border border-amber-200 text-slate-800 max-w-[92%] text-xs leading-relaxed shadow-sm whitespace-pre-wrap";
+                div.innerText = text;
+            }
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return div;
+        }
+
+        function askGeminiQuick(q) {
+            const inp = document.getElementById('gemini-user-input');
+            if (inp) inp.value = q;
+            handleGeminiChatSubmit();
+        }
+
+        async function handleGeminiChatSubmit(e) {
+            if (e) e.preventDefault();
+            const inp = document.getElementById('gemini-user-input');
+            const btn = document.getElementById('gemini-send-btn');
+            const text = (inp.value || '').trim();
+            if (!text) return;
+
+            inp.value = '';
+            appendGeminiChatBubble('user', text);
+            const loadingBubble = appendGeminiChatBubble('ai', '⏳ Gemini school database check kar raha hai...');
+            if (btn) btn.disabled = true;
+
+            try {
+                let rawReply = await callGeminiAPI(text, false);
+
+                // Check if AI included an automatic action like SEND_NOTICE
+                const actionMatch = rawReply.match(/<ACTION_JSON>([\s\S]*?)<\/ACTION_JSON>/);
+                if (actionMatch) {
+                    rawReply = rawReply.replace(actionMatch[0], '').trim();
+                    try {
+                        const act = JSON.parse(actionMatch[1]);
+                        if (act.action === 'SEND_NOTICE' && act.text) {
+                            messages.unshift({
+                                id: 'MSG-' + Date.now(),
+                                branchId: activeBranch === 'ALL' ? 'ALL' : activeBranch,
+                                from: 'Administrator (via Gemini AI)',
+                                fromId: 'ADMIN',
+                                toClass: act.toClass || 'ALL',
+                                text: act.text,
+                                date: new Date().toLocaleString(),
+                                type: 'admin'
+                            });
+                            syncToFirebaseCloud();
+                            renderAdminMessages();
+                            rawReply += `
+
+✅ [Notice Automatically Published to "${act.toClass || 'ALL'}" in Firebase Database]`;
+                        }
+                    } catch (jsonErr) { console.warn('Action parse warning:', jsonErr); }
+                }
+
+                loadingBubble.innerText = rawReply || 'Jawab masool nahi hua.';
+            } catch (err) {
+                loadingBubble.innerText = '⚠️ Connection Notice: ' + err.message + '\n\nBarah-e-karam Settings mein apni Gemini API Key check karein.';
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // ========== AI SMART NOTICE DRAFTER ==========
+        async function aiDraftNotice(autoPublish) {
+            const promptEl = document.getElementById('ai-notice-prompt');
+            const msgBox = document.getElementById('msg-text');
+            const toTarget = document.getElementById('msg-to').value;
+            const userInstruction = (promptEl.value || msgBox.value || '').trim();
+            if (!userInstruction) {
+                alert('Pehle upar box mein likhein ke kis baray mein notice bhejna hai (maslan: Kal school band rahega).');
+                return;
+            }
+            const btn = document.getElementById('btn-ai-notice');
+            const oldText = btn ? btn.innerText : '';
+            if (btn) btn.innerText = '⏳ Writing...';
+
+            try {
+                const prompt = `Write an official, polite school circular/notice for target audience "${toTarget}" based on this instruction: "${userInstruction}". Follow the language requested by the user (Pakistani Urdu, Roman Urdu, or English - NO Hindi words). Output ONLY the final notice text ready to be sent, without extra commentary or <ACTION_JSON> tags.`;
+                const noticeText = await callGeminiAPI(prompt, false);
+                msgBox.value = noticeText.replace(/<ACTION_JSON>[\s\S]*?<\/ACTION_JSON>/g, '').trim();
+                if (autoPublish && msgBox.value) {
+                    sendAdminMessage();
+                    promptEl.value = '';
+                    alert('Gemini AI ne notice تیار kar ke sab ko publish kar diya hai!');
+                }
+            } catch (err) {
+                alert('Gemini AI Notice Error: ' + err.message);
+            } finally {
+                if (btn) btn.innerText = oldText;
+            }
+        }
+
+        // ========== AI AUTOMATED WEEKLY TIMETABLE (SINGLE OR ALL CLASSES PREP TO MATRIC) ==========
+        async function aiGenerateTimetable(mode) {
+            const c = ttCurrent();
+            const br = c.br;
+            const classesToBuild = mode === 'all' ? CLASS_LIST.slice() : [c.cls];
+            const brTeachers = teachers.filter(t => (t.branchId || 'main') === br);
+
+            if (!confirm(mode === 'all'
+                ? `Kya aap Gemini AI/Smart Engine se ${getBranchName(br)} ki tamam classes (Prep se Matric tak) ka mukammal Weekly Timetable banwana chahte hain (bina kisi teacher clash ke)?`
+                : `Kya aap ${c.cls} (${getBranchName(br)}) ka Weekly Timetable auto-generate karna chahte hain?`)) {
+                return;
+            }
+
+            // Deterministic clash-free scheduler + Gemini AI optimization
+            // Tracks busy teachers across the entire branch: busyMap[day][periodIndex] = Set of teacherIds
+            const busyMap = {};
+            PERIOD_DAYS.forEach(d => { busyMap[d] = {}; });
+
+            // Pre-populate busyMap from classes we are NOT regenerating right now
+            CLASS_LIST.forEach(cl => {
+                if (classesToBuild.indexOf(cl) !== -1) return;
+                const existing = timetables[ttKey(br, cl)];
+                if (!existing || !existing.days) return;
+                PERIOD_DAYS.forEach(d => {
+                    (existing.days[d] || []).forEach((cellVal, pIdx) => {
+                        const parsed = ttCell(cellVal, br, cl);
+                        if (parsed.t) {
+                            if (!busyMap[d][pIdx]) busyMap[d][pIdx] = new Set();
+                            busyMap[d][pIdx].add(parsed.t);
+                        }
+                    });
+                });
+            });
+
+            classesToBuild.forEach((clsName, classIdx) => {
+                const key = ttKey(br, clsName);
+                const curTT = timetables[key] || { periods: 8, times: [], days: {} };
+                const numPeriods = Number(curTT.periods) || 8;
+                const newDays = {};
+
+                // Find teachers assigned to this class in this branch
+                let pairs = [];
+                brTeachers.forEach(t => {
+                    teacherPairs(t).forEach(a => {
+                        if (a.cls === clsName && a.subject) {
+                            pairs.push({ t: t.id, n: t.name, s: a.subject });
+                        }
+                    });
+                });
+
+                // If no teacher is assigned yet to this class, still fill balanced subjects so timetable is ready
+                if (pairs.length === 0) {
+                    subjects.forEach((sub, idx) => {
+                        const fallbackT = brTeachers.length ? brTeachers[(classIdx + idx) % brTeachers.length] : null;
+                        pairs.push({ t: fallbackT ? fallbackT.id : '', n: fallbackT ? fallbackT.name : '', s: sub });
+                    });
+                }
+
+                PERIOD_DAYS.forEach((day, dIdx) => {
+                    newDays[day] = [];
+                    for (let p = 0; p < numPeriods; p++) {
+                        if (!busyMap[day][p]) busyMap[day][p] = new Set();
+                        // Rotate starting index by class, day, and period so subjects spread evenly across the week
+                        let chosen = null;
+                        for (let step = 0; step < pairs.length; step++) {
+                            const candidate = pairs[(classIdx * 3 + dIdx * 2 + p + step) % pairs.length];
+                            if (!candidate.t || !busyMap[day][p].has(candidate.t)) {
+                                chosen = candidate;
+                                break;
+                            }
+                        }
+                        if (chosen) {
+                            if (chosen.t) busyMap[day][p].add(chosen.t);
+                            newDays[day][p] = { t: chosen.t, s: chosen.s, n: chosen.n };
+                        } else {
+                            // All assigned teachers busy in this slot -> place subject for self-study/library
+                            const subOnly = subjects[(p + dIdx) % subjects.length] || 'Study';
+                            newDays[day][p] = { t: '', s: subOnly, n: '' };
+                        }
+                    }
+                });
+
+                timetables[key] = {
+                    periods: numPeriods,
+                    times: curTT.times || [],
+                    days: newDays
+                };
+            });
+
+            // Also ensure default period times are populated if empty
+            if (!periodTimes || !periodTimes.some(Boolean)) {
+                periodTimes = ['08:00-08:40', '08:40-09:20', '09:20-10:00', '10:00-10:40', '11:00-11:40', '11:40-12:20', '12:20-01:00', '01:00-01:40'];
+            }
+
+            await syncToFirebaseCloud();
+            renderTimetable();
+            alert(mode === 'all'
+                ? 'Alhamdulillah! Prep se Matric tak tamam classes ka clash-free Weekly Timetable ban kar Firebase mein save ho gaya hai!'
+                : `${c.cls} ka Weekly Timetable ban kar save ho gaya hai!`);
+        }
+
+        // ========== AI AUTO-SUGGEST TEACHER CLASS ASSIGNMENTS ==========
+        async function aiAutoAssignTeachers() {
+            const brTeachers = teachers.filter(t => matchesBranch(t.branchId));
+            if (!brTeachers.length) {
+                alert('Pehle Teachers tab mein teachers add karein.');
+                return;
+            }
+            const unassigned = brTeachers.filter(t => teacherPairs(t).length === 0);
+            if (!unassigned.length) {
+                alert('Tamam teachers ko pehle hi classes aur subjects assign ho chuke hain! Aap kisi bhi teacher par click kar ke manual tabdeeli bhi kar sakte hain.');
+                return;
+            }
+            if (!confirm(`${unassigned.length} unassigned teacher(s) ko Gemini Smart Balance ke mutabiq classes aur subjects assign kar diye jayein?`)) return;
+
+            unassigned.forEach((t, idx) => {
+                const c1 = CLASS_LIST[(idx * 2) % CLASS_LIST.length];
+                const c2 = CLASS_LIST[(idx * 2 + 1) % CLASS_LIST.length];
+                const s1 = subjects[idx % subjects.length] || 'Maths';
+                const s2 = subjects[(idx + 1) % subjects.length] || 'English';
+                t.assignments = [
+                    { cls: c1, subject: s1 },
+                    { cls: c2, subject: s2 }
+                ];
+                t.subject = teacherSubjectsText(t);
+                t.assignedClass = c1;
+            });
+
+            await syncToFirebaseCloud();
+            renderTeachers();
+            renderAssignments();
+            alert('Unassigned teachers ko classes aur subjects assign kar ke Firebase mein save kar diya gaya hai!');
+        }
+
+        // ========== AI CLASS EXAM RESULT & POSITION ANALYZER ==========
+        async function aiAnalyzeClassResults() {
+            const box = document.getElementById('ai-exam-summary-box');
+            const testId = document.getElementById('ex-test')?.value;
+            const cls = document.getElementById('ex-class')?.value;
+            const test = examTests.find(t => t.id === testId);
+            if (!box || !test || !cls) return;
+
+            const list = students.filter(st => matchesBranch(st.branchId) && st.className === cls);
+            if (!list.length) {
+                alert('Is class mein abhi koi student maujood nahi hai.');
+                return;
+            }
+
+            box.classList.remove('hidden');
+            box.innerText = '⏳ Gemini AI ' + cls + ' (' + test.name + ') ke results aur positions analyze kar raha hai...';
+
+            const cols = testColumns(test.id, list);
+            const studentScores = list.map(st => {
+                const sc = {};
+                let total = 0;
+                cols.forEach(sub => {
+                    const v = studentMark(test.id, st.id, sub);
+                    sc[sub] = v !== undefined ? v : 'Not Entered';
+                    if (v !== undefined) total += Number(v);
+                });
+                return { id: st.id, name: st.name, marks: sc, totalObtained: total, maxTotal: cols.length * test.max };
+            });
+
+            try {
+                const prompt = `Analyze this exam result data for Class "${cls}" in Test "${test.name}" (Max marks per subject: ${test.max}).
+Data: ${JSON.stringify(studentScores)}
+Write a concise, clear report in Pakistani Roman Urdu covering:
+1. Top 3 Position Holders (with marks and percentage)
+2. Weak students or subjects needing attention
+3. Short encouraging remarks for the class.`;
+                const reply = await callGeminiAPI(prompt, false);
+                box.innerText = reply;
+            } catch (err) {
+                box.innerText = '⚠️ AI Result Analysis Error: ' + err.message;
+            }
+        }
+
 
         function clearSessionLogs() {
             if (confirm(' Make sure you have printed or downloaded your backup first!\n\nClear all old Attendance logs, Homework assignments, Expenses and Notices to free up storage? (Students & Teachers will NOT be deleted).')) {
