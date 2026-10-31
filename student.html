@@ -253,6 +253,54 @@ function logout() {
     $('login-pin').value = '';
 }
 
+
+// ===================== NEW-NOTICE / HOMEWORK-DONE TRACKING (stored on this phone) =====================
+function lsGet(k, fb) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? fb : v; } catch (e) { return fb; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage full or blocked */ } }
+function seenKey() { return 'saira_seen_msgs_' + (S && S.stu ? S.stu.id : ''); }
+function hwDoneKey() { return 'saira_hw_done_' + (S && S.stu ? S.stu.id : ''); }
+function hwSeenKey() { return 'saira_hw_seen_' + (S && S.stu ? S.stu.id : ''); }
+function newNoticeCount() {
+    const seen = lsGet(seenKey(), []);
+    return S.messages.filter(function(m) { return seen.indexOf(m.id) < 0; }).length;
+}
+function pendingHomework() {
+    const today = isoToday(), done = lsGet(hwDoneKey(), {});
+    return S.homework.filter(function(h) { return String(h.dueDate) >= today && !done[h.id]; });
+}
+function newHomeworkCount() {
+    const seen = lsGet(hwSeenKey(), []);
+    return pendingHomework().filter(function(h) { return seen.indexOf(h.id) < 0; }).length;
+}
+function markNoticesSeen() { lsSet(seenKey(), S.messages.map(function(m) { return m.id; })); }
+function markHomeworkSeen() { lsSet(hwSeenKey(), S.homework.map(function(h) { return h.id; })); }
+function toggleHwDone(id) {
+    const done = lsGet(hwDoneKey(), {});
+    if (done[id]) delete done[id]; else done[id] = true;
+    lsSet(hwDoneKey(), done);
+    renderHomework();
+    updateNavDots();
+}
+function updateNavDots() {
+    if (!S) return;
+    const set = function(tab, n) {
+        const b = document.querySelector('.nav-btn[data-tab="' + tab + '"]');
+        if (!b) return;
+        let d = b.querySelector('.nav-dot');
+        if (!n) { if (d) d.remove(); return; }
+        if (!d) {
+            d = document.createElement('span');
+            d.className = 'nav-dot';
+            d.style.cssText = 'position:absolute;top:4px;right:22%;min-width:16px;height:16px;padding:0 4px;border-radius:9999px;background:#e11d48;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
+            b.style.position = 'relative';
+            b.appendChild(d);
+        }
+        d.innerText = n > 9 ? '9+' : n;
+    };
+    set('messages', newNoticeCount());
+    set('homework', newHomeworkCount());
+}
+
 // ===================== TABS =====================
 function showTab(name) {
     S.tab = name;
@@ -260,6 +308,9 @@ function showTab(name) {
     $('tab-' + name).classList.remove('hidden');
     document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
     ({ home: renderHome, timetable: renderTimetable, homework: renderHomework, attendance: renderAttendance, results: renderResults, messages: renderMessages })[name]();
+    if (name === 'messages') markNoticesSeen();
+    if (name === 'homework') markHomeworkSeen();
+    updateNavDots();
     window.scrollTo(0, 0);
 }
 
@@ -296,7 +347,8 @@ function todayDay() {
 function renderHome() {
     const s = S.stu, today = isoToday();
     const todayCells = dayCells(todayDay()).filter(function(c) { return c.cell.s; });
-    const pending = S.homework.filter(function(h) { return String(h.dueDate) >= today; }).length;
+    const pending = pendingHomework().length;
+    const newN = newNoticeCount();
     const unpaid = s.feeStatus === 'Unpaid';
     let h = card('<div class="flex items-center gap-4"><img src="' + esc(s.photo || DEFAULT_AVATAR) + '" class="w-20 h-20 rounded-xl object-cover border-2 border-indigo-100">' +
         '<div class="min-w-0"><p class="text-lg font-bold text-slate-800 truncate">' + esc(s.name) + '</p>' +
@@ -309,7 +361,7 @@ function renderHome() {
         '<span class="px-3 py-1.5 rounded-full text-xs font-bold ' + (unpaid ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700') + '">' + (unpaid ? 'UNPAID' : 'PAID') + '</span></div>');
     h += '<div class="grid grid-cols-2 gap-3">' +
         '<button onclick="showTab(\'homework\')" class="text-left">' + card('<p class="text-xs text-slate-400">Homework to do</p><p class="text-2xl font-bold text-indigo-700">' + pending + '</p>') + '</button>' +
-        '<button onclick="showTab(\'messages\')" class="text-left">' + card('<p class="text-xs text-slate-400">Notices</p><p class="text-2xl font-bold text-indigo-700">' + S.messages.length + '</p>') + '</button></div>';
+        '<button onclick="showTab(\'messages\')" class="text-left">' + card('<p class="text-xs text-slate-400">Notices</p><p class="text-2xl font-bold text-indigo-700">' + S.messages.length + '</p>' + (newN ? '<p class="text-[11px] font-bold text-rose-600 mt-0.5">' + newN + ' new</p>' : '<p class="text-[11px] text-slate-400 mt-0.5">All read</p>')) + '</button></div>';
     h += card(heading("Today's Periods", 'آج کا ٹائم ٹیبل') + '<div class="mt-2 space-y-1.5">' + (todayCells.length ? todayCells.map(function(c) {
         return '<div class="flex items-center gap-3 text-sm"><span class="w-16 text-[11px] text-slate-400">P' + (c.i + 1) + (c.time ? '<br>' + esc(c.time) : '') + '</span><span class="font-semibold">' + esc(c.cell.s) + '</span><span class="text-xs text-slate-500">' + esc(c.cell.n) + '</span></div>';
     }).join('') : '<p class="text-sm text-slate-400">No periods found for today.</p>') + '</div>');
@@ -334,18 +386,26 @@ function renderTimetable() {
 // ---------- Homework ----------
 function renderHomework() {
     const today = isoToday();
+    const doneMap = lsGet(hwDoneKey(), {});
+    const seenHw = lsGet(hwSeenKey(), []);
     const list = S.homework.slice().sort(function(a, b) { return String(b.dueDate).localeCompare(String(a.dueDate)); });
-    const pending = list.filter(function(h) { return String(h.dueDate) >= today; }).reverse();
+    const pending = list.filter(function(h) { return String(h.dueDate) >= today && !doneMap[h.id]; }).reverse();
+    const finished = list.filter(function(h) { return String(h.dueDate) >= today && doneMap[h.id]; });
     const old = list.filter(function(h) { return String(h.dueDate) < today; });
     const one = function(h, late) {
+        const isDone = !!doneMap[h.id];
+        const isNew = !late && !isDone && seenHw.indexOf(h.id) < 0;
         const due = String(h.dueDate) === today ? 'Due today' : (late ? 'Past due ' + esc(h.dueDate) : 'Due ' + esc(h.dueDate));
-        return card('<div class="flex items-center justify-between gap-2"><span class="font-bold text-slate-800">' + esc(h.subject) + '</span>' +
-            '<span class="text-[11px] font-semibold px-2 py-0.5 rounded ' + (late ? 'bg-slate-100 text-slate-500' : 'bg-amber-100 text-amber-700') + '">' + due + '</span></div>' +
+        return card('<div class="flex items-center justify-between gap-2"><span class="font-bold text-slate-800">' + esc(h.subject) +
+            (isNew ? ' <span class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white">NEW</span>' : '') + '</span>' +
+            '<span class="text-[11px] font-semibold px-2 py-0.5 rounded ' + (isDone ? 'bg-emerald-100 text-emerald-700' : (late ? 'bg-slate-100 text-slate-500' : 'bg-amber-100 text-amber-700')) + '">' + (isDone ? 'Done ✓' : due) + '</span></div>' +
             '<p class="text-sm text-slate-700 mt-1.5 whitespace-pre-line">' + esc(h.description) + '</p>' +
-            '<p class="text-[11px] text-slate-400 mt-2">Given by ' + esc(h.assignedBy) + '</p>');
+            '<div class="flex items-center justify-between mt-2"><p class="text-[11px] text-slate-400">Given by ' + esc(h.assignedBy) + '</p>' +
+            (late ? '' : '<button onclick="toggleHwDone(\'' + esc(h.id) + '\')" class="text-xs font-bold px-3 py-1.5 rounded-lg ' + (isDone ? 'bg-slate-100 text-slate-600' : 'bg-emerald-600 text-white') + '">' + (isDone ? 'Undo' : '✓ Mark as Done') + '</button>') + '</div>');
     };
     $('tab-homework').innerHTML = heading('Homework', 'ہوم ورک') +
         (pending.length ? pending.map(function(h) { return one(h, false); }).join('') : card('<p class="text-sm text-slate-400 text-center">No homework to do. 🎉</p>')) +
+        (finished.length ? '<p class="text-xs font-semibold text-slate-400 pt-2">Done</p>' + finished.map(function(h) { return one(h, false); }).join('') : '') +
         (old.length ? '<p class="text-xs font-semibold text-slate-400 pt-2">Earlier homework</p>' + old.slice(0, 15).map(function(h) { return one(h, true); }).join('') : '');
 }
 
@@ -410,7 +470,8 @@ function renderMessages() {
     $('tab-messages').innerHTML = heading('Notices & Messages', 'نوٹس اور پیغامات') +
         (S.messages.length ? S.messages.map(function(m) {
             const fromTeacher = m.type === 'teacher';
-            return card('<div class="flex items-center justify-between gap-2 mb-1"><span class="text-[11px] font-bold px-2 py-0.5 rounded ' + (fromTeacher ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700') + '">' + (fromTeacher ? 'Teacher' : 'School') + '</span>' +
+            const isNewMsg = lsGet(seenKey(), []).indexOf(m.id) < 0;
+            return card('<div class="flex items-center justify-between gap-2 mb-1"><span class="text-[11px] font-bold px-2 py-0.5 rounded ' + (fromTeacher ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700') + '">' + (fromTeacher ? 'Teacher' : 'School') + '</span>' + (isNewMsg ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white">NEW</span>' : '') +
                 '<span class="text-[11px] text-slate-400">' + esc(m.date) + '</span></div>' +
                 '<p class="text-sm text-slate-800 whitespace-pre-line">' + esc(m.text) + '</p><p class="text-[11px] text-slate-400 mt-2">From ' + esc(m.from || 'Administrator') + '</p>');
         }).join('') : card('<p class="text-sm text-slate-400 text-center">No notices.</p>'));
@@ -432,4 +493,3 @@ window.onload = async function() {
 </script>
 </body>
 </html>
-
